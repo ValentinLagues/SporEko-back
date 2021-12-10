@@ -7,6 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
+    "dev": "nodemon index.js",
     "start": "node index.js",
     "lint": "eslint \"./**/*.js\" --fix .",
     "prettify": "prettier --write ."

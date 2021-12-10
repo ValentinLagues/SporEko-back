@@ -1,15 +1,39 @@
+const cors = require('cors');
 const express = require('express');
+const connection = require('./db-config');
 
 const app = express();
+// utilise le package cors pour autoriser les appels extérieurs
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
-app.get('/characters', async (req, res) => {
-  res.status(404).send('Route not found! ');
+const port = process.env.PORT || 8000;
+
+connection.connect((err) => {
+  if (err) {
+    console.error(`error connecting: ${err.stack}`);
+  } else {
+    console.log(
+      `connected to database with threadId :  ${connection.threadId}`
+    );
+  }
 });
 
-app.use('/', (req, res) => {
-  res.status(404).send('Route not found! ');
+app.get('/', (req, res) => {
+  const sqlQuery = 'SELECT * FROM brands';
+  connection.query(sqlQuery, (err, result) => {
+    if (err) {
+      res.status(500).send('Error retrieving data from database');
+    } else {
+      res.status(200).json(result);
+    }
+  });
 });
 
-app.listen(5050, () => {
-  console.log('Terra Battle API now available on http://localhost:5050 !');
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}, 
+  http://localhost:${port}/`);
 });
