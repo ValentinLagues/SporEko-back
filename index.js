@@ -1,15 +1,13 @@
 const express = require('express');
+const { setupRoutes } = require('./routes');
 
 const app = express();
+app.use(express.json());
 
-app.get('/characters', async (req, res) => {
-  res.status(404).send('Route not found! ');
-});
+const port = process.env.PORT || 8000;
 
-app.use('/', (req, res) => {
-  res.status(404).send('Route not found! ');
-});
+setupRoutes(app);
 
-app.listen(5050, () => {
-  console.log('Terra Battle API now available on http://localhost:5050 !');
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
