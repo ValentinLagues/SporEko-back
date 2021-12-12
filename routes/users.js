@@ -11,8 +11,9 @@ const User = require('../models/user');
 
 
 //GET '/' pour récup tous les users (plus tard y'aura tous les filtres en plus ^^)
+// y'a que '/' parce que le début est initialisé par HOST et PORT dans .env et usersRouter dans routes/index mais au final, l'url de requête nécessaire pour faire un get est : https://localhost:8000/users/
 usersRouter.get('/', (req, res) => {
-  User.findMany()
+  User.findMany() // .findMany est une fonction crée dans models/user. on pourrait l'appeler fonctionQuiRécupèreTousLesUsers mais c'est un peu long ...
     .then((results) => {
       res.json(results);
     })
@@ -23,6 +24,7 @@ usersRouter.get('/', (req, res) => {
 });
 
 //GET '/:id' pour récup un seul user par son id (est-ce qu'il faudra créer des routes get/:lastname, get/:firstname email etc? je sais pas)
+// postman : https://localhost:8000/users/1
 usersRouter.get('/:id', (req, res) => { 
   User.findOne(req.params.id)
     .then((user) => {
@@ -36,6 +38,7 @@ usersRouter.get('/:id', (req, res) => {
 });
 
 //POST pour créer un nouveau user
+// postman : https://localhost:8000/users/
 usersRouter.post("/", (req, res) => {
   //vérif infos ok -> joi / + pas de double? cf client (qu'est-ce qui doit être unique? bref plein de trucs à rajouter... puis)
   User.create(req.body)
@@ -48,6 +51,7 @@ usersRouter.post("/", (req, res) => {
 });
 
 // PUT '/:id' pour modifier un user existant en le retrouvant par son id (même question que pour get /:id)
+// postman : https://localhost:8000/users/1
 usersRouter.put("/:id", (req, res) => {
   // d'abords, on récup l'id depuis req.params.id pour aller chercher le user correspondant dans la bdd avec la fonction findOne qui est dans models/user
   User.findOne(req.params.id)
@@ -76,6 +80,7 @@ usersRouter.put("/:id", (req, res) => {
 });
 
 //DELETE '/:id' pour supprimer un user en le trouvant par son id
+// postman : https://localhost:8000/users/1
 usersRouter.delete("/:id", (req, res) => {
   //le delete depuis le compte utilisateur sera un changement de statut -> archivé
   //pas de route delete sauf dans admin?

@@ -1,10 +1,11 @@
+// à chaque nouvelle fonction crée, ne pas oublier de l'exporter en bas
 const connection = require('../db-config');
 
 const db = connection.promise();
 
-const findMany = () => {
+const findMany = () => { // penser à export
   let sql = 'SELECT * FROM users';
-  const sqlValues = [];
+  const sqlValues = []; 
 
   return db.query(sql, sqlValues).then(([results]) => results);
 };
@@ -17,6 +18,7 @@ const findOne = (id) => {
 
 const create = (newUser) => {
   // faudra déstructurer, ne pas retourner le mdp etc
+  // cette fonction va pas mal changer :p
 	return db
 		.query(
 			"INSERT INTO users SET ?",
