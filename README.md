@@ -1,8 +1,8 @@
 
-# git clone, npm install
-# (tuto express git checkout firstLocalConfig)
+# git clone, git checkout dev, npm install
+# (ou tuto express git checkout firstLocalConfig, npm install)
 
 # create a .env file
-# update tour bdd
+# update your bdd
 
 # npm run dev (nodemon)
