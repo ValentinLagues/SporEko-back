@@ -1,6 +1,7 @@
+
 const Joi = require("joi");
-const dbConfig = require('../db-config')
-const db = dbConfig.connection;
+const dbTextiles = require('../db-config')
+
 
 
 const validate = (data:object, forCreation = true) => {
@@ -12,12 +13,13 @@ const validate = (data:object, forCreation = true) => {
 
 const findMany = async () => {
   const sql = 'SELECT * FROM textiles';
-  const resultat = await db.promise().query(sql);
-  return resultat[0];
+  const result = await dbTextiles.connection.promise().query(sql);
+  return result[0];
 };
 
 
 
 module.exports = {
   findMany,
+  validate,
 };
