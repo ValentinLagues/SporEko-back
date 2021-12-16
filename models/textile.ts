@@ -13,8 +13,7 @@ const validate = (data:object, forCreation = true) => {
 const findMany = async () => {
   const sql = 'SELECT * FROM textiles';
   const resultat = await db.promise().query(sql);
-  console.log(resultat);
-  return resultat;
+  return resultat[0];
 };
 
 

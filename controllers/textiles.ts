@@ -3,8 +3,7 @@ const textilesRouter = require('express').Router();
 const Textiles = require('../models/textile')
 
 textilesRouter.get('/', (req: Request, res: Response) => {
-  Textiles.findMany().then(([result]:Array<any>) => {
-    console.log(result)
+  Textiles.findMany().then((result:Array<any>) => {
     res.status(200).send(result);
   });
    
