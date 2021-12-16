@@ -13,6 +13,8 @@ const Categories = require('./categories');
 // const SportifStyles = require('./sportifStyles');
 // const Textiles = require('./textiles');
 
+const Textiles = require('./textiles');
+// const Categories = require('./categories');
 
 
 const setupRoutes = (app: Application) => {
@@ -29,6 +31,7 @@ const setupRoutes = (app: Application) => {
   // app.use('/modialRelay', MondialRelay.mondialRelayRouter);
   // app.use('/sportifStyles', SportifStyles.sportifStylesRouter);
   // app.use('/textiles', Textiles.textilesRouter);
+  app.use('/textiles', Textiles.textilesRouter);
 };
 
 module.exports = { setupRoutes };
