@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const routes = require('./controllers');
-const port: number = 3000;
+const port:string  = process.env.PORT || '8000';
 
 app.use(express.json());
 
