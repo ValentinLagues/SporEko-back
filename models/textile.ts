@@ -1,13 +1,10 @@
+const JoiTextiles = require('joi');
+const dbTextiles = require('../db-config');
 
-const Joi = require("joi");
-const dbTextiles = require('../db-config')
-
-
-
-const validate = (data:object, forCreation = true) => {
-  const presence = forCreation ? "required" : "optional";
-  return Joi.object({
-    name: Joi.string().max(255).presence(presence),
+const validate = (data: object, forCreation = true) => {
+  const presence = forCreation ? 'required' : 'optional';
+  return JoiTextiles.object({
+    name: JoiTextiles.string().max(255).presence(presence),
   }).validate(data, { abortEarly: false }).error;
 };
 
@@ -16,8 +13,6 @@ const findMany = async () => {
   const result = await dbTextiles.connection.promise().query(sql);
   return result[0];
 };
-
-
 
 module.exports = {
   findMany,
