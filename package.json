@@ -31,12 +31,8 @@
     "dotenv": "^9.0.2",
     "express": "^4.16.4",
     "joi": "^17.5.0",
-<<<<<<< HEAD
-    "mysql2": "^2.2.5"
-=======
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.15"
->>>>>>> 548c015cbf5b9b6f09f12a01ff8191296692a489
   },
   "devDependencies": {
     "@babel/core": "^7.13.15",

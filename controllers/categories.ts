@@ -1,56 +1,70 @@
-const categoriesRouter = require('express').Router();
 import { Request, Response } from 'express';
-const Category = require('../models/category');
+const categoriesRouter = require('express').Router();
+const Categories = require('../models/category')
 
-interface CategoryInfo {
-  name: string;
-}
-
-categoriesRouter.get('/coucou', (req: Request, res: Response) => {
-  res.status(200).send('hibou categories');
-});
-
-///////////// BRANDS ///////////////
 
 categoriesRouter.get('/', (req: Request, res: Response) => {
-  res.status(200).send('get all categories');
+  Categories.findManyCategories().then(([result]:Array<any>) => {
+    res.status(200).json(result);
+  })
+  .catch((error : Array<any>) => { 
+    console.log(error); 
+  res.status(501).send('Error finding categories')
+})
 });
 
-categoriesRouter.get('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  res.status(200).send('get category for id_category ' + idcategory);
+categoriesRouter.get('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  Categories.findOneCategory(id).then(([result]:Array<any>) => {
+    if ([result]) {
+      res.status(200).json([result]); }
+      else {
+  res.status(404).send('Category not found')
+}})
+.catch((error: Array<any>) => {
+  console.log(error)
+  res.status(501).send('Error finding the category');
+})
 });
 
 categoriesRouter.post('/', (req: Request, res: Response) => {
-  const category: CategoryInfo = req.body;
-  console.log(category.name);
-  res.status(200).send('post category');
+  const { name } = req.body;
+  const joiErrors = Categories.validateCategory(name);
+  if (joiErrors) {
+    res.status(422).send(joiErrors.details);
+  } else {
+    Categories.createCategory(name).then((createdCategory: object) => {
+      res.status(200).json(createdCategory);
+    })
+      .catch((error: Array<any>) => {
+        console.log(error)
+        res.status(501).send('Error creating the category')
+      })
+  }
 });
 
-categoriesRouter.put('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  res.status(200).send('put category for id_category ' + idcategory);
+categoriesRouter.put('/:id', (req: Request, res: Response) => { 
+  const { id } = req.params;
+  const { name } = req.body;
+  Categories.updateCategory(id, name).then(()=>res
+  .status(201).json(`Brand id:${id} successfully updated`))
+  .catch((error:Array<any>) => {
+    console.log(error)
+    res.status(501).send('Error updating a brand')
+  })
 });
 
-categoriesRouter.delete('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  res.status(200).send('delete category for id_category ' + idcategory);
-});
-
-///////////// OFFERS BY BRAND //////////////
-
-categoriesRouter.get('/:idbrand/offers', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-
-  //   Session.findByUser(iduser).then((sessions: Array<Object>) =>
-  //     res.status(200).json(sessions)
-  //   );
-
-  res.status(200).send(`SELECT * 
-FROM categories AS c
-INNER JOIN offers AS o 
-ON c.id_category = o.id_category
-AND o.id_category = ${idcategory}`);
+categoriesRouter.delete('/:id', (req: Request, res: Response) => { 
+  const { id } = req.params;
+  Categories.destroyCategory(id)
+  .then((deleted : Array<any>) => {
+    if (deleted) res.status(201).json(`Category id:${id} successfully deleted`);
+    else res.status(404).send('Category not found')
+})
+.catch((error : Array<any>) => {
+  console.log(error);
+  res.status(501).send('Error deleting the category')
+})
 });
 
 module.exports = { categoriesRouter };

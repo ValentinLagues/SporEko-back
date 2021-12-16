@@ -1,56 +1,70 @@
-const brandsRouter = require('express').Router();
 import { Request, Response } from 'express';
-const Brand = require('../models/brand');
+const brandsRouter = require('express').Router();
+const Brands = require('../models/brand')
 
-interface BrandInfo {
-  name: string;
-}
-
-brandsRouter.get('/coucou', (req: Request, res: Response) => {
-  res.status(200).send('hibou brands');
-});
-
-///////////// BRANDS ///////////////
 
 brandsRouter.get('/', (req: Request, res: Response) => {
-  res.status(200).send('get all brands');
+  Brands.findManyBrands().then(([result]:Array<any>) => {
+    res.status(200).json(result);
+  })
+  .catch((error : Array<any>) => { 
+    console.log(error); 
+  res.status(501).send('Error finding brands')
+})
 });
 
-brandsRouter.get('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  res.status(200).send('get brand for id_brand ' + idbrand);
+brandsRouter.get('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  Brands.findOneBrand(id).then(([result]:Array<any>) => {
+    if ([result]) {
+      res.status(200).json([result]); }
+      else {
+  res.status(404).send('Brand not found')
+}})
+.catch((error: Array<any>) => {
+  console.log(error)
+  res.status(501).send('Error finding the brand');
+})
 });
 
 brandsRouter.post('/', (req: Request, res: Response) => {
-  const brand: BrandInfo = req.body;
-  console.log(brand.name);
-  res.status(200).send('post brand');
+  const { name } = req.body;
+  const joiErrors = Brands.validateBrand(name);
+  if (joiErrors) {
+    res.status(422).send(joiErrors.details);
+  } else {
+    Brands.createBrand(name).then((createdBrand: object) => {
+      res.status(200).json(createdBrand);
+    })
+      .catch((error: Array<any>) => {
+        console.log(error)
+        res.status(501).send('Error creating the brand')
+      })
+  }
 });
 
-brandsRouter.put('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  res.status(200).send('put brand for id_brand ' + idbrand);
+brandsRouter.put('/:id', (req: Request, res: Response) => { 
+  const { id } = req.params;
+  const { name } = req.body;
+  Brands.updateBrand(id, name).then(()=>res
+  .status(201).json(`Brand id:${id} successfully updated`))
+  .catch((error:Array<any>) => {
+    console.log(error)
+    res.status(501).send('Error updating a brand')
+  })
 });
 
-brandsRouter.delete('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  res.status(200).send('delete brand for id_brand ' + idbrand);
-});
-
-///////////// OFFERS BY BRAND //////////////
-
-brandsRouter.get('/:idbrand/offers', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-
-  //   Session.findByUser(iduser).then((sessions: Array<Object>) =>
-  //     res.status(200).json(sessions)
-  //   );
-
-  res.status(200).send(`SELECT * 
-FROM brands AS b
-INNER JOIN offers AS o 
-ON b.id_brand = o.id_brand
-AND o.id_brand = ${idbrand}`);
+brandsRouter.delete('/:id', (req: Request, res: Response) => { 
+  const { id } = req.params;
+  Brands.destroyBrand(id)
+  .then((deleted : Array<any>) => {
+    if (deleted) res.status(201).json(`Brand id:${id} successfully deleted`);
+    else res.status(404).send('Brand not found')
+})
+.catch((error : Array<any>) => {
+  console.log(error);
+  res.status(501).send('Error deleting the brand')
+})
 });
 
 module.exports = { brandsRouter };

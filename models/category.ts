@@ -1,56 +1,47 @@
-const connection = require("../db-config");
-const Joi = require("joi");
+const dbCategories= require("../db-config");
+const JoiCategories = require("joi");
 
-const db = connection.promise();
 
-const validate = (data: object, forCreation = true) => {
+const validateCategory = (data: object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
-  return Joi.object({
-    name: Joi.string().max(255).presence(presence),
-  }).validate(data, { abortEarly: false }).error;
+  return JoiCategories.object({
+    name: JoiCategories.string().max(50).presence(presence),
+  }).validateCategory(data, { abortEarly: false }).error;
 };
 
-const findMany = () => {
-  let sql = 'SELECT * FROM categories';
-  const sqlValues: Array<any> = [];
-
-  return db.query(sql, sqlValues).then(([results]: Array<any>) => results);
+const findManyCategories = () => {
+  let sql = "SELECT * FROM categories";
+  return dbCategories.connection.promise().query(sql)
 };
 
-const findOne = (id: number) => {
-  return db
-    .query('SELECT * FROM categories WHERE id_category = ?', [id])
-    .then(([results]: Array<any>) => results[0])
+const findOneCategory = (id: number) => {
+  return dbCategories.connection.promise()
+  .query("SELECT * FROM categories WHERE id_category = ?", [id])
 };
 
-const create = (newCategory: object) => {
-	return db
-		.query(
-			"INSERT INTO categories SET ?",
-			[newCategory]
+const createCategory = (name: object) => {
+	return dbCategories.connection.promise()
+		.query("INSERT INTO categories SET ?",
+			[name]
 		)
-		.then(([result]: Array<any>) => {
-			const id = result.insertId;
-			return { id, ...newCategory };
-		});
+		
 };
 
-const update = (id: number, newAttributes: object) => {
-  return db
-    .query("UPDATE categories SET ? WHERE id_category = ?", [newAttributes, id])
+const updateCategory = (id: number, name: object) => {
+  return dbCategories.connection.promise()
+    .query("UPDATE categories SET name = ? WHERE id_category = ?", [name, id])
 };
 
-const destroy = (id: number) => {
-  return db
+const destroyCategory = (id: number) => {
+  return dbCategories.connection.promise()
     .query("DELETE FROM categories WHERE id_category = ?", [id])
-    .then(([result]: Array<any>) => result.affectedRows !== 0);
 };
 
 module.exports = {
-  findMany,
-  findOne,
-  create,
-  update,
-  destroy,
-  validate,
+  validateCategory,
+  findManyCategories,
+  findOneCategory,
+  createCategory,
+  updateCategory,
+  destroyCategory,
 };

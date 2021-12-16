@@ -1,56 +1,47 @@
-const connection = require("../db-config");
-const Joi = require("joi");
+const dbBrands= require("../db-config");
+const JoiBrands = require("joi");
 
-const db = connection.promise();
 
-const validate = (data: object, forCreation = true) => {
+const validateBrand = (data: object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
-  return Joi.object({
-    name: Joi.string().max(255).presence(presence),
-  }).validate(data, { abortEarly: false }).error;
+  return JoiBrands.object({
+    name: JoiBrands.string().max(50).presence(presence),
+  }).validateBrand(data, { abortEarly: false }).error;
 };
 
-const findMany = () => {
-  let sql = 'SELECT * FROM brands';
-  const sqlValues: Array<any> = [];
-
-  return db.query(sql, sqlValues).then(([results]: Array<any>) => results);
+const findManyBrands = () => {
+  let sql = "SELECT * FROM brands";
+  return dbBrands.connection.promise().query(sql)
 };
 
-const findOne = (id: number) => {
-  return db
-    .query('SELECT * FROM brands WHERE id_brand = ?', [id])
-    .then(([results]: Array<any>) => results[0])
+const findOneBrand = (id: number) => {
+  return dbBrands.connection.promise()
+  .query("SELECT * FROM brands WHERE id_brand = ?", [id])
 };
 
-const create = (newBrand: object) => {
-	return db
-		.query(
-			"INSERT INTO brands SET ?",
-			[newBrand]
+const createBrand = (name: object) => {
+	return dbBrands.connection.promise()
+		.query("INSERT INTO brands SET ?",
+			[name]
 		)
-		.then(([result]: Array<any>) => {
-			const id = result.insertId;
-			return { id, ...newBrand };
-		});
+		
 };
 
-const update = (id: number, newAttributes: object) => {
-  return db
-    .query("UPDATE brands SET ? WHERE id_brand = ?", [newAttributes, id])
+const updateBrand = (id: number, name: object) => {
+  return dbBrands.connection.promise()
+    .query("UPDATE brands SET name = ? WHERE id_brand = ? ", [name, id])
 };
 
-const destroy = (id: number) => {
-  return db
+const destroyBrand = (id: number) => {
+  return dbBrands.connection.promise()
     .query("DELETE FROM brands WHERE id_brand = ?", [id])
-    .then(([result]: Array<any>) => result.affectedRows !== 0);
 };
 
 module.exports = {
-  findMany,
-  findOne,
-  create,
-  update,
-  destroy,
-  validate,
+  validateBrand,
+  findManyBrands,
+  findOneBrand,
+  createBrand,
+  updateBrand,
+  destroyBrand,
 };
