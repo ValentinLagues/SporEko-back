@@ -1,3 +1,4 @@
+import { Application } from 'express';
 const Users = require('./users');
 const Offers = require('./offers');
 const Genders = require('./genders');
@@ -12,7 +13,7 @@ const SportifStyles = require('./sportifStyles');
 const Textiles = require('./textiles');
 
 
-const setupRoutes = (app: any) => {
+const setupRoutes = (app: Application) => {
   app.use('/users', Users.userssRouter);
   app.use('/offers', Offers.offersRouter);
   app.use('/genders', Genders.gendersRouter);
