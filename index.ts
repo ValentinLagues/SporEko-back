@@ -1,13 +1,15 @@
 const express = require('express');
-const { setupRoutes } = require('./routes');
-
 const app = express();
+const routes = require('./controllers');
+const port: number = 3000;
+
 app.use(express.json());
 
-const port = process.env.PORT || 8000;
+routes.setupRoutes(app);
 
-setupRoutes(app);
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(port, (err: Error) => {
+  if (err) {
+    return console.error(err);
+  }
+  return console.log(`server is listening on ${port}`);
 });
