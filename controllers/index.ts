@@ -11,10 +11,11 @@ const Colissimo = require('./colissimo');
 const MondialRelay = require('./mondialRelay');
 const SportifStyles = require('./sportifStyles');
 const Textiles = require('./textiles');
+const Categories = require('./categories');
 
 
 const setupRoutes = (app: Application) => {
-  app.use('/users', Users.userssRouter);
+  app.use('/users', Users.usersRouter);
   app.use('/offers', Offers.offersRouter);
   app.use('/genders', Genders.gendersRouter);
   app.use('/sports', Sports.sportsRouter);
@@ -26,6 +27,7 @@ const setupRoutes = (app: Application) => {
   app.use('/modialRelay', MondialRelay.mondialRelayRouter);
   app.use('/sportifStyles', SportifStyles.sportifStylesRouter);
   app.use('/textiles', Textiles.textilesRouter);
+  app.use('/categories', Categories.categoriesRouter);
 };
 
 module.exports = { setupRoutes };

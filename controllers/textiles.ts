@@ -1,16 +1,24 @@
 import { Request, Response } from 'express';
-const textilesRouteur = require('express').Router();
+const textilesRouter = require('express').Router();
+const Textiles = require('../models/textile')
 
-textilesRouteur.get('/coucou', (req: Request, res: Response) => {
-  res.status(200).send('hibou sessions');
+textilesRouter.get('/', (req: Request, res: Response) => {
+  Textiles.findMany().then(([result]:Array<any>) => {
+    console.log(result)
+    res.status(200).send(result);
+  });
+   
+  
 });
 
 ///////////// SURFSTYLES BY SESSIONS///////////
-textilesRouteur.get('/:id', (req: Request, res: Response) => {
+textilesRouter.get('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
-  res
+    res
     .status(200)
     .send('get all for session id_session' + id);
+
+  
 });
 
-module.exports = { textilesRouteur };
+module.exports = { textilesRouter };
