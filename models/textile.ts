@@ -1,13 +1,12 @@
-
-const Joi = require("joi");
+const JoiTextiles = require("joi");
 const dbTextiles = require('../db-config')
 
 
 
 const validate = (data:object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
-  return Joi.object({
-    name: Joi.string().max(255).presence(presence),
+  return JoiTextiles.object({
+    name: JoiTextiles.string().max(255).presence(presence),
   }).validate(data, { abortEarly: false }).error;
 };
 
