@@ -31,9 +31,7 @@ const updateColor = (id: number, newAttributes: object) => {
 };
 
 const destroyColor = (id: number) => {
-  return connectDbColor
-    .query('DELETE FROM colors WHERE id_color = ?', [id])
-    .then(([result]: Array<any>) => result.affectedRows !== 0);
+  return connectDbColor.query('DELETE FROM colors WHERE id_color = ?', [id]);
 };
 
 module.exports = {
