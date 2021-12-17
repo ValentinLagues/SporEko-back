@@ -51,8 +51,8 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
         console.log('dans if');
         res.status(409).send(joiErrors.details);
       } else {
-        Color.updateColor(idcolor, color).then((updatedColor: object) => {
-          res.status(200).json({ colorFound, ...color });
+        Color.updateColor(idcolor, color).then(() => {
+          res.status(200).json({ ...colorFound[0], ...color });
         });
       }
     } else {
