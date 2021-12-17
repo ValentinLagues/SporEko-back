@@ -7,8 +7,6 @@ interface ColorInfo {
   color_code: string;
 }
 
-///////////// COLORS ///////////////
-
 colorsRouter.get('/', (req: Request, res: Response) => {
   Color.findManyColor().then(([result]: Array<any>) => {
     res.status(200).json(result);
@@ -33,12 +31,12 @@ colorsRouter.post('/', (req: Request, res: Response) => {
     res.status(422).send(joiErrors.details);
   } else {
     Color.createColor(color)
-      .then((createdColor: object) => {
-        console.log(createdColor);
-        res.status(201).json(createdColor);
+      .then(([createdColor]: Array<any>) => {
+        const id = createdColor.insertId;
+        res.status(201).json({ id, ...color });
       })
       .catch((error: Array<any>) => {
-        console.log(error);
+        res.status(500).send(error);
       });
   }
 });
@@ -53,12 +51,8 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
         console.log('dans if');
         res.status(409).send(joiErrors.details);
       } else {
-        Color.updateColor(idcolor, color).then((updatedColor: object) => {
-          // console.log(updatedColor);
-          // console.log({ ...colorFound, ...color });
-          res.status(200).json({ ...colorFound, ...color });
-          // const id_color = updatedColor[0].insertId
-          // res.status(201).json(updatedColor)
+        Color.updateColor(idcolor, color).then(() => {
+          res.status(200).json({ ...colorFound[0], ...color });
         });
       }
     } else {
@@ -67,20 +61,17 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
   });
 });
 
-// colorsRouter.delete('/:idcolor', (req: Request, res: Response) => {
-//   const { idcolor } = req.params;
-//   res.status(200).send('delete color for id_color ' + idcolor);
-// });
-
-///////////// OFFERS BY color //////////////
-
-// colorsRouter.get('/:idbrand/offers', (req: Request, res: Response) => {
-//   const { idcolor } = req.params;
-//   res.status(200).send(`SELECT *
-// FROM categories AS c
-// INNER JOIN offers AS o
-// ON c.id_color = o.id_color
-// AND o.id_color = ${idcolor}`);
-// });
+colorsRouter.delete('/:idcolor', (req: Request, res: Response) => {
+  const { idcolor } = req.params;
+  Color.findOneColor(idcolor).then(([colorFound]: Array<any>) => {
+    if (colorFound.length > 0) {
+      Color.destroyColor(idcolor).then(() => {
+        res.status(200).send('Couleur supprimée');
+      });
+    } else {
+      res.status(404).send('Couleur non trouvée (vérif id)');
+    }
+  });
+});
 
 module.exports = { colorsRouter };

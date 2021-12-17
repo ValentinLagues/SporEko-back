@@ -7,7 +7,6 @@ const validateSport = (data: object, forCreation = true) => {
     const presence = forCreation ? 'required' : 'optional';
     return JoiSport.object({
       name: JoiSport.string().max(50).presence(presence),
-    //   sport_code: JoiSport.string().min(7).max(9).presence(presence),
     }).validate(data, { abortEarly: false }).error;
   };
 
@@ -32,8 +31,8 @@ const validateSport = (data: object, forCreation = true) => {
 
   const destroySport = (id: number) => {
     return connectDbSport
-      .query('DELETE FROM sports WHERE id_sport = ?', [id])
-      .then(([result]: Array<any>) => result.affectedRows !== 0);
+      .query('DELETE FROM sports WHERE id_sport = ?', [id]);
+    //   .then(([result]: Array<any>) => result.affectedRows !== 0);
   };
 
   module.exports = {
