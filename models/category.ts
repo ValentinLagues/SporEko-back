@@ -6,7 +6,7 @@ const validateCategory = (data: object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
   return JoiCategories.object({
     name: JoiCategories.string().max(50).presence(presence),
-  }).validateCategory(data, { abortEarly: false }).error;
+  }).validate(data, { abortEarly: false }).error;
 };
 
 const findManyCategories = () => {

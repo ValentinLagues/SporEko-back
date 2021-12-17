@@ -34,6 +34,7 @@ categoriesRouter.post('/', (req: Request, res: Response) => {
     res.status(422).send(joiErrors.details);
   } else {
     Categories.createCategory(name).then((createdCategory: object) => {
+      console.log(createdCategory)
       res.status(200).json(createdCategory);
     })
       .catch((error: Array<any>) => {

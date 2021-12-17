@@ -6,7 +6,7 @@ const validateBrand = (data: object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
   return JoiBrands.object({
     name: JoiBrands.string().max(50).presence(presence),
-  }).validateBrand(data, { abortEarly: false }).error;
+  }).validate(data, { abortEarly: false }).error;
 };
 
 const findManyBrands = () => {
@@ -21,7 +21,7 @@ const findOneBrand = (id: number) => {
 
 const createBrand = (name: object) => {
 	return dbBrands.connection.promise()
-		.query("INSERT INTO brands SET ?",
+		.query("INSERT INTO brands (name) VALUES (?)",
 			[name]
 		)
 		

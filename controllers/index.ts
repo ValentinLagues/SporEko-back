@@ -1,3 +1,4 @@
+
 import { Application } from 'express';
 // const Users = require('./users');
 // const Offers = require('./offers');
@@ -6,16 +7,12 @@ import { Application } from 'express';
 // const Sizes = require('./sizes');
 // const Conditions = require('./conditions');
 const Brands = require('./brands');
-const Categories = require('./categories');
-// const Colors = require('./colors');
+const Colors = require('./colors');
 // const Colissimo = require('./colissimo');
 // const MondialRelay = require('./mondialRelay');
 // const SportifStyles = require('./sportifStyles');
-// const Textiles = require('./textiles');
-
 const Textiles = require('./textiles');
-// const Categories = require('./categories');
-
+const Categories = require('./categories');
 
 const setupRoutes = (app: Application) => {
   // app.use('/users', Users.usersRouter);
@@ -25,13 +22,12 @@ const setupRoutes = (app: Application) => {
   // app.use('/sizes', Sizes.sizesRouter);
   // app.use('/conditions', Conditions.conditionsRouter);
   app.use('/brands', Brands.brandsRouter);
-  app.use('/categories', Categories.categoriesRouter);
-  // app.use('/colors', Colors.colorsRouter);
+  app.use('/colors', Colors.colorsRouter);
   // app.use('/colissimo', Colissimo.colissimoRouter);
   // app.use('/modialRelay', MondialRelay.mondialRelayRouter);
   // app.use('/sportifStyles', SportifStyles.sportifStylesRouter);
-  // app.use('/textiles', Textiles.textilesRouter);
   app.use('/textiles', Textiles.textilesRouter);
+  app.use('/categories', Categories.categoriesRouter);
 };
 
 module.exports = { setupRoutes };
