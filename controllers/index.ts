@@ -5,7 +5,7 @@ import { Application } from 'express';
 // const Genders = require('./genders');
 // const Sports = require('./sports');
 // const Sizes = require('./sizes');
-// const Conditions = require('./conditions');
+const Conditions = require('./conditions');
 const Brands = require('./brands');
 const Colors = require('./colors');
 // const Colissimo = require('./colissimo');
@@ -20,7 +20,7 @@ const setupRoutes = (app: Application) => {
   // app.use('/genders', Genders.gendersRouter);
   // app.use('/sports', Sports.sportsRouter);
   // app.use('/sizes', Sizes.sizesRouter);
-  // app.use('/conditions', Conditions.conditionsRouter);
+  app.use('/conditions', Conditions.conditionsRouter);
   app.use('/brands', Brands.brandsRouter);
   app.use('/colors', Colors.colorsRouter);
   // app.use('/colissimo', Colissimo.colissimoRouter);
