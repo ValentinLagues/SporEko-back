@@ -2,7 +2,7 @@ import { Application } from 'express';
 // const Users = require('./users');
 // const Offers = require('./offers');
 // const Genders = require('./genders');
-// const Sports = require('./sports');
+const Sports = require('./sports');
 // const Sizes = require('./sizes');
 // const Conditions = require('./conditions');
 // const Brands = require('./brands');
@@ -17,7 +17,7 @@ const setupRoutes = (app: Application) => {
   // app.use('/users', Users.usersRouter);
   // app.use('/offers', Offers.offersRouter);
   // app.use('/genders', Genders.gendersRouter);
-  // app.use('/sports', Sports.sportsRouter);
+  app.use('/sports', Sports.sportsRouter);
   // app.use('/sizes', Sizes.sizesRouter);
   // app.use('/conditions', Conditions.conditionsRouter);
   // app.use('/brands', Brands.brandsRouter);
