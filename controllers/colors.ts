@@ -33,12 +33,12 @@ colorsRouter.post('/', (req: Request, res: Response) => {
     res.status(422).send(joiErrors.details);
   } else {
     Color.createColor(color)
-      .then((createdColor: object) => {
-        console.log(createdColor);
-        res.status(201).json(createdColor);
+      .then(([createdColor]: Array<any>) => {
+        const id = createdColor.insertId;
+        res.status(201).json({ id, ...color });
       })
       .catch((error: Array<any>) => {
-        console.log(error);
+        res.status(500).send(error);
       });
   }
 });
@@ -54,11 +54,7 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
         res.status(409).send(joiErrors.details);
       } else {
         Color.updateColor(idcolor, color).then((updatedColor: object) => {
-          // console.log(updatedColor);
-          // console.log({ ...colorFound, ...color });
-          res.status(200).json({ ...colorFound, ...color });
-          // const id_color = updatedColor[0].insertId
-          // res.status(201).json(updatedColor)
+          res.status(200).json({ colorFound, ...color });
         });
       }
     } else {
@@ -67,10 +63,10 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
   });
 });
 
-// colorsRouter.delete('/:idcolor', (req: Request, res: Response) => {
-//   const { idcolor } = req.params;
-//   res.status(200).send('delete color for id_color ' + idcolor);
-// });
+colorsRouter.delete('/:idcolor', (req: Request, res: Response) => {
+  const { idcolor } = req.params;
+  res.status(200).send('delete color for id_color ' + idcolor);
+});
 
 ///////////// OFFERS BY color //////////////
 
