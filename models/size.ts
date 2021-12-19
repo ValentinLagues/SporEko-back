@@ -1,5 +1,3 @@
-import { mainModule } from "process";
-
 const dbSizes= require("../db-config");
 const JoiSizes = require("joi");
 
