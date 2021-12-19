@@ -15,7 +15,7 @@ const findManyGenders = () => {
   return dbGenders.connection.promise().query(sql)
 };
 
-const findByNameGender = (name: string){
+const findByGenderName = (name: string)=>{
   return dbGenders.connection.promise().query('SELECT * FROM genders WHERE name = ? ', [name])
   
 } 
@@ -44,7 +44,7 @@ const destroyGender = (id: number) => {
 
 module.exports = {
   findManyGenders,
-  findByNameGender,
+  findByGenderName,
   findOneGender,
   createGender,
   updateGender,

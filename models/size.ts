@@ -1,3 +1,5 @@
+import { mainModule } from "process";
+
 const dbSizes= require("../db-config");
 const JoiSizes = require("joi");
 
@@ -6,8 +8,9 @@ const JoiSizes = require("joi");
 const validateSize = (data: object, forCreation = true) => {
   const presence = forCreation ? "required" : "optional";
   return JoiSizes.object({
-    name: JoiSizes.string().max(255).presence(presence),
-  }).validateGenders(data, { abortEarly: false }).error;
+    name: JoiSizes.string().max(45).presence(presence),
+    is_children: JoiSizes.number().integer().min(0).max(1).presence(presence),
+  }).validate(data, { abortEarly: false }).error;
 };
 
 const findManySizes = () => {
@@ -22,20 +25,20 @@ const findOneSize = (id: number) => {
 
 const createSize = (name: object,isChildren:boolean) => {
 	return dbSizes.connection.promise()
-		.query("INSERT INTO sizes (name,is_children) VALUES (?,?) ",
+		.query("INSERT INTO sizes  SET ? ",
 			[name,isChildren]
 		)
 		
 };
 
-const updateSize = (id: number, name: object) => {
+const updateSize = (id: number, newAttributes:object) => {
   return dbSizes.connection.promise()
-    .query("UPDATE sizes SET name = ? WHERE id_size = ? ", [name, id])
+    .query(" UPDATE sizes  SET  ?  WHERE id_size = ? ", [newAttributes,id])
 };
 
 const destroySize = (id: number) => {
   return dbSizes.connection.promise()
-    .query("DELETE FROM sizes WHERE id_size = ?", [id])
+    .query("DELETE FROM sizes WHERE id_size = ? ", [id])
 };
 
 module.exports = {
