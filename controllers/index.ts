@@ -1,5 +1,5 @@
 import { Application } from 'express';
-// const Users = require('./users');
+const Users = require('./users');
 // const Offers = require('./offers');
 // const Genders = require('./genders');
 const Sports = require('./sports');
@@ -14,7 +14,7 @@ const Textiles = require('./textiles');
 // const Categories = require('./categories');
 
 const setupRoutes = (app: Application) => {
-  // app.use('/users', Users.usersRouter);
+  app.use('/users', Users.usersRouter);
   // app.use('/offers', Offers.offersRouter);
   // app.use('/genders', Genders.gendersRouter);
   app.use('/sports', Sports.sportsRouter);
