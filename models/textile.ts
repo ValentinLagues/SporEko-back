@@ -43,4 +43,3 @@ const validateTextile = (data: object, forCreation = true) => {
     destroyTextile,
     validateTextile,
   };
-
