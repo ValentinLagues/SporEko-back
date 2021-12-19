@@ -1,20 +1,20 @@
 const brandsRouter = require('express').Router();
 import { Request, Response } from 'express';
-const Brands = require('../models/brand');
+const Brand = require('../models/brand');
 
 interface BrandInfo {
   name: string;
 }
 
 brandsRouter.get('/', (req: Request, res: Response) => {
-  Brands.findManyBrands().then(([result]: Array<any>) => {
+  Brand.findManyBrands().then(([result]: Array<any>) => {
     res.status(200).json(result);
   });
 });
 
 brandsRouter.get('/:idbrand', (req: Request, res: Response) => {
   const { idbrand } = req.params;
-  Brands.findOneBrand(idbrand).then(([result]: Array<any>) => {
+  Brand.findOneBrand(idbrand).then(([result]: Array<any>) => {
     if (result.length > 0) {
       res.json(result);
     } else {
@@ -25,11 +25,11 @@ brandsRouter.get('/:idbrand', (req: Request, res: Response) => {
 
 brandsRouter.post('/', (req: Request, res: Response) => {
   const brand: BrandInfo = req.body;
-  const joiErrors = Brands.validateBrand(brand);
+  const joiErrors = Brand.validateBrand(brand);
   if (joiErrors) {
     res.status(422).send(joiErrors.details);
   } else {
-    Brands.createBrand(brand)
+    Brand.createBrand(brand)
       .then(([createdBrand]: Array<any>) => {
         const id = createdBrand.insertId;
         res.status(201).json({ id, ...brand });
@@ -42,15 +42,15 @@ brandsRouter.post('/', (req: Request, res: Response) => {
 
 brandsRouter.put('/:idbrand', (req: Request, res: Response) => {
   const { idbrand } = req.params;
-  Brands.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
+  Brand.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
     if (brandFound.length > 0) {
       const brand: BrandInfo = req.body;
-      const joiErrors = Brands.validateBrand(brand, false);
+      const joiErrors = Brand.validateBrand(brand, false);
       if (joiErrors) {
         console.log('JoiErrors dans put brand');
         res.status(409).send(joiErrors.details);
       } else {
-        Brands.updateBrand(idbrand, brand).then(() => {
+        Brand.updateBrand(idbrand, brand).then(() => {
           res.status(200).json({ ...brandFound[0], ...brand });
         });
       }
@@ -62,9 +62,9 @@ brandsRouter.put('/:idbrand', (req: Request, res: Response) => {
 
 brandsRouter.delete('/:idbrand', (req: Request, res: Response) => {
   const { idbrand } = req.params;
-  Brands.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
+  Brand.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
     if (brandFound.length > 0) {
-      Brands.destroyBrand(idbrand).then(() => {
+      Brand.destroyBrand(idbrand).then(() => {
         res.status(200).send('Brand successfully deleted');
       });
     } else {
