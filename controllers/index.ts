@@ -23,7 +23,7 @@ const setupRoutes = (app: Application) => {
   app.use('/brands', Brands.brandsRouter);
   app.use('/colors', Colors.colorsRouter);
   app.use('/colissimos', Colissimos.colissimosRouter);
-  // app.use('/modialRelay', MondialRelay.mondialRelayRouter);
+  // app.use('/mondialRelay', MondialRelay.mondialRelayRouter);
   // app.use('/sportifStyles', SportifStyles.sportifStylesRouter);
   app.use('/textiles', Textiles.textilesRouter);
   app.use('/categories', Categories.categoriesRouter);
