@@ -30,16 +30,45 @@ gendersRouter.get('/:id', (req: Request, res: Response) => {
 
 gendersRouter.post('/', (req: Request, res: Response) => {
   const gender: GenderInfo = req.body;
-  const joiErrors = Genders.validateGender(gender);
-  
-      Genders.createGender(gender)
+  let duplicateData: string = '';
+  interface joiErrorsModel {
+    details: Array<any>;
+  }
+  interface errModel {
+    message: string;
+  }
+  let joiErrorsGender: joiErrorsModel;
+  Promise.all([
+    Genders.findByGenderName(gender.name),
+  ])
+    .then(([nameAllreadyExist]) => {
+      if (nameAllreadyExist[0].length > 0) {
+        duplicateData += 'Ce genre existe déjà; ';
+      }
+      if (duplicateData) {
+        return Promise.reject(duplicateData);
+      }
+      const joiErrorsGender = Genders.validateGender(gender);
+      if (joiErrorsGender) {
+        return Promise.reject('INVALID_DATA');
+      }
+      return  Genders.createGender(gender)
+    })
         .then(([createdGender]: Array<any>) => {
           const id = createdGender.insertId;
           res.status(201).json({ id, ...gender });
         })
-        .catch((error: Array<any>) => {
-          res.status(500).send(error);
-          res.status(422).send(joiErrors.details);
+        .catch((error) => {
+          if (error === duplicateData)
+            res.status(409).json({ message: duplicateData });
+          else if (error === 'INVALID_DATA') {
+            const joiDetails: Array<string> = joiErrorsGender.details.map(
+              (error: errModel) => {
+                console.log(error);
+                return error.message;
+              })
+            res.status(422).send(joiErrorsGender.details);
+          }else res.status(500).send(error);
         });
 });
 
@@ -51,16 +80,53 @@ gendersRouter.delete('/:id', (req: Request, res: Response) => {
   })
 });
 
-gendersRouter.put('/:id', (req: Request, res: Response) => { 
+gendersRouter.put('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
-  const gender: GenderInfo = req.body;
-  const joiErrors = Genders.validateGender(gender);
-  if (joiErrors) res.status(422).json(joiErrors.message);
-   else Genders.updateGender(id, gender).then(() =>  res.status(201).json({ id_gender: id, ...gender }))
-  .catch((error: Array<any>) => {
-    res.status(500).send(error);
-  });
+  Genders.findOneGender(id).then(([genderFound]: Array<any>) => {
+    if (genderFound.length < 1) {
+      res.status(404).send('Genre non trouvé');
+    } else {
+      const gender: GenderInfo = req.body;
 
+      let duplicateData: string = '';
+      interface joiErrorsModel {
+        details: Array<any>;
+      }
+      interface errModel {
+        message: string;
+      }
+      let joiErrorsGender: joiErrorsModel;
+      Promise.all([
+        Genders.findByGenderName(gender.name),
+      ])
+        .then(([nameAllreadyExist]) => {
+          if (nameAllreadyExist[0].length > 0) {
+            duplicateData += 'Ce genre existe déjà; ';
+          }
+          if (duplicateData) {
+            return Promise.reject(duplicateData);
+          }
+          const joiErrorsGender = Genders.validateGender(gender,false);
+          if (joiErrorsGender) {
+            return Promise.reject('INVALID_DATA');
+          }
+          return Genders.updateGender(id, gender)
+        })
+        .then(() => res.status(201).json({ ...genderFound[0], ...gender }))
+        .catch((error) => {
+          if (error === duplicateData)
+            res.status(409).json({ message: duplicateData });
+          else if (error === 'INVALID_DATA') {
+            const joiDetails: Array<string> = joiErrorsGender.details.map(
+              (error: errModel) => {
+                console.log(error);
+                return error.message;
+              })
+            res.status(422).send(joiErrorsGender.details);
+          } else res.status(500).send(error);
+        });
+      }
+    });
 });
 
 module.exports = { gendersRouter };

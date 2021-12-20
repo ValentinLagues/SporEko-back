@@ -20,8 +20,15 @@ const findOneSize = (id: number) => {
   return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE id_size = ? ', [id])
     
 };
-
-const createSize = (name: object,isChildren:boolean) => {
+const findByIsChildrenSize = (is_children:number)=>{
+  return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE is_children = ? ', [is_children])
+  
+} 
+const findByNameSize = (name: string)=>{
+  return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE name = ? ', [name])
+  
+} 
+const createSize = (name: object,isChildren:number) => {
 	return dbSizes.connection.promise()
 		.query("INSERT INTO sizes  SET ? ",
 			[name,isChildren]
@@ -46,4 +53,6 @@ module.exports = {
   updateSize,
   destroySize,
   validateSize,
+  findByNameSize,
+  findByIsChildrenSize,
 };
