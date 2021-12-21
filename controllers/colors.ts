@@ -83,55 +83,6 @@ colorsRouter.post('/', (req: Request, res: Response) => {
         res.status(422).json(joiErrorsArray);
       } else res.status(500).send('erreur d interface chaise-écran');
     });
-
-  // const color: ColorInfo = req.body;
-  // let duplicateData: string = '';
-  // interface joiErrorsModel {
-  //   details: Array<any>;
-  // }
-  // interface errModel {
-  //   message: string;
-  // }
-  // let joiErrors: joiErrorsModel;
-
-  // Promise.all([
-  //   Color.findColorByName(color.name),
-  //   Color.findColorByColorCode(color.color_code),
-  // ])
-  //   .then(([colorNameAlreadytaken, colorCodeAlreadytaken]) => {
-  //     if (colorNameAlreadytaken[0].length > 0) {
-  //       duplicateData += 'Ce nom existe déjà; ';
-  //     }
-  //     if (colorCodeAlreadytaken[0].length > 0) {
-  //       duplicateData += 'Ce code couleur existe déjà; ';
-  //     }
-  //     if (duplicateData) {
-  //       return Promise.reject(duplicateData);
-  //     }
-
-  //     joiErrors = Color.validateColor(color);
-  //     if (joiErrors) {
-  //       return Promise.reject('INVALID_DATA');
-  //     }
-
-  //     return Color.createColor(color);
-  //   })
-  //   .then(([createdColor]: Array<any>) => {
-  //     const id = createdColor.insertId;
-  //     res.status(201).json({ id, ...color });
-  //   })
-  //   .catch((err) => {
-  //     if (err === duplicateData)
-  //       res.status(409).json({ message: duplicateData });
-  //     else if (err === 'INVALID_DATA') {
-  //       const joiDetails: Array<string> = joiErrors.details.map(
-  //         (err: errModel) => {
-  //           return err.message;
-  //         }
-  //       );
-  //       res.status(422).json(joiDetails);
-  //     } else res.status(500).send(err);
-  //   });
 });
 
 colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
