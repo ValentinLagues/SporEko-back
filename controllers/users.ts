@@ -82,11 +82,9 @@ usersRouter.post('/', (req: Request, res: Response) => {
       else if (err === 'INVALID_DATA') {
         const joiDetails: Array<string> = joiErrors.details.map(
           (err: errModel) => {
-            console.log(err);
             return err.message;
           }
         );
-        console.log(joiDetails);
         res.status(422).json(joiDetails);
       } else res.status(500).send('erreur d interface chaise-écran');
     });
@@ -140,7 +138,6 @@ usersRouter.put('/:iduser', (req: Request, res: Response) => {
           else if (err === 'INVALID_DATA') {
             const joiDetails: Array<string> = joiErrors.details.map(
               (err: errModel) => {
-                console.log(err);
                 return err.message;
               }
             );
