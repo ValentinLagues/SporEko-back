@@ -18,7 +18,12 @@ colissimosRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { idColissimo } = req.params;
     Colissimo.getById(Number(idColissimo))
-      .then((colissimo: IColissimo) => res.status(200).json(colissimo))
+      .then((colissimo: IColissimo) => {
+        if (colissimo === undefined) {
+          res.status(404).send('Colissimo non trouvé');
+        }
+        res.status(200).json(colissimo);
+      })
       .catch((err) => next(err));
   }
 );
@@ -40,6 +45,7 @@ colissimosRouter.post(
 
 colissimosRouter.put(
   '/:idcolissimo',
+  Colissimo.recordExists,
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
   async (req: Request, res: Response) => {
