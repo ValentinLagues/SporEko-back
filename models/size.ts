@@ -1,58 +1,106 @@
-const dbSizes= require("../db-config");
-const JoiSizes = require("joi");
+import connection from '../db-config';
+import { ErrorHandler } from '../helpers/errors';
+import { ResultSetHeader } from 'mysql2';
+import { Request, Response, NextFunction } from 'express';
+import ISize from '../interfaces/ISize';
+import Joi from 'joi';
 
-
-
-const validateSize = (data: object, forCreation = true) => {
-  const presence = forCreation ? "required" : "optional";
-  return JoiSizes.object({
-    name: JoiSizes.string().max(45).presence(presence),
-    is_children: JoiSizes.number().integer().min(0).max(1).presence(presence),
-  }).validate(data, { abortEarly: false }).error;
+const validateSize = (req: Request, res: Response, next: NextFunction) => {
+  let required: Joi.PresenceMode = 'optional';
+  if (req.method === 'POST') {
+    required = 'required';
+  }
+  const errors = Joi.object({
+    name: Joi.string().max(45).presence(required),
+    is_children: Joi.number().integer().min(0).max(1).presence(required),
+  }).validate(req.body, { abortEarly: false }).error;
+  if (errors) {
+    next(new ErrorHandler(422, errors.message));
+  } else {
+    next();
+  }
 };
 
+const getAllSizes = () => {
+  let sql = 'SELECT * FROM sizes';
+  return connection.promise().query(sql);
+};
+
+const getSizeById = (id: number) => {
+  return connection
+    .promise()
+    .query('SELECT * FROM sizes WHERE id_size = ? ', [id]);
+};
+
+<<<<<<< HEAD
 const findManySizes = () => {
   const sql = 'SELECT * FROM sizes';
   return dbSizes.connection.promise().query(sql)
+=======
+const getSizeByName = (name: string) => {
+  return connection
+    .promise()
+    .query('SELECT * FROM sizes WHERE name = ? ', [name])
+    .then(([results]: Array<Array<ISize>>) => results[0]);
+>>>>>>> b9f02dc91de0753f5ee582067c486f79cd977b37
 };
 
-const findOneSize = (id: number) => {
-  return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE id_size = ? ', [id])
-    
-};
-const findByIsChildrenSize = (is_children:number)=>{
-  return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE is_children = ? ', [is_children])
-  
-} 
-const findByNameSize = (name: string)=>{
-  return dbSizes.connection.promise().query('SELECT * FROM sizes WHERE name = ? ', [name])
-  
-} 
-const createSize = (name: object,isChildren:number) => {
-	return dbSizes.connection.promise()
-		.query("INSERT INTO sizes  SET ? ",
-			[name,isChildren]
-		)
-		
+const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+  const size = req.body as ISize;
+  const sizeWithSameName: ISize = await getSizeByName(size.name);
+  if (sizeWithSameName) {
+    next(new ErrorHandler(409, `Ce nom de taille existe déjà`));
+  } else {
+    next();
+  }
 };
 
-const updateSize = (id: number, newAttributes:object) => {
-  return dbSizes.connection.promise()
-    .query(" UPDATE sizes  SET  ?  WHERE id_size = ? ", [newAttributes,id])
+const createSize = (newSize: ISize) => {
+  return connection
+    .promise()
+    .query('INSERT INTO sizes (name,is_children) VALUES (?,?) ', [
+      newSize.name,
+      newSize.is_children,
+    ])
+    .then(([results]: Array<ResultSetHeader>) => results.insertId);
+};
+
+const updateSize = (idSize: number, name: string, is_children: number) => {
+  let sql: string = 'UPDATE sizes SET ';
+  let sqlValues: Array<any> = [];
+  let oneValue: boolean = false;
+  console.log(is_children);
+  if (name) {
+    sql += 'name = ? ';
+    sqlValues.push(name);
+    oneValue = true;
+  }
+  if (is_children === 0 || is_children === 1) {
+    sql += oneValue ? ', is_children = ? ' : ' is_children = ? ';
+    sqlValues.push(is_children);
+    oneValue = true;
+  }
+  sql += ' WHERE id_size = ?';
+  sqlValues.push(idSize);
+  return connection
+    .promise()
+    .query(sql, sqlValues)
+    .then(([results]: Array<ResultSetHeader>) => results.affectedRows === 1);
 };
 
 const destroySize = (id: number) => {
-  return dbSizes.connection.promise()
-    .query("DELETE FROM sizes WHERE id_size = ? ", [id])
+  return connection
+    .promise()
+    .query('DELETE FROM sizes WHERE id_size = ? ', [id]);
 };
 
-module.exports = {
-  findManySizes,
-  findOneSize,
+export {
+  getAllSizes,
+  nameIsFree,
+  getSizeById,
   createSize,
   updateSize,
   destroySize,
   validateSize,
-  findByNameSize,
-  findByIsChildrenSize,
+  getSizeByName,
 };
