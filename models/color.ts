@@ -15,8 +15,18 @@ const findManyColor = () => {
   return connectDbColor.query('SELECT * FROM colors');
 };
 
-const findOneColor = (id: number) => {
+const findColorById = (id: number) => {
   return connectDbColor.query('SELECT * FROM colors WHERE id_color = ?', [id]);
+};
+
+const findColorByName = (name: string) => {
+  return connectDbColor.query('SELECT * FROM colors WHERE name = ?', [name]);
+};
+
+const findColorByColorCode = (color_code: string) => {
+  return connectDbColor.query('SELECT * FROM colors WHERE color_code = ?', [
+    color_code,
+  ]);
 };
 
 const createColor = (newColor: object) => {
@@ -36,7 +46,9 @@ const destroyColor = (id: number) => {
 
 module.exports = {
   findManyColor,
-  findOneColor,
+  findColorById,
+  findColorByName,
+  findColorByColorCode,
   createColor,
   updateColor,
   destroyColor,

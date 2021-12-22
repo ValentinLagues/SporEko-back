@@ -30,31 +30,101 @@ sizesRouter.get('/:id', (req: Request, res: Response) => {
 });
 
 sizesRouter.post('/', (req: Request, res: Response) => {
-  const size: SizeInfo = req.body;
-  const joiErrors = Sizes.validateSize(size);
-  
-      Sizes.createSize(size)
-        .then(([createdSize]: Array<any>) => {
-          const id = createdSize.insertId;
-          res.status(201).json({ id, ...size });
+      const size: SizeInfo = req.body;
+      let duplicateData: string = '';
+      interface joiErrorsModel {
+        details: Array<any>;
+      }
+      interface errModel {
+        message: string;
+      }
+      let joiErrorsSize: joiErrorsModel;
+      Promise.all([
+        Sizes.findByNameSize(size.name),
+      ])
+        .then(([nameAllreadyExist]) => {
+          if (nameAllreadyExist[0].length > 0) {
+            duplicateData += 'Ce nom de taille existe déjà; ';
+          }
+          if (duplicateData) {
+            return Promise.reject(duplicateData);
+          }
+          const joiErrorsSize = Sizes.validateSize(size, false);
+          if (joiErrorsSize) {
+            return Promise.reject('INVALID_DATA');
+          }
+          return Sizes.createSize(size)
         })
-        .catch((error: Array<any>) => {
-          res.status(500).send(error);
-          res.status(422).send(joiErrors.details);
+        .then(([createSize]: Array<any>) => {
+          const id = createSize.insertId;
+          res.status(201).json({ id, ...size })
+        })
+        .catch((error) => {
+          if (error === duplicateData)
+            res.status(409).json({ message: duplicateData });
+          else if (error === 'INVALID_DATA') {
+            const joiDetails: Array<string> = joiErrorsSize.details.map(
+              (error: errModel) => {
+                console.log(error);
+                return error.message;
+              })
+            res.status(422).send(joiErrorsSize.details);
+          } else res.status(500).send(error);
         });
-});
+      }
+    );
 
-sizesRouter.put('/:id', (req: Request, res: Response) => { 
+
+
+sizesRouter.put('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
-  const size: SizeInfo = req.body;
-  const joiErrors = Sizes.validateSize(size);
-  if (joiErrors) res.status(422).json(joiErrors.message);
-  else Sizes.updateSize(id, size ).then(() =>  res.status(201).json({ id_size: id, ...size }))
-  .catch((error: Array<any>) => {
-    res.status(500).send(error);
-  });
-
+  Sizes.findOneSize(id).then(([sizeFound]: Array<any>) => {
+    if (sizeFound.length < 1) {
+      res.status(404).send('Taille non trouvé');
+    } else {
+      const size: SizeInfo = req.body;
+      let duplicateData: string = '';
+      interface joiErrorsModel {
+        details: Array<any>;
+      }
+      interface errModel {
+        message: string;
+      }
+      let joiErrorsSize: joiErrorsModel;
+      Promise.all([
+        Sizes.findByNameSize(size.name),
+      ])
+        .then(([nameAllreadyExist]) => {
+          if (nameAllreadyExist[0].length > 0) {
+            duplicateData += 'Ce nom de taille existe déjà; ';
+          }
+          if (duplicateData) {
+            return Promise.reject(duplicateData);
+          }
+          const joiErrorsSize = Sizes.validateSize(size, false);
+          if (joiErrorsSize) {
+            return Promise.reject('INVALID_DATA');
+          }
+          return Sizes.updateSize(id, size)
+        })
+        .then(() => res.status(201).json( { ...sizeFound[0], ...size }))
+        .catch((error) => {
+          if (error === duplicateData)
+            res.status(409).json({ message: duplicateData });
+          else if (error === 'INVALID_DATA') {
+            const joiDetails: Array<string> = joiErrorsSize.details.map(
+              (error: errModel) => {
+                console.log(error);
+                return error.message;
+              })
+            res.status(422).send(joiErrorsSize.details);
+          } else res.status(500).send(error);
+        });
+      }
+    });
 });
+
+
 
 sizesRouter.delete('/:id', (req: Request, res: Response) => { 
   const { id } = req.params;

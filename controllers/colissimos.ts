@@ -1,81 +1,77 @@
-const colissimosRouter = require('express').Router();
-import { Request, Response } from 'express';
-const Colissimo = require('../models/colissimo');
+import { Request, Response, NextFunction, Router } from 'express';
+import * as Colissimo from '../models/colissimo';
+import IColissimo from '../interfaces/IColissimo';
+import { ErrorHandler } from '../helpers/errors';
 
-interface ColissimoInfo {
-  name: string;
-  weight: string;
-  price: number;
-}
+const colissimosRouter = Router();
 
-colissimosRouter.get('/', (req: Request, res: Response) => {
-  Colissimo.findManyColissimo().then(([result]: Array<any>) => {
-    res.status(200).json(result);
-  });
+colissimosRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  Colissimo.getAll()
+    .then((colissimos: Array<IColissimo>) => {
+      res.status(200).json(colissimos);
+    })
+    .catch((err) => next(err));
 });
 
-colissimosRouter.get('/:idcolissimo', (req: Request, res: Response) => {
-  const { idcolissimo } = req.params;
-  Colissimo.findOneColissimo(idcolissimo).then(([result]: Array<any>) => {
-    if (result.length > 0) {
-      res.json(result);
-    } else {
-      res.status(404).send('Colissimo non trouvé');
-    }
-  });
-});
-
-colissimosRouter.post('/', (req: Request, res: Response) => {
-  const colissimo: ColissimoInfo = req.body;
-  const joiErrors = Colissimo.validateColissimo(colissimo);
-  if (joiErrors) {
-    res.status(422).send(joiErrors.details);
-  } else {
-    Colissimo.createColissimo(colissimo)
-      .then(([createdColissimo]: Array<any>) => {
-        const id = createdColissimo.insertId;
-        res.status(201).json({ id, ...colissimo });
-      })
-      .catch((error: Array<any>) => {
-        res.status(500).send(error);
-      });
+colissimosRouter.get(
+  '/:idColissimo',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idColissimo } = req.params;
+    Colissimo.getById(Number(idColissimo))
+      .then((colissimo: IColissimo) => res.status(200).json(colissimo))
+      .catch((err) => next(err));
   }
-});
+);
 
-colissimosRouter.put('/:idcolissimo', (req: Request, res: Response) => {
-  const { idcolissimo } = req.params;
-  Colissimo.findOneColissimo(idcolissimo).then(
-    ([colissimoFound]: Array<any>) => {
-      if (colissimoFound.length > 0) {
-        const colissimo: ColissimoInfo = req.body;
-        const joiErrors = Colissimo.validateColissimo(colissimo, false);
-        if (joiErrors) {
-          res.status(409).send(joiErrors.details);
-        } else {
-          Colissimo.updateColissimo(idcolissimo, colissimo).then(() => {
-            res.status(200).json({ ...colissimoFound[0], ...colissimo });
-          });
-        }
-      } else {
-        res.status(404).send('Colissimo non trouvé');
-      }
+colissimosRouter.post(
+  '/',
+  Colissimo.nameIsFree,
+  Colissimo.validateColissimo,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const colissimo = req.body as IColissimo;
+      colissimo.id_colissimo = await Colissimo.create(colissimo);
+      res.status(201).json(colissimo);
+    } catch (err) {
+      next(err);
     }
-  );
-});
+  }
+);
 
-colissimosRouter.delete('/:idcolissimo', (req: Request, res: Response) => {
-  const { idcolissimo } = req.params;
-  Colissimo.findOneColissimo(idcolissimo).then(
-    ([colissimoFound]: Array<any>) => {
-      if (colissimoFound.length > 0) {
-        Colissimo.destroyColissimo(idcolissimo).then(() => {
-          res.status(200).send('Colissimo supprimé');
-        });
-      } else {
-        res.status(404).send('Colissimo non trouvé (vérif id)');
-      }
+colissimosRouter.put(
+  '/:idcolissimo',
+  Colissimo.nameIsFree,
+  Colissimo.validateColissimo,
+  async (req: Request, res: Response) => {
+    const { idcolissimo } = req.params;
+
+    const colissimoUpdated = await Colissimo.update(
+      Number(idcolissimo),
+      req.body as IColissimo
+    );
+    if (colissimoUpdated) {
+      res.status(200).send('Colissimo mis à jour');
+    } else {
+      throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
     }
-  );
-});
+  }
+);
 
-module.exports = { colissimosRouter };
+colissimosRouter.delete(
+  '/:idcolissimo',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { idcolissimo } = req.params;
+      const colissimoDeleted = await Colissimo.destroy(Number(idcolissimo));
+      if (colissimoDeleted) {
+        res.status(200).send('Colissimo supprimé');
+      } else {
+        throw new ErrorHandler(404, `Colissimo non trouvé`);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+export default colissimosRouter;
