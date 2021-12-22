@@ -1,8 +1,3 @@
-// const JoiColor = require('joi');
-// const dbColor = require('../db-config');
-
-// const connectDbColor = dbColor.connection.promise();
-
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
@@ -10,13 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IColor from '../interfaces/IColor';
 
-// const validateColor = (data: object, forCreation = true) => {
-//   const presence = forCreation ? 'required' : 'optional';
-//   return JoiColor.object({
-//     name: JoiColor.string().max(50).presence(presence),
-//     color_code: JoiColor.string().min(7).max(9).presence(presence),
-//   }).validate(data, { abortEarly: false }).error;
-// };
 const validateColor = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -33,9 +21,6 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// const findManyColor = () => {
-//   return connectDbColor.query('SELECT * FROM colors');
-// };
 const getAll = async (): Promise<IColor[]> => {
   return connection
     .promise()
@@ -43,9 +28,6 @@ const getAll = async (): Promise<IColor[]> => {
     .then(([results]) => results);
 };
 
-// const findColorById = (id: number) => {
-//   return connectDbColor.query('SELECT * FROM colors WHERE id_color = ?', [id]);
-// };
 const getById = async (idColor: number): Promise<IColor> => {
   return connection
     .promise()
@@ -53,9 +35,6 @@ const getById = async (idColor: number): Promise<IColor> => {
     .then(([results]) => results[0]);
 };
 
-// const findColorByName = (name: string) => {
-//   return connectDbColor.query('SELECT * FROM colors WHERE name = ?', [name]);
-// };
 const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
   const colorWithSameName: IColor = await getByName(color.name);
@@ -65,6 +44,7 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
 const getByName = async (name: string): Promise<IColor> => {
   return connection
     .promise()
@@ -72,11 +52,6 @@ const getByName = async (name: string): Promise<IColor> => {
     .then(([results]) => results[0]);
 };
 
-// const findColorByColorCode = (color_code: string) => {
-//   return connectDbColor.query('SELECT * FROM colors WHERE color_code = ?', [
-//     color_code,
-//   ]);
-// };
 const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
   const colorWithSameCode: IColor = await getByCode(color.color_code);
@@ -86,6 +61,7 @@ const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
 const getByCode = async (color_code: string): Promise<IColor> => {
   return connection
     .promise()
@@ -93,9 +69,6 @@ const getByCode = async (color_code: string): Promise<IColor> => {
     .then(([results]) => results[0]);
 };
 
-// const createColor = (newColor: object) => {
-//   return connectDbColor.query('INSERT INTO colors SET ?', [newColor]);
-// };
 const create = async (newColor: IColor): Promise<number> => {
   return connection
     .promise()
@@ -106,12 +79,6 @@ const create = async (newColor: IColor): Promise<number> => {
     .then(([results]) => results.insertId);
 };
 
-// const updateColor = (id: number, newAttributes: object) => {
-//   return connectDbColor.query('UPDATE colors SET ? WHERE id_color = ?', [
-//     newAttributes,
-//     id,
-//   ]);
-// };
 const update = async (
   idColor: number,
   attibutesToUpdate: IColor
@@ -139,9 +106,6 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-// const destroyColor = (id: number) => {
-//   return connectDbColor.query('DELETE FROM colors WHERE id_color = ?', [id]);
-// };
 const destroy = async (idColor: number): Promise<boolean> => {
   return connection
     .promise()
@@ -149,16 +113,6 @@ const destroy = async (idColor: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-// module.exports = {
-//   findManyColor,
-//   findColorById,
-//   findColorByName,
-//   findColorByColorCode,
-//   createColor,
-//   updateColor,
-//   destroyColor,
-//   validateColor,
-// };
 export {
   getAll,
   getById,
