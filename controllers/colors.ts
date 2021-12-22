@@ -1,77 +1,85 @@
-const colorsRouter = require('express').Router();
-import { Request, Response } from 'express';
-const Color = require('../models/color');
+import { Request, Response, NextFunction, Router } from 'express';
+import * as Color from '../models/color';
+import IColor from '../interfaces/IColor';
+import { ErrorHandler } from '../helpers/errors';
 
-interface ColorInfo {
-  name: string;
-  color_code: string;
-}
+const colorsRouter = Router();
 
-colorsRouter.get('/', (req: Request, res: Response) => {
-  Color.findManyColor().then(([result]: Array<any>) => {
-    res.status(200).json(result);
-  });
+colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  Color.getAll()
+    .then((colors: Array<IColor>) => {
+      res.status(200).json(colors);
+    })
+    .catch((err) => next(err));
 });
 
-colorsRouter.get('/:idcolor', (req: Request, res: Response) => {
-  const { idcolor } = req.params;
-  Color.findOneColor(idcolor).then(([result]: Array<any>) => {
-    if (result.length > 0) {
-      res.json(result);
-    } else {
-      res.status(404).send('Color not found');
-    }
-  });
-});
-
-colorsRouter.post('/', (req: Request, res: Response) => {
-  const color: ColorInfo = req.body;
-  const joiErrors = Color.validateColor(color);
-  if (joiErrors) {
-    res.status(422).send(joiErrors.details);
-  } else {
-    Color.createColor(color)
-      .then(([createdColor]: Array<any>) => {
-        const id = createdColor.insertId;
-        res.status(201).json({ id, ...color });
+colorsRouter.get(
+  '/:idColor',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idColor } = req.params;
+    Color.getById(Number(idColor))
+      .then((color: IColor) => {
+        if (color === undefined) {
+          res.status(404).send('Couleur non trouvée');
+        }
+        res.status(200).json(color);
       })
-      .catch((error: Array<any>) => {
-        res.status(500).send(error);
-      });
+      .catch((err) => next(err));
   }
-});
+);
 
-colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
-  const { idcolor } = req.params;
-  Color.findOneColor(idcolor).then(([colorFound]: Array<any>) => {
-    if (colorFound.length > 0) {
-      const color: ColorInfo = req.body;
-      const joiErrors = Color.validateColor(color, false);
-      if (joiErrors) {
-        console.log('dans if');
-        res.status(409).send(joiErrors.details);
-      } else {
-        Color.updateColor(idcolor, color).then(() => {
-          res.status(200).json({ ...colorFound[0], ...color });
-        });
-      }
-    } else {
-      res.status(404).send('Color not found');
+colorsRouter.post(
+  '/',
+  Color.nameIsFree,
+  Color.codeIsFree,
+  Color.validateColor,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const color = req.body as IColor;
+      color.id_color = await Color.create(color);
+      res.status(201).json(color);
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-colorsRouter.delete('/:idcolor', (req: Request, res: Response) => {
-  const { idcolor } = req.params;
-  Color.findOneColor(idcolor).then(([colorFound]: Array<any>) => {
-    if (colorFound.length > 0) {
-      Color.destroyColor(idcolor).then(() => {
+colorsRouter.put(
+  '/:idcolor',
+  Color.recordExists,
+  Color.nameIsFree,
+  Color.codeIsFree,
+  Color.validateColor,
+  async (req: Request, res: Response) => {
+    const { idcolor } = req.params;
+
+    const colorUpdated = await Color.update(
+      Number(idcolor),
+      req.body as IColor
+    );
+    if (colorUpdated) {
+      res.status(200).send('Couleur mise à jour');
+    } else {
+      throw new ErrorHandler(500, `Cette Couleur ne peut pas être mise à jour`);
+    }
+  }
+);
+
+colorsRouter.delete(
+  '/:idcolor',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { idcolor } = req.params;
+      const colorDeleted = await Color.destroy(Number(idcolor));
+      if (colorDeleted) {
         res.status(200).send('Couleur supprimée');
-      });
-    } else {
-      res.status(404).send('Couleur non trouvée (vérif id)');
+      } else {
+        throw new ErrorHandler(404, `Couleur non trouvée`);
+      }
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-module.exports = { colorsRouter };
+export default colorsRouter;

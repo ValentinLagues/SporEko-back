@@ -1,6 +1,4 @@
-# git clone, git checkout dev, npm install
-
-# (ou début tuto express - mvc / joi -> git checkout firstLocalConfig, npm install)
+# git clone, git checkout dev on dev time / main, npm install
 
 # create a .env file
 

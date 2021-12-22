@@ -1,17 +1,22 @@
 import express from 'express';
-require('dotenv').config();
-const app = express();
+import cookieParser from 'cookie-parser';
 import { handleError } from './helpers/errors';
 import setupRoutes from './controllers';
+import 'dotenv/config';
 
+const app = express();
+const port = process.env.PORT || 8000;
 
-const port:string  = process.env.PORT || '8000';
 
 app.use(express.json());
+app.use(cookieParser());
 
 setupRoutes(app);
 
+
+
 // A mettre à la fin pour gèrer les erreurs qui sortiront des routes
+
 app.use(handleError);
 
 app.listen(port, () => {
