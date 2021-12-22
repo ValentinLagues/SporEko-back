@@ -10,7 +10,7 @@ import colorsRouter from './colors';
 import colissimosRouter from './colissimos';
 // import MondialRelayRouter from './mondialRelay';
 // import SportifStylesRouter from './sportifStyles';
-// import TextilesRouter from './textiles';
+import textilesRouter from './textiles';
 // import CategoriesRouter from './categories';
 
 const setupRoutes = (app: express.Application) => {
@@ -25,7 +25,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/colissimos', colissimosRouter);
   // app.use('/modialRelay', mondialRelayRouter);
   // app.use('/sportifStyles', sportifStylesRouter);
-  // app.use('/textiles', textilesRouter);
+  app.use('/textiles', textilesRouter);
   // app.use('/categories', categoriesRouter);
 };
 
