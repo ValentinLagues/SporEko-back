@@ -1,15 +1,19 @@
-const express = require('express');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import { handleError } from './helpers/errors';
+import setupRoutes from './controllers';
+import 'dotenv/config';
+
 const app = express();
-const routes = require('./controllers');
-const port:string  = process.env.PORT || '8000';
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
+app.use(cookieParser());
 
-routes.setupRoutes(app);
+setupRoutes(app);
 
-app.listen(port, (err: Error) => {
-  if (err) {
-    return console.error(err);
-  }
-  return console.log(`server is listening on ${port}`);
+app.use(handleError);
+
+app.listen(port, () => {
+  console.log(`server is listening on ${port}`);
 });
