@@ -22,18 +22,32 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = (): Promise<IColissimo[]> => {
+const getAll = async (): Promise<IColissimo[]> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo')
     .then(([results]) => results);
 };
 
-const getById = (idcolissimo: number): Promise<IColissimo> => {
+const recordExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const colissimo = req.body as IColissimo;
+  const recordFound: IColissimo = await getById(colissimo.id_colissimo);
+  if (!recordFound) {
+    next(new ErrorHandler(404, `Colissimo non trouvé`));
+  } else {
+    next();
+  }
+};
+
+const getById = async (idColissimo: number): Promise<IColissimo> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo WHERE id_colissimo = ?', [
-      idcolissimo,
+      idColissimo,
     ])
     .then(([results]) => results[0]);
 };
@@ -48,38 +62,60 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getByName = (name: string): Promise<IColissimo> => {
+const getByName = async (name: string): Promise<IColissimo> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = (newColissimo: IColissimo): Promise<number> => {
+const create = async (newColissimo: IColissimo): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO colissimo SET ?', [newColissimo])
+    .query<ResultSetHeader>(
+      'INSERT INTO colissimo (name, weight, price) VALUES (?, ?, ?)',
+      [newColissimo.name, newColissimo.weight, newColissimo.price]
+    )
     .then(([results]) => results.insertId);
 };
 
-const update = (
-  idcolissimo: number,
-  newAttributes: IColissimo
+const update = async (
+  idColissimo: number,
+  attibutesToUpdate: IColissimo
 ): Promise<boolean> => {
+  let sql = 'UPDATE colissimo SET ';
+  const sqlValues: Array<string | number> = [];
+  let oneValue = false;
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.weight) {
+    sql += oneValue ? ', weight = ? ' : ' weight = ? ';
+    sqlValues.push(attibutesToUpdate.weight);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.price) {
+    sql += oneValue ? ', price = ? ' : ' price = ? ';
+    sqlValues.push(attibutesToUpdate.price);
+    oneValue = true;
+  }
+  sql += ' WHERE id_colissimo = ?';
+  sqlValues.push(idColissimo);
+
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE colissimo SET ? WHERE id_colissimo = ?', [
-      newAttributes,
-      idcolissimo,
-    ])
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idcolissimo: number): Promise<boolean> => {
+const destroy = async (idColissimo: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM colissimo WHERE id_colissimo = ?', [
-      idcolissimo,
+      idColissimo,
     ])
     .then(([results]) => results.affectedRows === 1);
 };
@@ -89,6 +125,7 @@ export {
   getById,
   getByName,
   nameIsFree,
+  recordExists,
   create,
   update,
   destroy,
