@@ -1,15 +1,19 @@
-const express = require('express');
+import express from 'express';
+require('dotenv').config();
 const app = express();
-const routes = require('./controllers');
+import { handleError } from './helpers/errors';
+import setupRoutes from './controllers';
+
+
 const port:string  = process.env.PORT || '8000';
 
 app.use(express.json());
 
-routes.setupRoutes(app);
+setupRoutes(app);
 
-app.listen(port, (err: Error) => {
-  if (err) {
-    return console.error(err);
-  }
-  return console.log(`server is listening on ${port}`);
+// A mettre à la fin pour gèrer les erreurs qui sortiront des routes
+app.use(handleError);
+
+app.listen(port, () => {
+  console.log(`server is listening on ${port}`);
 });
