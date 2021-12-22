@@ -123,9 +123,9 @@ const destroy = async (idColissimo: number): Promise<boolean> => {
 export {
   getAll,
   getById,
+  recordExists,
   getByName,
   nameIsFree,
-  recordExists,
   create,
   update,
   destroy,
