@@ -11,7 +11,7 @@ const validateBrand = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(150).presence(presence),
+    name: Joi.string().max(50).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -20,75 +20,90 @@ const validateBrand = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAllBrands = (): Promise<IBrand[]> => {
+const getAll = async (): Promise<IBrand[]> => {
   return connection
     .promise()
     .query<IBrand[]>('SELECT * FROM brands')
     .then(([results]) => results);
 };
 
-const getBrandById = (idbrand: number): Promise<IBrand> => {
-  return connection
-    .promise()
-    .query<IBrand[]>('SELECT * FROM brands WHERE id_brand = ?', [
-      idbrand,
-    ])
-    .then(([results]) => results[0]);
-};
-
-const brandNameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+const recordExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const brand = req.body as IBrand;
-  const brandWithSameName: IBrand = await getByBrandName(brand.name);
-  if (brandWithSameName) {
-    next(new ErrorHandler(409, `Cette marque existe déjà dans la BDD`));
+  const recordFound: IBrand = await getById(brand.id_brand);
+  if (!recordFound) {
+    next(new ErrorHandler(404, `Marque non trouvée`));
   } else {
     next();
   }
 };
 
-const getByBrandName = (name: string): Promise<IBrand> => {
+const getById = async (idBrand: number): Promise<IBrand> => {
+  return connection
+    .promise()
+    .query<IBrand[]>('SELECT * FROM brands WHERE id_brand = ?', [idBrand])
+    .then(([results]) => results[0]);
+};
+
+const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+  const brand = req.body as IBrand;
+  const brandWithSameName: IBrand = await getByName(brand.name);
+  if (brandWithSameName) {
+    next(new ErrorHandler(409, `Ce nom de marque existe déjà`));
+  } else {
+    next();
+  }
+};
+
+const getByName = async (name: string): Promise<IBrand> => {
   return connection
     .promise()
     .query<IBrand[]>('SELECT * FROM brands WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const createBrand = (brand: IBrand): Promise<number> => {
+const create = async (newBrand: IBrand): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO brands (name) VALUES (?)', [brand.name])
+    .query<ResultSetHeader>(
+      'INSERT INTO brands (name) VALUES (?)',
+      [newBrand.name]
+    )
     .then(([results]) => results.insertId);
 };
 
-const updateBrand = (
-  idbrand: number,
-  newAttributes: IBrand
+const update = async (
+  idBrand: number,
+  attributesToUpdate: IBrand
 ): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('UPDATE brands SET name = ? WHERE id_brand = ?', [
-      newAttributes,
-      idbrand,
+      attributesToUpdate,
+      idBrand,
     ])
     .then(([results]) => results.affectedRows === 1);
-};
+}
 
-const destroyBrand = async (idbrand: number): Promise<boolean> => {
+const destroy = async (idBrand: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM brands WHERE id_brand = ?', [
-      idbrand,
-    ])
+    .query<ResultSetHeader>('DELETE FROM brands WHERE id_brand = ?', [idBrand])
     .then(([results]) => results.affectedRows === 1);
 };
 
 export {
   validateBrand,
-  getAllBrands,
-  getBrandById,
-  brandNameIsFree,
-  getByBrandName,
-  createBrand,
-  updateBrand,
-  destroyBrand
+  getAll,
+  getById,
+  recordExists,
+  getByName,
+  nameIsFree,
+  create,
+  update,
+  destroy,
 };
+

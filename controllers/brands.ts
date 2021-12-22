@@ -6,67 +6,72 @@ import { ErrorHandler } from '../helpers/errors';
 const brandsRouter = Router();
 
 brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Colissimo.getAll()
-    .then((colissimos: Array<IColissimo>) => {
-      res.status(200).json(colissimos);
+  Brand.getAll()
+    .then((brands: Array<IBrand>) => {
+      res.status(200).json(brands);
     })
     .catch((err) => next(err));
 });
 
-colissimosRouter.get(
-  '/:idColissimo',
+brandsRouter.get(
+  '/:idBrand',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idColissimo } = req.params;
-    Colissimo.getById(Number(idColissimo))
-      .then((colissimo: IColissimo) => res.status(200).json(colissimo))
+    const { idBrand } = req.params;
+    Brand.getById(Number(idBrand))
+      .then((brand: IBrand) => {
+        if (brand === undefined) {
+          res.status(404).send('Marque non trouvée');
+        }
+        res.status(200).json(brand);
+      })
       .catch((err) => next(err));
   }
 );
 
-colissimosRouter.post(
+brandsRouter.post(
   '/',
-  Colissimo.nameIsFree,
-  Colissimo.validateColissimo,
+  Brand.nameIsFree,
+  Brand.validateBrand,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const colissimo = req.body as IColissimo;
-      colissimo.id_colissimo = await Colissimo.create(colissimo);
-      res.status(201).json(colissimo);
+      const brand = req.body as IBrand;
+      brand.id_brand = await Brand.create(brand);
+      res.status(201).json(brand);
     } catch (err) {
       next(err);
     }
   }
 );
 
-colissimosRouter.put(
-  '/:idcolissimo',
-  Colissimo.nameIsFree,
-  Colissimo.validateColissimo,
+brandsRouter.put(
+  '/:idBrand',
+  Brand.recordExists,
+  Brand.nameIsFree,
+  Brand.validateBrand,
   async (req: Request, res: Response) => {
-    const { idcolissimo } = req.params;
-
-    const colissimoUpdated = await Colissimo.update(
-      Number(idcolissimo),
-      req.body as IColissimo
+    const { idBrand } = req.params;
+    const brandUpdated = await Brand.update(
+      Number(idBrand),
+      req.body as IBrand
     );
-    if (colissimoUpdated) {
-      res.status(200).send('Colissimo mis à jour');
+    if (brandUpdated) {
+      res.status(200).send('Marque mise à jour');
     } else {
-      throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
+      throw new ErrorHandler(500, `Cette marque ne peut pas être mise à jour`);
     }
   }
 );
 
-colissimosRouter.delete(
-  '/:idcolissimo',
+brandsRouter.delete(
+  '/:idBrand',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { idcolissimo } = req.params;
-      const colissimoDeleted = await Colissimo.destroy(Number(idcolissimo));
-      if (colissimoDeleted) {
-        res.status(200).send('Colissimo supprimé');
+      const { idBrand } = req.params;
+      const brandDeleted = await Brand.destroy(Number(idBrand));
+      if (brandDeleted) {
+        res.status(200).send('Marque supprimée');
       } else {
-        throw new ErrorHandler(404, `Colissimo non trouvé`);
+        throw new ErrorHandler(404, `Marque non trouvée`);
       }
     } catch (err) {
       next(err);
