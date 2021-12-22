@@ -41,7 +41,7 @@ usersRouter.get('/:iduser', (req: Request, res: Response) => {
 
 usersRouter.post('/', (req: Request, res: Response) => {
   const user: UserInfo = req.body;
-  let duplicateData: string = '';
+  let duplicateData = '';
   interface joiErrorsModel {
     details: Array<any>;
   }
@@ -98,7 +98,7 @@ usersRouter.put('/:iduser', (req: Request, res: Response) => {
     } else {
       const user: UserInfo = req.body;
 
-      let duplicateData: string = '';
+      let duplicateData = '';
       interface joiErrorsModel {
         details: Array<any>;
       }

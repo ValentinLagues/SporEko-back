@@ -30,7 +30,7 @@ gendersRouter.get('/:id', (req: Request, res: Response) => {
 
 gendersRouter.post('/', (req: Request, res: Response) => {
   const gender: GenderInfo = req.body;
-  let duplicateData: string = '';
+  let duplicateData = '';
   interface joiErrorsModel {
     details: Array<any>;
   }
@@ -88,7 +88,7 @@ gendersRouter.put('/:id', (req: Request, res: Response) => {
     } else {
       const gender: GenderInfo = req.body;
 
-      let duplicateData: string = '';
+      let duplicateData = '';
       interface joiErrorsModel {
         details: Array<any>;
       }

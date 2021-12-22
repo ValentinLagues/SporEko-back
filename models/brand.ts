@@ -27,20 +27,6 @@ const getAll = async (): Promise<IBrand[]> => {
     .then(([results]) => results);
 };
 
-const recordExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const brand = req.body as IBrand;
-  const recordFound: IBrand = await getById(brand.id_brand);
-  if (!recordFound) {
-    next(new ErrorHandler(404, `Marque non trouvée`));
-  } else {
-    next();
-  }
-};
-
 const getById = async (idBrand: number): Promise<IBrand> => {
   return connection
     .promise()
@@ -77,16 +63,25 @@ const create = async (newBrand: IBrand): Promise<number> => {
 
 const update = async (
   idBrand: number,
-  attributesToUpdate: IBrand
+  attibutesToUpdate: IBrand
 ): Promise<boolean> => {
+  let sql = 'UPDATE brands SET ';
+  const sqlValues: Array<string | number> = [];
+  let oneValue = false;
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+    oneValue = true;
+  }
+  sql += ' WHERE id_brand = ?';
+  sqlValues.push(idBrand);
+
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE brands SET name = ? WHERE id_brand = ?', [
-      attributesToUpdate,
-      idBrand,
-    ])
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
-}
+};
 
 const destroy = async (idBrand: number): Promise<boolean> => {
   return connection
@@ -99,11 +94,9 @@ export {
   validateBrand,
   getAll,
   getById,
-  recordExists,
   getByName,
   nameIsFree,
   create,
   update,
   destroy,
 };
-

@@ -1,48 +1,102 @@
-const JoiConditions = require('joi');
-const dbConditions = require('../db-config');
+import connection from '../db-config.js';
+import { ResultSetHeader } from 'mysql2';
+import Joi from 'joi';
+import { NextFunction, Request, Response } from 'express';
+import { ErrorHandler } from '../helpers/errors';
+import ICondition from '../interfaces/ICondition';
 
-const connectDbConditions = dbConditions.connection.promise();
-
-const validateCondition = (data: object, forCreation = true) => {
-  const presence = forCreation ? 'required' : 'optional';
-  return JoiConditions.object({
-    name: JoiConditions.string().max(50).presence(presence),
-  }).validate(data, { abortEarly: false }).error;
+const validateCondition = (req: Request, res: Response, next: NextFunction) => {
+  let presence: Joi.PresenceMode = 'optional';
+  if (req.method === 'POST') {
+    presence = 'required';
+  }
+  const errors = Joi.object({
+    name: Joi.string().max(50).presence(presence),
+  }).validate(req.body, { abortEarly: false }).error;
+  if (errors) {
+    next(new ErrorHandler(422, errors.message));
+  } else {
+    next();
+  }
 };
 
-const findManyConditions = () => {
-  return connectDbConditions.query('SELECT * FROM conditions');
+const getAll = async (): Promise<ICondition[]> => {
+  return connection
+    .promise()
+    .query<ICondition[]>('SELECT * FROM conditions')
+    .then(([results]) => results);
 };
 
-const findOneCondition = (id: number) => {
-  return connectDbConditions.query('SELECT * FROM conditions WHERE id_condition = ?', [id]);
+const getById = async (idCondition: number): Promise<ICondition> => {
+  return connection
+    .promise()
+    .query<ICondition[]>('SELECT * FROM conditions WHERE id_condition = ?', [idCondition])
+    .then(([results]) => results[0]);
 };
 
-const findByConditionName = (name: string) => {
-  return connectDbConditions.query('SELECT * FROM conditions WHERE name = ?', [name]);
-}
-
-const createCondition = (newCondition: object) => {
-  return connectDbConditions.query('INSERT INTO conditions SET ?', [newCondition]);
+const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+  const condition = req.body as ICondition;
+  const conditionWithSameName: ICondition = await getByName(condition.name);
+  if (conditionWithSameName) {
+    next(new ErrorHandler(409, `Cet état existe déjà`));
+  } else {
+    next();
+  }
 };
 
-const updateCondition = (id: number, newAttributes: object) => {
-  return connectDbConditions.query('UPDATE conditions SET ? WHERE id_condition = ?', [
-    newAttributes,
-    id,
-  ]);
+const getByName = async (name: string): Promise<ICondition> => {
+  return connection
+    .promise()
+    .query<ICondition[]>('SELECT * FROM conditions WHERE name = ?', [name])
+    .then(([results]) => results[0]);
 };
 
-const destroyCondition = (id: number) => {
-  return connectDbConditions.query('DELETE FROM conditions WHERE id_condition = ?', [id]);
+const create = async (newCondition: ICondition): Promise<number> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>(
+      'INSERT INTO conditions (name) VALUES (?)',
+      [newCondition.name]
+    )
+    .then(([results]) => results.insertId);
 };
 
-module.exports = {
+const update = async (
+  idCondition: number,
+  attibutesToUpdate: ICondition
+): Promise<boolean> => {
+  let sql = 'UPDATE conditions SET ';
+  const sqlValues: Array<string | number> = [];
+  let oneValue = false;
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+    oneValue = true;
+  }
+  sql += ' WHERE id_condition = ?';
+  sqlValues.push(idCondition);
+
+  return connection
+    .promise()
+    .query<ResultSetHeader>(sql, sqlValues)
+    .then(([results]) => results.affectedRows === 1);
+};
+
+const destroy = async (idCondition: number): Promise<boolean> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('DELETE FROM conditions WHERE id_condition = ?', [idCondition])
+    .then(([results]) => results.affectedRows === 1);
+};
+
+export {
   validateCondition,
-  findManyConditions,
-  findOneCondition,
-  findByConditionName,
-  createCondition,
-  updateCondition,
-  destroyCondition,
+  getAll,
+  getById,
+  getByName,
+  nameIsFree,
+  create,
+  update,
+  destroy,
 };

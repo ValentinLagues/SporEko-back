@@ -45,7 +45,6 @@ brandsRouter.post(
 
 brandsRouter.put(
   '/:idBrand',
-  Brand.recordExists,
   Brand.nameIsFree,
   Brand.validateBrand,
   async (req: Request, res: Response) => {

@@ -5,7 +5,7 @@ import brandsRouter from './brands';
 // import GendersRouter from './genders';
 // import SportsRouter from './sports';
 // import SizesRouter from './sizes';
-// import ConditionsRouter from './conditions';
+import conditionsRouter from './conditions';
 // import BrandsRouter from './brands';
 import colorsRouter from './colors';
 import colissimosRouter from './colissimos';
@@ -20,7 +20,7 @@ const setupRoutes = (app: express.Application) => {
   // app.use('/genders', gendersRouter);
   // app.use('/sports', sportsRouter);
   // app.use('/sizes', sizesRouter);
-  // app.use('/conditions', conditionsRouter);
+  app.use('/conditions', conditionsRouter);
   app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);
   app.use('/colissimos', colissimosRouter);

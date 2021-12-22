@@ -31,7 +31,7 @@ sizesRouter.get('/:id', (req: Request, res: Response) => {
 
 sizesRouter.post('/', (req: Request, res: Response) => {
       const size: SizeInfo = req.body;
-      let duplicateData: string = '';
+      let duplicateData = '';
       interface joiErrorsModel {
         details: Array<any>;
       }
@@ -83,7 +83,7 @@ sizesRouter.put('/:id', (req: Request, res: Response) => {
       res.status(404).send('Taille non trouvé');
     } else {
       const size: SizeInfo = req.body;
-      let duplicateData: string = '';
+      let duplicateData = '';
       interface joiErrorsModel {
         details: Array<any>;
       }

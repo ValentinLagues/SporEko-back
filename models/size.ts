@@ -12,7 +12,7 @@ const validateSize = (data: object, forCreation = true) => {
 };
 
 const findManySizes = () => {
-  let sql = 'SELECT * FROM sizes';
+  const sql = 'SELECT * FROM sizes';
   return dbSizes.connection.promise().query(sql)
 };
 
