@@ -22,48 +22,48 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getAllSizes = () => {
-  let sql = 'SELECT * FROM sizes';
+  const sql = 'SELECT * FROM sizes';
   return connection.promise().query(sql);
 };
 
 const getSizeById = (id: number) => {
   return connection
     .promise()
-    .query('SELECT * FROM sizes WHERE id_size = ? ', [id]);
+    .query<ISize[]>('SELECT * FROM sizes WHERE id_size = ? ', [id])
+    .then(([result]) => result[0]);
 };
 
 const getSizeByName = (name: string) => {
   return connection
     .promise()
-    .query('SELECT * FROM sizes WHERE name = ? ', [name])
-    .then(([results]: Array<Array<ISize>>) => results[0]);
+    .query<ISize[]>('SELECT * FROM sizes WHERE name = ? ', [name])
+    .then(([results]) => results[0]);
 };
 
 const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const size = req.body as ISize;
-  const sizeWithSameName: ISize = await getSizeByName(size.name);
-  if (sizeWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de taille existe déjà`));
+  const gender = req.body as ISize;
+  const genderWithSameName: ISize = await getSizeByName(gender.name);
+  if (genderWithSameName) {
+    next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
   } else {
     next();
   }
 };
 
-const createSize = (newSize: ISize) => {
+const createSize = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
-    .query('INSERT INTO sizes (name,is_children) VALUES (?,?) ', [
-      newSize.name,
-      newSize.is_children,
-    ])
-    .then(([results]: Array<ResultSetHeader>) => results.insertId);
+    .query<ResultSetHeader>(
+      'INSERT INTO sizes (name,is_children) VALUES (?,?) ',
+      [newSize.name, newSize.is_children]
+    )
+    .then(([results]) => results.insertId);
 };
 
 const updateSize = (idSize: number, name: string, is_children: number) => {
-  let sql: string = 'UPDATE sizes SET ';
-  let sqlValues: Array<any> = [];
-  let oneValue: boolean = false;
-  console.log(is_children);
+  let sql = 'UPDATE sizes SET ';
+  const sqlValues: Array<any> = [];
+  let oneValue = false;
   if (name) {
     sql += 'name = ? ';
     sqlValues.push(name);
@@ -78,8 +78,8 @@ const updateSize = (idSize: number, name: string, is_children: number) => {
   sqlValues.push(idSize);
   return connection
     .promise()
-    .query(sql, sqlValues)
-    .then(([results]: Array<ResultSetHeader>) => results.affectedRows === 1);
+    .query<ResultSetHeader>(sql, sqlValues)
+    .then(([results]) => results.affectedRows === 1);
 };
 
 const destroySize = (id: number) => {

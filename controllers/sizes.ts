@@ -1,33 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
-const sizesRouter = require('express').Router();
 import ISize from '../interfaces/ISize';
 import { ErrorHandler } from '../helpers/errors';
 import * as Sizes from '../models/size';
 
-sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  try {
-    Sizes.getAllSizes().then(([result]: Array<ISize>) =>
-      res.status(200).json(result)
-    );
-  } catch (err) {
-    next(err);
+const sizesRouter = require('express').Router();
+
+sizesRouter.get(
+  '/',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await Sizes.getAllSizes().then(([result]) =>
+        res.status(200).json(result)
+      );
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 sizesRouter.get(
   '/:idSize',
   (req: Request, res: Response, next: NextFunction) => {
     try {
       const { idSize } = req.params;
-      Sizes.getSizeById(Number(idSize)).then(
-        ([result]: Array<Array<ISize>>) => {
-          if (result[0]) res.status(200).json(result[0]);
-          else
-            res
-              .status(404)
-              .send(`La taille avec id:${idSize} est introuvable.`);
-        }
-      );
+      Sizes.getSizeById(Number(idSize)).then((result) => {
+        if (result) res.status(200).json(result);
+        else
+          res.status(404).send(`La taille avec id:${idSize} est introuvable.`);
+      });
     } catch (err) {
       next(err);
     }
@@ -36,8 +36,8 @@ sizesRouter.get(
 
 sizesRouter.post(
   '/',
-  Sizes.validateSize,
   Sizes.nameIsFree,
+  Sizes.validateSize,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const size = req.body as ISize;

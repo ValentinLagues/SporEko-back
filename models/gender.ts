@@ -21,21 +21,21 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getAllGenders = () => {
-  let sql = 'SELECT * FROM genders';
+  const sql = 'SELECT * FROM genders';
   return connection.promise().query(sql);
 };
 
 const getGenderById = (id: number) => {
   return connection
     .promise()
-    .query('SELECT * FROM genders WHERE id_gender = ? ', [id]);
+    .query<IGender[]>('SELECT * FROM genders WHERE id_gender = ? ', [id]);
 };
 
 const getGenderByName = (name: string) => {
   return connection
     .promise()
-    .query('SELECT * FROM genders WHERE name = ?', [name])
-    .then(([results]: Array<Array<IGender>>) => results[0]);
+    .query<IGender[]>('SELECT * FROM genders WHERE name = ?', [name])
+    .then(([results]) => results[0]);
 };
 
 const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,11 +48,13 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const createGender = (name: object) => {
+const createGender = (newGender: IGender): Promise<number> => {
   return connection
     .promise()
-    .query('INSERT INTO genders SET ? ', [name])
-    .then(([results]: Array<ResultSetHeader>) => results.insertId);
+    .query<ResultSetHeader>('INSERT INTO genders SET name = ? ', [
+      newGender.name,
+    ])
+    .then(([results]) => results.insertId);
 };
 
 const updateGender = (id: number, name: object) => {

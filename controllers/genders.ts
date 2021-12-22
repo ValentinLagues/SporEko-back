@@ -1,33 +1,35 @@
-import { Request, Response, NextFunction } from 'express';
-const gendersRouter = require('express').Router();
+import { Request, Response, NextFunction, Router } from 'express';
 import IGender from '../interfaces/IGender';
 import * as Genders from '../models/gender';
 import { ErrorHandler } from '../helpers/errors';
 
-gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  try {
-    Genders.getAllGenders().then(([result]: Array<IGender>) =>
-      res.status(200).json(result)
-    );
-  } catch (err) {
-    next(err);
+const gendersRouter = Router();
+
+gendersRouter.get(
+  '/',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { gender } = req.body;
+      await Genders.getAllGenders().then(([result]) =>
+        res.status(200).json(result)
+      );
+      return gender;
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 gendersRouter.get(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
     try {
       const { idGender } = req.params;
-      Genders.getGenderById(Number(idGender)).then(
-        ([result]: Array<Array<IGender>>) => {
-          if (result[0]) res.status(200).json(result[0]);
-          else
-            res
-              .status(404)
-              .send(`Gender id:${idGender} n'est pas dans la base de donnée.`);
-        }
-      );
+      Genders.getGenderById(Number(idGender)).then(([gender]) => {
+        if (gender[0]) res.status(200).json(gender[0]);
+        else
+          res.status(404).send(`Le genre avec id:${idGender} est introuvable.`);
+      });
     } catch (err) {
       next(err);
     }
@@ -62,17 +64,17 @@ gendersRouter.put(
     if (genderUpdated) {
       res.status(200).send('Genre mis à jour');
     } else {
-      throw new ErrorHandler(500, `User cannot be updated`);
+      throw new ErrorHandler(500, `Genre ne peut pas être mis à jour`);
     }
   }
 );
 
-gendersRouter.delete('/:id', (req: Request, res: Response) => {
+gendersRouter.delete('/:idGender', (req: Request, res: Response) => {
   const { idGender } = req.params;
   Genders.destroyGender(Number(idGender)).then((result: Array<any>) => {
     if (result[0].affectedRows)
-      res.status(201).json(`Gender id:${idGender} supprimé`);
-    else res.status(404).json(`Gender id:${idGender} n'existe pas`);
+      res.status(201).json(`Le gebre avec l'id:${idGender} à était supprimé`);
+    else res.status(404).json(`Le genre avec l'id:${idGender} n'existe pas`);
   });
 });
 

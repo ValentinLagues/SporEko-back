@@ -1,18 +1,18 @@
 import express from 'express';
 
-// import UsersRouter from './users';
-// import OffersRouter from './offers';
-import GendersRouter from './genders';
+// import usersRouter from './users';
+// import offersRouter from './offers';
+import gendersRouter from './genders';
 import sportsRouter from './sports';
-import SizesRouter from './sizes';
-// import ConditionsRouter from './conditions';
-// import BrandsRouter from './brands';
+import sizesRouter from './sizes';
+// import conditionsRouter from './conditions';
+// import brandsRouter from './brands';
 import colorsRouter from './colors';
 import colissimosRouter from './colissimos';
-// import MondialRelayRouter from './mondialRelay';
-// import SportifStylesRouter from './sportifStyles';
+// import mondialRelayRouter from './mondialRelay';
+// import sportifStylesRouter from './sportifStyles';
 import textilesRouter from './textiles';
-// import CategoriesRouter from './categories';
+// import categoriesRouter from './categories';
 
 const setupRoutes = (app: express.Application) => {
   // app.use('/users', usersRouter);
@@ -31,4 +31,3 @@ const setupRoutes = (app: express.Application) => {
 };
 
 export default setupRoutes;
-
