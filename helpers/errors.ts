@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import 'dotenv/config';
 
+
 class ErrorHandler extends Error {
   statusCode: number;
   constructor(statusCode: number, message: string) {
@@ -9,6 +10,7 @@ class ErrorHandler extends Error {
     this.message = message;
   }
 }
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const handleError = (
   err: ErrorHandler,
@@ -32,6 +34,8 @@ const handleError = (
     });
   }
 };
+
 /* eslint-enable @typescript-eslint/no-unused-vars */
+
 
 export { ErrorHandler, handleError };
