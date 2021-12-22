@@ -5,8 +5,8 @@ const connectDbSportifStyle = dbSportifStyle.connection.promise();
 
 const validateSportifStyle = (data: object, forCreation = true) => {
   const presence = forCreation ? 'required' : 'optional';
-  return JoiConditions.object({
-    name: JoiConditions.string().max(50).presence(presence),
+  return JoiSportifStyle.object({
+    name: JoiSportifStyle.string().max(50).presence(presence),
   }).validate(data, { abortEarly: false }).error;
 };
 
