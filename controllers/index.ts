@@ -3,7 +3,7 @@ import brandsRouter from './brands';
 // import UsersRouter from './users';
 // import OffersRouter from './offers';
 // import GendersRouter from './genders';
-// import SportsRouter from './sports';
+import sportsRouter from './sports';
 // import SizesRouter from './sizes';
 import conditionsRouter from './conditions';
 // import BrandsRouter from './brands';
@@ -18,7 +18,7 @@ const setupRoutes = (app: express.Application) => {
   // app.use('/users', usersRouter);
   // app.use('/offers', offersRouter);
   // app.use('/genders', gendersRouter);
-  // app.use('/sports', sportsRouter);
+  app.use('/sports', sportsRouter);
   // app.use('/sizes', sizesRouter);
   app.use('/conditions', conditionsRouter);
   app.use('/brands', brandsRouter);
