@@ -1,76 +1,77 @@
-const brandsRouter = require('express').Router();
-import { Request, Response } from 'express';
-const Brand = require('../models/brand');
+import { Request, Response, NextFunction, Router } from 'express';
+import * as Brand from '../models/brand';
+import IBrand from '../interfaces/IBrand';
+import { ErrorHandler } from '../helpers/errors';
 
-interface BrandInfo {
-  name: string;
-}
+const brandsRouter = Router();
 
-brandsRouter.get('/', (req: Request, res: Response) => {
-  Brand.findManyBrands().then(([result]: Array<any>) => {
-    res.status(200).json(result);
-  });
+brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  Colissimo.getAll()
+    .then((colissimos: Array<IColissimo>) => {
+      res.status(200).json(colissimos);
+    })
+    .catch((err) => next(err));
 });
 
-brandsRouter.get('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  Brand.findOneBrand(idbrand).then(([result]: Array<any>) => {
-    if (result.length > 0) {
-      res.json(result);
-    } else {
-      res.status(404).send('Brand not found');
-    }
-  });
-});
-
-brandsRouter.post('/', (req: Request, res: Response) => {
-  const brand: BrandInfo = req.body;
-  const joiErrors = Brand.validateBrand(brand);
-  if (joiErrors) {
-    res.status(422).send(joiErrors.details);
-  } else {
-    Brand.createBrand(brand)
-      .then(([createdBrand]: Array<any>) => {
-        const id = createdBrand.insertId;
-        res.status(201).json({ id, ...brand });
-      })
-      .catch((error: Array<any>) => {
-        res.status(500).send(error);
-      });
+colissimosRouter.get(
+  '/:idColissimo',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idColissimo } = req.params;
+    Colissimo.getById(Number(idColissimo))
+      .then((colissimo: IColissimo) => res.status(200).json(colissimo))
+      .catch((err) => next(err));
   }
-});
+);
 
-brandsRouter.put('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  Brand.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
-    if (brandFound.length > 0) {
-      const brand: BrandInfo = req.body;
-      const joiErrors = Brand.validateBrand(brand, false);
-      if (joiErrors) {
-        console.log('JoiErrors dans put brand');
-        res.status(409).send(joiErrors.details);
+colissimosRouter.post(
+  '/',
+  Colissimo.nameIsFree,
+  Colissimo.validateColissimo,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const colissimo = req.body as IColissimo;
+      colissimo.id_colissimo = await Colissimo.create(colissimo);
+      res.status(201).json(colissimo);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+colissimosRouter.put(
+  '/:idcolissimo',
+  Colissimo.nameIsFree,
+  Colissimo.validateColissimo,
+  async (req: Request, res: Response) => {
+    const { idcolissimo } = req.params;
+
+    const colissimoUpdated = await Colissimo.update(
+      Number(idcolissimo),
+      req.body as IColissimo
+    );
+    if (colissimoUpdated) {
+      res.status(200).send('Colissimo mis à jour');
+    } else {
+      throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
+    }
+  }
+);
+
+colissimosRouter.delete(
+  '/:idcolissimo',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { idcolissimo } = req.params;
+      const colissimoDeleted = await Colissimo.destroy(Number(idcolissimo));
+      if (colissimoDeleted) {
+        res.status(200).send('Colissimo supprimé');
       } else {
-        Brand.updateBrand(idbrand, brand).then(() => {
-          res.status(200).json({ ...brandFound[0], ...brand });
-        });
+        throw new ErrorHandler(404, `Colissimo non trouvé`);
       }
-    } else {
-      res.status(404).send('Brand not found');
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-brandsRouter.delete('/:idbrand', (req: Request, res: Response) => {
-  const { idbrand } = req.params;
-  Brand.findOneBrand(idbrand).then(([brandFound]: Array<any>) => {
-    if (brandFound.length > 0) {
-      Brand.destroyBrand(idbrand).then(() => {
-        res.status(200).send('Brand successfully deleted');
-      });
-    } else {
-      res.status(404).send('Brand not found');
-    }
-  });
-});
-
-module.exports = { brandsRouter };
+export default brandsRouter;
