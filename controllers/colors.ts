@@ -46,6 +46,7 @@ colorsRouter.post(
 
 colorsRouter.put(
   '/:idcolor',
+  Color.recordExists,
   Color.nameIsFree,
   Color.codeIsFree,
   Color.validateColor,

@@ -28,6 +28,20 @@ const getAll = async (): Promise<IColor[]> => {
     .then(([results]) => results);
 };
 
+const recordExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const color = req.body as IColor;
+  const recordFound: IColor = await getById(color.id_color);
+  if (!recordFound) {
+    next(new ErrorHandler(404, `Couleur non trouvée`));
+  } else {
+    next();
+  }
+};
+
 const getById = async (idColor: number): Promise<IColor> => {
   return connection
     .promise()
@@ -116,6 +130,7 @@ const destroy = async (idColor: number): Promise<boolean> => {
 export {
   getAll,
   getById,
+  recordExists,
   getByName,
   nameIsFree,
   codeIsFree,
