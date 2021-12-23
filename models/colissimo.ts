@@ -37,6 +37,7 @@ const recordExists = async (
   next: NextFunction
 ) => {
   const colissimo = req.body as IColissimo;
+  colissimo.id_colissimo = parseInt(req.params.idColissimo);
   const recordFound: IColissimo = await getById(colissimo.id_colissimo);
   if (!recordFound) {
     next(new ErrorHandler(404, `Colissimo non trouvé`));

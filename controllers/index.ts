@@ -1,6 +1,6 @@
 import express from 'express';
 
-// import usersRouter from './users';
+import usersRouter from './users';
 // import offersRouter from './offers';
 import gendersRouter from './genders';
 import sportsRouter from './sports';
@@ -15,7 +15,7 @@ import textilesRouter from './textiles';
 // import categoriesRouter from './categories';
 
 const setupRoutes = (app: express.Application) => {
-  // app.use('/users', usersRouter);
+  app.use('/users', usersRouter);
   // app.use('/offers', offersRouter);
   app.use('/genders', gendersRouter);
   app.use('/sports', sportsRouter);
