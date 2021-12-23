@@ -11,6 +11,8 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_colissimo: Joi.number(),
     name: Joi.string().max(150).presence(presence),
     weight: Joi.string().max(100).presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),

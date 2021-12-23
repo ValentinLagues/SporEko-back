@@ -56,7 +56,7 @@ colissimosRouter.put(
       req.body as IColissimo
     );
     if (colissimoUpdated) {
-      res.status(200).send('Colissimo mis à jour');
+      res.status(200).send(req.body);
     } else {
       throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
     }
