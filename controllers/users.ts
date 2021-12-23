@@ -1,164 +1,85 @@
-const usersRouter = require('express').Router();
-import { Request, Response } from 'express';
-const User = require('../models/user');
+import { Request, Response, NextFunction, Router } from 'express';
+import * as User from '../models/user';
+import IUser from '../interfaces/IUser';
+import { ErrorHandler } from '../helpers/errors';
 
-interface UserInfo {
-  lastname: string;
-  firstname: string;
-  adress: string;
-  zipcode: number;
-  city: string;
-  mail: string;
-  hash_password: string;
-  picture: string;
-  isadmin: number;
-  isarchived: number;
-  id_gender: number;
-  adress_complement: string;
-  id_sportif_style: number;
-  birthday: string; //c'est type date pour mysql... = string?
-  phone: string;
-  pseudo: string;
-  authentified_by_facebook: number;
-}
+const usersRouter = Router();
 
-usersRouter.get('/', (req: Request, res: Response) => {
-  User.findManyUser().then(([result]: Array<any>) => {
-    res.status(200).json(result);
-  });
-});
-
-usersRouter.get('/:iduser', (req: Request, res: Response) => {
-  const { iduser } = req.params;
-  User.findUserById(iduser).then(([result]: Array<any>) => {
-    if (result.length > 0) {
-      res.json(result);
-    } else {
-      res.status(404).send('Utilisateur non trouvé');
-    }
-  });
-});
-
-usersRouter.post('/', (req: Request, res: Response) => {
-  const user: UserInfo = req.body;
-  let duplicateData = '';
-  interface joiErrorsModel {
-    details: Array<any>;
-  }
-  interface errModel {
-    message: string;
-  }
-  let joiErrors: joiErrorsModel;
-
-  Promise.all([
-    User.findUserByEmail(user.mail),
-    User.findUserByPseudo(user.pseudo),
-  ])
-    .then(([emailAlreadytaken, pseudoAlreadytaken]) => {
-      if (emailAlreadytaken[0].length > 0) {
-        duplicateData += 'Cet email existe déjà; ';
-      }
-      if (pseudoAlreadytaken[0].length > 0) {
-        duplicateData += 'Ce pseudo existe déjà; ';
-      }
-      if (duplicateData) {
-        return Promise.reject(duplicateData);
-      }
-
-      joiErrors = User.validateUser(user);
-      if (joiErrors) {
-        return Promise.reject('INVALID_DATA');
-      }
-
-      return User.createUser(user);
+usersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  User.getAll()
+    .then((user: Array<IUser>) => {
+      res.status(200).json(user);
     })
-    .then(([createdUser]: Array<any>) => {
-      const id = createdUser.insertId;
-      res.status(201).json({ id, ...user });
-    })
-    .catch((err) => {
-      if (err === duplicateData)
-        res.status(409).json({ message: duplicateData });
-      else if (err === 'INVALID_DATA') {
-        const joiDetails: Array<string> = joiErrors.details.map(
-          (err: errModel) => {
-            return err.message;
-          }
-        );
-        res.status(422).json(joiDetails);
-      } else res.status(500).send('erreur d interface chaise-écran');
-    });
+    .catch((err) => next(err));
 });
 
-usersRouter.put('/:iduser', (req: Request, res: Response) => {
-  const { iduser } = req.params;
-  User.findUserById(iduser).then(([userFound]: Array<any>) => {
-    if (userFound.length < 1) {
-      res.status(404).send('Utilisateur non trouvé');
-    } else {
-      const user: UserInfo = req.body;
+usersRouter.get(
+  '/:idUser',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idUser } = req.params;
+    User.getById(Number(idUser))
+      .then((user: IUser) => {
+        if (user === undefined) {
+          res.status(404).send('Utilisateur non trouvé');
+        }
+        res.status(200).json(user);
+      })
+      .catch((err) => next(err));
+  }
+);
 
-      let duplicateData = '';
-      interface joiErrorsModel {
-        details: Array<any>;
-      }
-      interface errModel {
-        message: string;
-      }
-      let joiErrors: joiErrorsModel;
-
-      Promise.all([
-        User.findUserByEmail(user.mail),
-        User.findUserByPseudo(user.pseudo),
-      ])
-        .then(([emailAlreadytaken, pseudoAlreadytaken]) => {
-          if (emailAlreadytaken[0].length > 0) {
-            duplicateData += 'Cet email existe déjà; ';
-          }
-          if (pseudoAlreadytaken[0].length > 0) {
-            duplicateData += 'Ce pseudo existe déjà; ';
-          }
-          if (duplicateData) {
-            return Promise.reject(duplicateData);
-          }
-
-          joiErrors = User.validateUser(user, false);
-          if (joiErrors) {
-            return Promise.reject('INVALID_DATA');
-          }
-
-          return User.updateUser(iduser, user);
-        })
-        .then(() => {
-          res.status(200).json({ ...userFound[0], ...user });
-        })
-        .catch((err) => {
-          if (err === duplicateData)
-            res.status(409).json({ message: duplicateData });
-          else if (err === 'INVALID_DATA') {
-            const joiDetails: Array<string> = joiErrors.details.map(
-              (err: errModel) => {
-                return err.message;
-              }
-            );
-            res.status(422).json(joiDetails);
-          } else res.status(500).send('erreur d interface chaise-écran');
-        });
+usersRouter.post(
+  '/',
+  User.emailIsFree,
+  User.pseudoIsFree,
+  User.validateUser,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.body as IUser;
+      user.id_user = await User.create(user);
+      res.status(201).json(user);
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-usersRouter.delete('/:iduser', (req: Request, res: Response) => {
-  const { iduser } = req.params;
-  User.findUserById(iduser).then(([userFound]: Array<any>) => {
-    if (userFound.length > 0) {
-      User.destroyUser(iduser).then(() => {
+usersRouter.put(
+  '/:idUser',
+  User.recordExists,
+  User.emailIsFree,
+  User.pseudoIsFree,
+  User.validateUser,
+  async (req: Request, res: Response) => {
+    const { idUser } = req.params;
+
+    const userUpdated = await User.update(Number(idUser), req.body as IUser);
+    if (userUpdated) {
+      res.status(200).send(req.body);
+    } else {
+      throw new ErrorHandler(
+        500,
+        `Cet utilisateur ne peut pas être mis à jour`
+      );
+    }
+  }
+);
+
+usersRouter.delete(
+  '/:idUser',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { idUser } = req.params;
+      const userDeleted = await User.destroy(Number(idUser));
+      if (userDeleted) {
         res.status(200).send('Utilisateur supprimé');
-      });
-    } else {
-      res.status(404).send('Utilisateur non trouvé (vérif id)');
+      } else {
+        throw new ErrorHandler(404, `Utilisateur non trouvé`);
+      }
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-module.exports = { usersRouter };
+export default usersRouter;
