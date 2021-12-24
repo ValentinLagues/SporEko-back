@@ -1,6 +1,7 @@
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
+import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IUser from '../interfaces/IUser';
@@ -19,7 +20,7 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     zipcode: Joi.number().integer().max(99999).presence(presence),
     city: Joi.string().max(255).presence(presence),
     email: Joi.string().max(255).presence(presence),
-    hash_password: Joi.string().max(255).presence(presence),
+    password: Joi.string().min(8).max(100).presence(presence),
     picture: Joi.string().max(255),
     isadmin: Joi.number().integer().min(0).max(1).presence(presence),
     isarchived: Joi.number().integer().min(0).max(1).presence(presence),
@@ -41,6 +42,24 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
   } else {
     next();
   }
+};
+
+const hashingOptions: Options & { raw?: false } = {
+  type: argon2.argon2id,
+  memoryCost: 2 ** 16,
+  timeCost: 5,
+  parallelism: 1,
+};
+
+const hashPassword = (password: string): Promise<string> => {
+  return argon2.hash(password, hashingOptions);
+};
+
+const verifyPassword = (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  return argon2.verify(hashedPassword, password, hashingOptions);
 };
 
 const getAll = async (): Promise<IUser[]> => {
@@ -111,16 +130,31 @@ const getByPseudo = async (pseudo: string): Promise<IUser> => {
 };
 
 const create = async (newUser: IUser): Promise<number> => {
-  //commenté pour l'instant car ordre pas encore définit
-
-  // (
-  //   'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender, adress_complement, id_sportif_style, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-  //   [newUser.lastname,newUser.firstname,newUser.adress,newUser.zipcode,newUser.city,newUser.email,newUser.hash_password,newUser.picture,newUser.isadmin,newUser.isarchived,newUser.id_gender,newUser.adress_complement,newUser.id_sportif_style,newUser.birthday,newUser.phone,newUser.pseudo,newUser.authentified_by_facebook]
-  // )
-
+  const hashedPassword = await hashPassword(newUser.password);
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO users SET ?', [newUser])
+    .query<ResultSetHeader>(
+      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender, adress_complement, id_sportif_style, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        newUser.lastname,
+        newUser.firstname,
+        newUser.adress,
+        newUser.zipcode,
+        newUser.city,
+        newUser.email,
+        hashedPassword,
+        newUser.picture,
+        newUser.isadmin,
+        newUser.isarchived,
+        newUser.id_gender,
+        newUser.adress_complement,
+        newUser.id_sportif_style,
+        newUser.birthday,
+        newUser.phone,
+        newUser.pseudo,
+        newUser.authentified_by_facebook,
+      ]
+    )
     .then(([results]) => results.insertId);
 };
 
@@ -247,4 +281,5 @@ export {
   update,
   destroy,
   validateUser,
+  verifyPassword,
 };
