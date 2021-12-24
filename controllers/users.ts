@@ -1,20 +1,27 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as User from '../models/user';
 import IUser from '../interfaces/IUser';
+import * as Auth from '../helpers/auth';
 import { ErrorHandler } from '../helpers/errors';
 
 const usersRouter = Router();
 
-usersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  User.getAll()
-    .then((user: Array<IUser>) => {
-      res.status(200).json(user);
-    })
-    .catch((err) => next(err));
-});
+usersRouter.get(
+  '/',
+  Auth.userConnected,
+  Auth.userIsAdmin,
+  (req: Request, res: Response, next: NextFunction) => {
+    User.getAll()
+      .then((user: Array<IUser>) => {
+        res.status(200).json(user);
+      })
+      .catch((err) => next(err));
+  }
+);
 
 usersRouter.get(
   '/:idUser',
+  Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     User.getById(Number(idUser))
@@ -30,6 +37,7 @@ usersRouter.get(
 
 usersRouter.post(
   '/',
+  Auth.userConnected,
   User.emailIsFree,
   User.pseudoIsFree,
   User.validateUser,
@@ -46,6 +54,7 @@ usersRouter.post(
 
 usersRouter.put(
   '/:idUser',
+  Auth.userConnected,
   User.recordExists,
   User.emailIsFree,
   User.pseudoIsFree,
@@ -67,6 +76,8 @@ usersRouter.put(
 
 usersRouter.delete(
   '/:idUser',
+  Auth.userConnected,
+  Auth.userIsAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { idUser } = req.params;

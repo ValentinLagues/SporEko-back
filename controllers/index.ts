@@ -13,6 +13,7 @@ import colissimosRouter from './colissimos';
 // import sportifStylesRouter from './sportifStyles';
 import textilesRouter from './textiles';
 // import categoriesRouter from './categories';
+import authRouter from './auth';
 
 const setupRoutes = (app: express.Application) => {
   app.use('/users', usersRouter);
@@ -28,6 +29,7 @@ const setupRoutes = (app: express.Application) => {
   // app.use('/sportifStyles', sportifStylesRouter);
   app.use('/textiles', textilesRouter);
   // app.use('/categories', categoriesRouter);
+  app.use('/login', authRouter);
 };
 
 export default setupRoutes;
