@@ -8,11 +8,12 @@ const usersRouter = Router();
 
 usersRouter.get(
   '/',
-  Auth.userConnected,
-  Auth.userIsAdmin,
+  // Auth.userConnected,
+  // Auth.userIsAdmin,
   (req: Request, res: Response, next: NextFunction) => {
     User.getAll()
       .then((user: Array<IUser>) => {
+        console.log('getAll ok');
         res.status(200).json(user);
       })
       .catch((err) => next(err));
@@ -21,7 +22,7 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser',
-  Auth.userConnected,
+  // Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     User.getById(Number(idUser))
@@ -37,7 +38,7 @@ usersRouter.get(
 
 usersRouter.post(
   '/',
-  Auth.userConnected,
+  // Auth.userConnected,
   User.emailIsFree,
   User.pseudoIsFree,
   User.validateUser,
@@ -54,7 +55,7 @@ usersRouter.post(
 
 usersRouter.put(
   '/:idUser',
-  Auth.userConnected,
+  // Auth.userConnected,
   User.recordExists,
   User.emailIsFree,
   User.pseudoIsFree,
@@ -76,8 +77,8 @@ usersRouter.put(
 
 usersRouter.delete(
   '/:idUser',
-  Auth.userConnected,
-  Auth.userIsAdmin,
+  // Auth.userConnected,
+  // Auth.userIsAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { idUser } = req.params;

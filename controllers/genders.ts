@@ -9,11 +9,11 @@ gendersRouter.get(
   '/',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { gender } = req.body;
+      // const { gender } = req.body;
       await Genders.getAllGenders().then(([result]) =>
         res.status(200).json(result)
       );
-      return gender;
+      // return gender;
     } catch (err) {
       next(err);
     }
@@ -59,7 +59,7 @@ gendersRouter.put(
     const { idGender } = req.params;
     const genderUpdated = await Genders.updateGender(
       Number(idGender),
-      req.body
+      req.body as IGender
     );
     if (genderUpdated) {
       res.status(200).send('Genre mis à jour');
@@ -72,8 +72,9 @@ gendersRouter.put(
 gendersRouter.delete('/:idGender', (req: Request, res: Response) => {
   const { idGender } = req.params;
   Genders.destroyGender(Number(idGender)).then((result: Array<any>) => {
+    console.log(result);
     if (result[0].affectedRows)
-      res.status(201).json(`Le gebre avec l'id:${idGender} à était supprimé`);
+      res.status(201).json(`Le genre avec l'id:${idGender} à été supprimé`);
     else res.status(404).json(`Le genre avec l'id:${idGender} n'existe pas`);
   });
 });

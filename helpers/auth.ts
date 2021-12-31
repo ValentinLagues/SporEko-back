@@ -22,16 +22,22 @@ interface ICookie {
 
 const userConnected = (req: Request, res: Response, next: NextFunction) => {
   const myCookie = req.cookies as ICookie;
+  console.log('dans userConnected');
+  console.log(req.cookies);
+  console.log(req);
   if (!myCookie.user_token) {
+    console.log('pas de token ds cookie');
     next(
       new ErrorHandler(401, 'Utilisateur non reconnu, veuillez vous connecter')
     );
   } else {
+    console.log('cookie');
     req.userInfo = jwt.verify(
       myCookie.user_token,
       process.env.PRIVATE_KEY as string
     ) as IUserInfo;
     if (req.userInfo === undefined) {
+      console.log('cookie -> pb vérif token');
       next(
         new ErrorHandler(
           401,
@@ -39,15 +45,18 @@ const userConnected = (req: Request, res: Response, next: NextFunction) => {
         )
       );
     } else {
+      console.log('fin userConnected');
       next();
     }
   }
 };
 
 const userIsAdmin = (req: Request, res: Response, next: NextFunction) => {
+  console.log('dans userIsAdmin');
   if (req.userInfo === undefined || !req.userInfo.admin) {
     next(new ErrorHandler(403, 'Utilisateur non autorisé'));
   } else {
+    console.log('fin userIsAdmin');
     next();
   }
 };

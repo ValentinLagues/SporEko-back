@@ -4,4 +4,4 @@
 
 # update your bdd
 
-# npm run start (nodemon)
+# npm start (nodemon)

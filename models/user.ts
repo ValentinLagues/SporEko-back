@@ -130,7 +130,7 @@ const getByPseudo = async (pseudo: string): Promise<IUser> => {
 };
 
 const create = async (newUser: IUser): Promise<number> => {
-  const hashedPassword = await hashPassword(newUser.password);
+  const hashedPassword: string = await hashPassword(newUser.password);
   return connection
     .promise()
     .query<ResultSetHeader>(
@@ -251,7 +251,6 @@ const update = async (
       ? ', authentified_by_facebook = ? '
       : ' authentified_by_facebook = ? ';
     sqlValues.push(attibutesToUpdate.authentified_by_facebook);
-    oneValue = true;
   }
   sql += ' WHERE id_user = ?';
   sqlValues.push(idUser);

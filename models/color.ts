@@ -11,6 +11,7 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_color: Joi.number(),
     name: Joi.string().max(50).presence(presence),
     color_code: Joi.string().min(7).max(9).presence(presence),
@@ -22,10 +23,22 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = async (): Promise<IColor[]> => {
+const getAll = async (
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
+): Promise<IColor[]> => {
+  let sql = 'SELECT * FROM colors';
+  if (sortBy) {
+    if (sortBy === 'id') {
+      sortBy = 'id_color';
+    }
+    sql += ` ORDER BY ${sortBy} ${order} LIMIT ${limit} OFFSET ${firstItem}`;
+  }
   return connection
     .promise()
-    .query<IColor[]>('SELECT * FROM colors')
+    .query<IColor[]>(sql)
     .then(([results]) => results);
 };
 
@@ -53,7 +66,7 @@ const getById = async (idColor: number): Promise<IColor> => {
 
 const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
-  const colorWithSameName: IColor = await getByName(color.name);
+  const colorWithSameName: IColor = await getByName(color.id, color.name);
   if (colorWithSameName) {
     next(new ErrorHandler(409, `Ce nom de couleur existe déjà`));
   } else {
@@ -61,16 +74,19 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getByName = async (name: string): Promise<IColor> => {
+const getByName = async (id: number, name: string): Promise<IColor> => {
   return connection
     .promise()
-    .query<IColor[]>('SELECT * FROM colors WHERE name = ?', [name])
+    .query<IColor[]>('SELECT * FROM colors WHERE id_color != ? AND name = ?', [
+      id,
+      name,
+    ])
     .then(([results]) => results[0]);
 };
 
 const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
-  const colorWithSameCode: IColor = await getByCode(color.color_code);
+  const colorWithSameCode: IColor = await getByCode(color.id, color.color_code);
   if (colorWithSameCode) {
     next(new ErrorHandler(409, `Ce code couleur existe déjà`));
   } else {
@@ -78,10 +94,13 @@ const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getByCode = async (color_code: string): Promise<IColor> => {
+const getByCode = async (id: number, color_code: string): Promise<IColor> => {
   return connection
     .promise()
-    .query<IColor[]>('SELECT * FROM colors WHERE color_code = ?', [color_code])
+    .query<IColor[]>(
+      'SELECT * FROM colors WHERE id_color != ? AND color_code = ?',
+      [id, color_code]
+    )
     .then(([results]) => results[0]);
 };
 
@@ -111,7 +130,6 @@ const update = async (
   if (attibutesToUpdate.color_code) {
     sql += oneValue ? ', color_code = ? ' : ' color_code = ? ';
     sqlValues.push(attibutesToUpdate.color_code);
-    oneValue = true;
   }
   sql += ' WHERE id_color = ?';
   sqlValues.push(idColor);
@@ -129,6 +147,15 @@ const destroy = async (idColor: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
+const destroyMany = async (ids: Array<number>): Promise<boolean> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('DELETE FROM colors WHERE id_color IN ( ? )', [
+      ids.map((id) => id),
+    ])
+    .then(([results]) => results.affectedRows > 0);
+};
+
 export {
   getAll,
   getById,
@@ -139,5 +166,6 @@ export {
   create,
   update,
   destroy,
+  destroyMany,
   validateColor,
 };

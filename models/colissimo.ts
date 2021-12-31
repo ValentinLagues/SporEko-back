@@ -103,7 +103,6 @@ const update = async (
   if (attibutesToUpdate.price) {
     sql += oneValue ? ', price = ? ' : ' price = ? ';
     sqlValues.push(attibutesToUpdate.price);
-    oneValue = true;
   }
   sql += ' WHERE id_colissimo = ?';
   sqlValues.push(idColissimo);

@@ -54,10 +54,9 @@ const getByName = async (name: string): Promise<ISport> => {
 const create = async (newSport: ISport): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'INSERT INTO sports (name) VALUES (?)',
-      [newSport.name]
-    )
+    .query<ResultSetHeader>('INSERT INTO sports (name) VALUES (?)', [
+      newSport.name,
+    ])
     .then(([results]) => results.insertId);
 };
 
@@ -67,12 +66,12 @@ const update = async (
 ): Promise<boolean> => {
   let sql = 'UPDATE sports SET ';
   const sqlValues: Array<string | number> = [];
-  let oneValue = false;
+  // let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
-    oneValue = true;
+    // oneValue = true;
   }
   sql += ' WHERE id_sport = ?';
   sqlValues.push(idSport);
@@ -101,7 +100,6 @@ export {
   validateSport,
 };
 
-
 // const JoiSport = require('joi');
 // const dbSport = require('../db-config');
 
@@ -117,7 +115,7 @@ export {
 //   const findManySport = () => {
 //     return connectDbSport.query('SELECT * FROM sports');
 //   };
-  
+
 //   const findOneSport = (id: number) => {
 //     return connectDbSport.query('SELECT * FROM sports WHERE id_sport = ?', [id]);
 //   };
@@ -125,7 +123,7 @@ export {
 //   const createSport = (newSport: object) => {
 //     return connectDbSport.query('INSERT INTO sports SET ?', [newSport]);
 //   };
-  
+
 //   const updateSport = (id: number, newAttributes: object) => {
 //     return connectDbSport.query('UPDATE sports SET ? WHERE id_sport = ?', [
 //       newAttributes,
@@ -147,4 +145,3 @@ export {
 //     destroySport,
 //     validateSport,
 //   };
-

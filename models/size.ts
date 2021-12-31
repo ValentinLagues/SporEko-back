@@ -62,7 +62,7 @@ const createSize = (newSize: ISize): Promise<number> => {
 
 const updateSize = (idSize: number, name: string, is_children: number) => {
   let sql = 'UPDATE sizes SET ';
-  const sqlValues: Array<any> = [];
+  const sqlValues: Array<string | number> = [];
   let oneValue = false;
   if (name) {
     sql += 'name = ? ';

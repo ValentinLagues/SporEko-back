@@ -9,6 +9,7 @@ const authRouter = Router();
 authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body as IUser;
+    console.log(email, password);
     User.getByEmail(email)
       .then(async (user) => {
         if (!user)
@@ -25,8 +26,9 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               Number(user.id_user),
               user.isadmin
             );
+            console.log('password ok token created');
             res.cookie('user_token', token);
-            res.send(`Bienvenue ${user.pseudo}`);
+            res.send(token);
           } else
             throw new ErrorHandler(401, 'Email et mot de passe incorrects');
         }

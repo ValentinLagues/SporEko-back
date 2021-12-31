@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, Router } from 'express';
 import ISize from '../interfaces/ISize';
 import { ErrorHandler } from '../helpers/errors';
 import * as Sizes from '../models/size';
 
-const sizesRouter = require('express').Router();
+const sizesRouter = Router();
 
 sizesRouter.get(
   '/',
@@ -55,7 +55,7 @@ sizesRouter.put(
   Sizes.validateSize,
   async (req: Request, res: Response) => {
     const { idSize } = req.params;
-    const { name, is_children } = req.body;
+    const { name, is_children } = req.body as ISize;
     const sizeUpdated = await Sizes.updateSize(
       Number(idSize),
       name,
