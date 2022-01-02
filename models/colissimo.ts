@@ -11,6 +11,8 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_colissimo: Joi.number(),
     name: Joi.string().max(150).presence(presence),
     weight: Joi.string().max(100).presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),
@@ -35,6 +37,7 @@ const recordExists = async (
   next: NextFunction
 ) => {
   const colissimo = req.body as IColissimo;
+  colissimo.id_colissimo = parseInt(req.params.idColissimo);
   const recordFound: IColissimo = await getById(colissimo.id_colissimo);
   if (!recordFound) {
     next(new ErrorHandler(404, `Colissimo non trouvé`));

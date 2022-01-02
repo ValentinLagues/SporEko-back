@@ -11,6 +11,7 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id_color: Joi.number(),
     name: Joi.string().max(50).presence(presence),
     color_code: Joi.string().min(7).max(9).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
@@ -34,6 +35,7 @@ const recordExists = async (
   next: NextFunction
 ) => {
   const color = req.body as IColor;
+  color.id_color = parseInt(req.params.idColor);
   const recordFound: IColor = await getById(color.id_color);
   if (!recordFound) {
     next(new ErrorHandler(404, `Couleur non trouvée`));

@@ -45,16 +45,16 @@ colorsRouter.post(
 );
 
 colorsRouter.put(
-  '/:idcolor',
+  '/:idColor',
   Color.recordExists,
   Color.nameIsFree,
   Color.codeIsFree,
   Color.validateColor,
   async (req: Request, res: Response) => {
-    const { idcolor } = req.params;
+    const { idColor } = req.params;
 
     const colorUpdated = await Color.update(
-      Number(idcolor),
+      Number(idColor),
       req.body as IColor
     );
     if (colorUpdated) {
@@ -66,11 +66,11 @@ colorsRouter.put(
 );
 
 colorsRouter.delete(
-  '/:idcolor',
+  '/:idColor',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { idcolor } = req.params;
-      const colorDeleted = await Color.destroy(Number(idcolor));
+      const { idColor } = req.params;
+      const colorDeleted = await Color.destroy(Number(idColor));
       if (colorDeleted) {
         res.status(200).send('Couleur supprimée');
       } else {
