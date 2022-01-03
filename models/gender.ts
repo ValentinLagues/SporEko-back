@@ -11,7 +11,7 @@ const validateGender = (data: object, forCreation = true) => {
 };
 
 const findManyGenders = () => {
-  let sql = 'SELECT * FROM genders';
+  const sql = 'SELECT * FROM genders';
   return dbGenders.connection.promise().query(sql)
 };
 

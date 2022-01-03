@@ -34,8 +34,8 @@ colorsRouter.post('/', (req: Request, res: Response) => {
   }
 
   const color: ColorInfo = req.body;
-  let duplicateDataArray: Array<any> = [];
-  let joiErrorsArray: Array<any> = [];
+  const duplicateDataArray: Array<any> = [];
+  const joiErrorsArray: Array<any> = [];
   let joiErrors: JoiErrorsModel;
 
   Promise.all([
@@ -97,8 +97,8 @@ colorsRouter.put('/:idcolor', (req: Request, res: Response) => {
   const { idcolor } = req.params;
   const color: ColorInfo = req.body;
   let colorFound: ColorInfo;
-  let duplicateDataArray: Array<any> = [];
-  let joiErrorsArray: Array<any> = [];
+  const duplicateDataArray: Array<any> = [];
+  const joiErrorsArray: Array<any> = [];
   let joiErrors: JoiErrorsModel;
 
   Promise.all([
