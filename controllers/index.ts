@@ -1,5 +1,4 @@
 import express from 'express';
-
 import usersRouter from './users';
 // import offersRouter from './offers';
 import gendersRouter from './genders';
@@ -9,8 +8,8 @@ import sizesRouter from './sizes';
 // import brandsRouter from './brands';
 import colorsRouter from './colors';
 import colissimosRouter from './colissimos';
-// import mondialRelayRouter from './mondialRelay';
-// import sportifStylesRouter from './sportifStyles';
+import mondialRelayRouter from './mondial_relay';
+import sportifStylesRouter from './sportif_styles';
 import textilesRouter from './textiles';
 // import categoriesRouter from './categories';
 import authRouter from './auth';
@@ -25,8 +24,8 @@ const setupRoutes = (app: express.Application) => {
   // app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);
   app.use('/colissimos', colissimosRouter);
-  // app.use('/modialRelay', mondialRelayRouter);
-  // app.use('/sportifStyles', sportifStylesRouter);
+  app.use('/mondialrelay', mondialRelayRouter);
+  app.use('/sportifstyles', sportifStylesRouter);
   app.use('/textiles', textilesRouter);
   // app.use('/categories', categoriesRouter);
   app.use('/login', authRouter);
