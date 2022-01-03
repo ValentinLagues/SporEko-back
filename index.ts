@@ -1,16 +1,25 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import { handleError } from './helpers/errors';
 import setupRoutes from './controllers';
 import 'dotenv/config';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
+
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
 
 setupRoutes(app);
+
+// A mettre à la fin pour gèrer les erreurs qui sortiront des routes
 
 app.use(handleError);
 

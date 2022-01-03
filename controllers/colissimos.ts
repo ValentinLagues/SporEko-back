@@ -18,7 +18,12 @@ colissimosRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { idColissimo } = req.params;
     Colissimo.getById(Number(idColissimo))
-      .then((colissimo: IColissimo) => res.status(200).json(colissimo))
+      .then((colissimo: IColissimo) => {
+        if (colissimo === undefined) {
+          res.status(404).send('Colissimo non trouvé');
+        }
+        res.status(200).json(colissimo);
+      })
       .catch((err) => next(err));
   }
 );
@@ -39,18 +44,19 @@ colissimosRouter.post(
 );
 
 colissimosRouter.put(
-  '/:idcolissimo',
+  '/:idColissimo',
+  Colissimo.recordExists,
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
   async (req: Request, res: Response) => {
-    const { idcolissimo } = req.params;
+    const { idColissimo } = req.params;
 
     const colissimoUpdated = await Colissimo.update(
-      Number(idcolissimo),
+      Number(idColissimo),
       req.body as IColissimo
     );
     if (colissimoUpdated) {
-      res.status(200).send('Colissimo mis à jour');
+      res.status(200).send(req.body);
     } else {
       throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
     }
@@ -58,11 +64,11 @@ colissimosRouter.put(
 );
 
 colissimosRouter.delete(
-  '/:idcolissimo',
+  '/:idColissimo',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { idcolissimo } = req.params;
-      const colissimoDeleted = await Colissimo.destroy(Number(idcolissimo));
+      const { idColissimo } = req.params;
+      const colissimoDeleted = await Colissimo.destroy(Number(idColissimo));
       if (colissimoDeleted) {
         res.status(200).send('Colissimo supprimé');
       } else {
