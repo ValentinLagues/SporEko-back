@@ -46,8 +46,14 @@ colorsRouter.post(
   Color.validateColor,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const color = req.body as IColor;
+      let color = req.body as IColor;
       color.id_color = await Color.create(color);
+      color = {
+        id_color: color.id_color,
+        name: color.name,
+        color_code: color.color_code,
+      };
+      console.log(color);
       res.status(201).json(color);
     } catch (err) {
       next(err);

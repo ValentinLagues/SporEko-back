@@ -58,6 +58,7 @@ const recordExists = async (
 };
 
 const getById = async (idColor: number): Promise<IColor> => {
+  console.log(idColor);
   return connection
     .promise()
     .query<IColor[]>('SELECT * FROM colors WHERE id_color = ?', [idColor])
