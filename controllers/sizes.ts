@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, Router } from 'express';
 import ISize from '../interfaces/ISize';
 import { ErrorHandler } from '../helpers/errors';
 import * as Sizes from '../models/size';
 
-const sizesRouter = require('express').Router();
+const sizesRouter = Router();
 
 sizesRouter.get(
   '/',

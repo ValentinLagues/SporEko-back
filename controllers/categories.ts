@@ -32,7 +32,8 @@ categoriesRouter.post(
   '/',
   Category.nameIsFree,
   Category.validateCategory,
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const category = req.body as ICategory;
       category.id_category = await Category.create(category);
@@ -41,13 +42,15 @@ categoriesRouter.post(
       next(err);
     }
   }
+  }
 );
 
 categoriesRouter.put(
   '/:idCategory',
   Category.nameIsFree,
   Category.validateCategory,
-  async (req: Request, res: Response) => {
+  (req: Request, res: Response) => {
+    async () => {
     const { idCategory } = req.params;
     const categoryUpdated = await Category.update(
       Number(idCategory),
@@ -59,11 +62,13 @@ categoriesRouter.put(
       throw new ErrorHandler(500, `Cette categorie ne peut pas être mise à jour`);
     }
   }
+  }
 );
 
 categoriesRouter.delete(
   '/:idCategory',
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const { idCategory } = req.params;
       const categoryDeleted = await Category.destroy(Number(idCategory));
@@ -75,6 +80,7 @@ categoriesRouter.delete(
     } catch (err) {
       next(err);
     }
+  }
   }
 );
 

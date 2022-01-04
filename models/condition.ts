@@ -20,21 +20,22 @@ const validateCondition = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = async (): Promise<ICondition[]> => {
+const getAll = (): Promise<ICondition[]> => {
   return connection
     .promise()
     .query<ICondition[]>('SELECT * FROM conditions')
     .then(([results]) => results);
 };
 
-const getById = async (idCondition: number): Promise<ICondition> => {
+const getById = (idCondition: number): Promise<ICondition> => {
   return connection
     .promise()
     .query<ICondition[]>('SELECT * FROM conditions WHERE id_condition = ?', [idCondition])
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
   const condition = req.body as ICondition;
   const conditionWithSameName: ICondition = await getByName(condition.name);
   if (conditionWithSameName) {
@@ -42,6 +43,7 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   } else {
     next();
   }
+}
 };
 
 const getByName = async (name: string): Promise<ICondition> => {
@@ -67,12 +69,10 @@ const update = async (
 ): Promise<boolean> => {
   let sql = 'UPDATE conditions SET ';
   const sqlValues: Array<string | number> = [];
-  let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
-    oneValue = true;
   }
   sql += ' WHERE id_condition = ?';
   sqlValues.push(idCondition);

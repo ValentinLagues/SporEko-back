@@ -32,7 +32,8 @@ brandsRouter.post(
   '/',
   Brand.nameIsFree,
   Brand.validateBrand,
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const brand = req.body as IBrand;
       brand.id_brand = await Brand.create(brand);
@@ -41,13 +42,15 @@ brandsRouter.post(
       next(err);
     }
   }
+  }
 );
 
 brandsRouter.put(
   '/:idBrand',
   Brand.nameIsFree,
   Brand.validateBrand,
-  async (req: Request, res: Response) => {
+  (req: Request, res: Response) => {
+    async () => {
     const { idBrand } = req.params;
     const brandUpdated = await Brand.update(
       Number(idBrand),
@@ -59,11 +62,13 @@ brandsRouter.put(
       throw new ErrorHandler(500, `Cette marque ne peut pas être mise à jour`);
     }
   }
+  }
 );
 
 brandsRouter.delete(
   '/:idBrand',
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const { idBrand } = req.params;
       const brandDeleted = await Brand.destroy(Number(idBrand));
@@ -75,6 +80,7 @@ brandsRouter.delete(
     } catch (err) {
       next(err);
     }
+  }
   }
 );
 

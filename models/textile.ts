@@ -86,12 +86,10 @@ import ITextile from '../interfaces/ITextile';
   ): Promise<boolean> => {
     let sql = 'UPDATE textiles SET ';
     const sqlValues: Array<string | number> = [];
-    let oneValue = false;
   
     if (attibutesToUpdate.name) {
       sql += 'name = ? ';
       sqlValues.push(attibutesToUpdate.name);
-      oneValue = true;
     }
     sql += ' WHERE id_textile = ?';
     sqlValues.push(idTextile);
