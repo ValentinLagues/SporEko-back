@@ -6,30 +6,31 @@ import { ErrorHandler } from '../helpers/errors';
 const gendersRouter = Router();
 
 gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  async () => {
+  void(async () => {
     try {
       const results = await Genders.getAllGenders();
       res.status(200).json(results);
     } catch (err) {
       next(err);
     }
-  };
+  })();
 });
 
 gendersRouter.get(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void(async () => {
       try {
         const { idGender } = req.params;
         const gender = await Genders.getGenderById(Number(idGender));
-        if (gender[0]) res.status(200).json(gender[0]);
+        if (gender) 
+        return res.status(200).json(gender);
         else
-          res.status(404).send(`Le genre avec id:${idGender} est introuvable.`);
+          return res.status(404).send(`Le genre avec id:${idGender} est introuvable.`);
       } catch (err) {
         next(err);
       }
-    };
+    }) ();
   }
 );
 
@@ -73,7 +74,7 @@ gendersRouter.delete('/:idGender', (req: Request, res: Response) => {
     const { idGender } = req.params;
     const deletedId = await Genders.destroyGender(Number(idGender));
     if (deletedId)
-      res.status(201).json(`Le gebre avec l'id:${idGender} à était supprimé`);
+      res.status(201).json(`Le genre avec l'id:${idGender} à été supprimé`);
     else res.status(404).json(`Le genre avec l'id:${idGender} n'existe pas`);
   };
 });

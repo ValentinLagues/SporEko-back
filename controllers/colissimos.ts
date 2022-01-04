@@ -51,7 +51,7 @@ colissimosRouter.put(
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
   (req: Request, res: Response) => {
-    async () => {
+    void(async () => {
       const { idColissimo } = req.params;
 
       const colissimoUpdated = await Colissimo.update(
@@ -63,7 +63,7 @@ colissimosRouter.put(
       } else {
         throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
       }
-    };
+    }) ();
   }
 );
 

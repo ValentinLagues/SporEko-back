@@ -31,17 +31,6 @@ const getAll = (): Promise<IColissimo[]> => {
     .then(([results]) => results);
 };
 
-const recordExists = (req: Request, res: Response, next: NextFunction) => {
-  const colissimo = req.body as IColissimo;
-  colissimo.id_colissimo = parseInt(req.params.idColissimo);
-  const recordFound: IColissimo = await getById(colissimo.id_colissimo);
-  if (!recordFound) {
-    next(new ErrorHandler(404, `Colissimo non trouvé`));
-  } else {
-    next();
-  }
-};
-
 const getById = (idColissimo: number): Promise<IColissimo> => {
   return connection
     .promise()
@@ -49,6 +38,16 @@ const getById = (idColissimo: number): Promise<IColissimo> => {
       idColissimo,
     ])
     .then(([results]) => results[0]);
+};
+
+const recordExists = async (req: Request, res: Response, next: NextFunction) => {
+  const colissimo = req.body as IColissimo;
+  colissimo.id_colissimo = parseInt(req.params.idColissimo);
+  if (!await getById(colissimo.id_colissimo)) {
+    next(new ErrorHandler(404, `Colissimo non trouvé`));
+  } else {
+    next();
+  }
 };
 
 const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
