@@ -24,18 +24,14 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = async (): Promise<IColissimo[]> => {
+const getAll = (): Promise<IColissimo[]> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo')
     .then(([results]) => results);
 };
 
-const recordExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const recordExists = (req: Request, res: Response, next: NextFunction) => {
   const colissimo = req.body as IColissimo;
   colissimo.id_colissimo = parseInt(req.params.idColissimo);
   const recordFound: IColissimo = await getById(colissimo.id_colissimo);
@@ -46,7 +42,7 @@ const recordExists = async (
   }
 };
 
-const getById = async (idColissimo: number): Promise<IColissimo> => {
+const getById = (idColissimo: number): Promise<IColissimo> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo WHERE id_colissimo = ?', [
@@ -55,14 +51,16 @@ const getById = async (idColissimo: number): Promise<IColissimo> => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const colissimo = req.body as IColissimo;
-  const colissimoWithSameName: IColissimo = await getByName(colissimo.name);
-  if (colissimoWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de colissimo existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
+  async () => {
+    const colissimo = req.body as IColissimo;
+    const colissimoWithSameName: IColissimo = await getByName(colissimo.name);
+    if (colissimoWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de colissimo existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getByName = async (name: string): Promise<IColissimo> => {

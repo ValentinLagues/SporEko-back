@@ -33,14 +33,16 @@ colorsRouter.post(
   Color.nameIsFree,
   Color.codeIsFree,
   Color.validateColor,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const color = req.body as IColor;
-      color.id_color = await Color.create(color);
-      res.status(201).json(color);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const color = req.body as IColor;
+        color.id_color = await Color.create(color);
+        res.status(201).json(color);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -50,35 +52,42 @@ colorsRouter.put(
   Color.nameIsFree,
   Color.codeIsFree,
   Color.validateColor,
-  async (req: Request, res: Response) => {
-    const { idColor } = req.params;
+  (req: Request, res: Response) => {
+    async () => {
+      const { idColor } = req.params;
 
-    const colorUpdated = await Color.update(
-      Number(idColor),
-      req.body as IColor
-    );
-    if (colorUpdated) {
-      res.status(200).send('Couleur mise à jour');
-    } else {
-      throw new ErrorHandler(500, `Cette Couleur ne peut pas être mise à jour`);
-    }
+      const colorUpdated = await Color.update(
+        Number(idColor),
+        req.body as IColor
+      );
+      if (colorUpdated) {
+        res.status(200).send('Couleur mise à jour');
+      } else {
+        throw new ErrorHandler(
+          500,
+          `Cette Couleur ne peut pas être mise à jour`
+        );
+      }
+    };
   }
 );
 
 colorsRouter.delete(
   '/:idColor',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { idColor } = req.params;
-      const colorDeleted = await Color.destroy(Number(idColor));
-      if (colorDeleted) {
-        res.status(200).send('Couleur supprimée');
-      } else {
-        throw new ErrorHandler(404, `Couleur non trouvée`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { idColor } = req.params;
+        const colorDeleted = await Color.destroy(Number(idColor));
+        if (colorDeleted) {
+          res.status(200).send('Couleur supprimée');
+        } else {
+          throw new ErrorHandler(404, `Couleur non trouvée`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 

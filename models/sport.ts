@@ -34,14 +34,16 @@ const getById = async (idSport: number): Promise<ISport> => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const sport = req.body as ISport;
-  const sportWithSameName: ISport = await getByName(sport.name);
-  if (sportWithSameName) {
-    next(new ErrorHandler(409, `Ce sport existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const sport = req.body as ISport;
+    const sportWithSameName: ISport = await getByName(sport.name);
+    if (sportWithSameName) {
+      next(new ErrorHandler(409, `Ce sport existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getByName = async (name: string): Promise<ISport> => {
@@ -54,10 +56,9 @@ const getByName = async (name: string): Promise<ISport> => {
 const create = async (newSport: ISport): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'INSERT INTO sports (name) VALUES (?)',
-      [newSport.name]
-    )
+    .query<ResultSetHeader>('INSERT INTO sports (name) VALUES (?)', [
+      newSport.name,
+    ])
     .then(([results]) => results.insertId);
 };
 
@@ -101,7 +102,6 @@ export {
   validateSport,
 };
 
-
 // const JoiSport = require('joi');
 // const dbSport = require('../db-config');
 
@@ -117,7 +117,7 @@ export {
 //   const findManySport = () => {
 //     return connectDbSport.query('SELECT * FROM sports');
 //   };
-  
+
 //   const findOneSport = (id: number) => {
 //     return connectDbSport.query('SELECT * FROM sports WHERE id_sport = ?', [id]);
 //   };
@@ -125,7 +125,7 @@ export {
 //   const createSport = (newSport: object) => {
 //     return connectDbSport.query('INSERT INTO sports SET ?', [newSport]);
 //   };
-  
+
 //   const updateSport = (id: number, newAttributes: object) => {
 //     return connectDbSport.query('UPDATE sports SET ? WHERE id_sport = ?', [
 //       newAttributes,
@@ -147,4 +147,3 @@ export {
 //     destroySport,
 //     validateSport,
 //   };
-

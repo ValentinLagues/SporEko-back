@@ -5,7 +5,11 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import ISportifStyles from '../interfaces/ISportifStyles';
 
-const validateSportifStyles = (req: Request, res: Response, next: NextFunction) => {
+const validateSportifStyles = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -30,33 +34,42 @@ const getAll = (): Promise<ISportifStyles[]> => {
 const getById = (idSportifStyles: number): Promise<ISportifStyles> => {
   return connection
     .promise()
-    .query<ISportifStyles[]>('SELECT * FROM sportif_styles WHERE id_sportif_style = ?', [
-      idSportifStyles,
-    ])
+    .query<ISportifStyles[]>(
+      'SELECT * FROM sportif_styles WHERE id_sportif_style = ?',
+      [idSportifStyles]
+    )
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const sportifStyles = req.body as ISportifStyles;
-  const sportifStylesWithSameName: ISportifStyles = await getByName(sportifStyles.name);
-  if (sportifStylesWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de sportif_styles existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const sportifStyles = req.body as ISportifStyles;
+    const sportifStylesWithSameName: ISportifStyles = await getByName(
+      sportifStyles.name
+    );
+    if (sportifStylesWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de sportif_styles existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getByName = (name: string): Promise<ISportifStyles> => {
   return connection
     .promise()
-    .query<ISportifStyles[]>('SELECT * FROM sportif_styles WHERE name = ?', [name])
+    .query<ISportifStyles[]>('SELECT * FROM sportif_styles WHERE name = ?', [
+      name,
+    ])
     .then(([results]) => results[0]);
 };
 
 const create = (newSportifStyles: ISportifStyles): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO sportif_styles SET ?', [newSportifStyles])
+    .query<ResultSetHeader>('INSERT INTO sportif_styles SET ?', [
+      newSportifStyles,
+    ])
     .then(([results]) => results.insertId);
 };
 
@@ -66,19 +79,20 @@ const update = (
 ): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE sportif_styles SET ? WHERE id_sportif_style = ?', [
-      newAttributes,
-      idSportifStyles,
-    ])
+    .query<ResultSetHeader>(
+      'UPDATE sportif_styles SET ? WHERE id_sportif_style = ?',
+      [newAttributes, idSportifStyles]
+    )
     .then(([results]) => results.affectedRows === 1);
 };
 
 const destroy = (idSportifStyles: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM sportif_styles WHERE id_sportif_style = ?', [
-      idSportifStyles,
-    ])
+    .query<ResultSetHeader>(
+      'DELETE FROM sportif_styles WHERE id_sportif_style = ?',
+      [idSportifStyles]
+    )
     .then(([results]) => results.affectedRows === 1);
 };
 

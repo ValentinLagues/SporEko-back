@@ -5,13 +5,16 @@ import { ErrorHandler } from '../helpers/errors';
 
 const mondialRelayRouter = Router();
 
-mondialRelayRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  MondialRelay.getAll()
-    .then((mondialRelay: Array<IMondialRelay>) => {
-      res.status(200).json(mondialRelay);
-    })
-    .catch((err) => next(err));
-});
+mondialRelayRouter.get(
+  '/',
+  (req: Request, res: Response, next: NextFunction) => {
+    MondialRelay.getAll()
+      .then((mondialRelay: Array<IMondialRelay>) => {
+        res.status(200).json(mondialRelay);
+      })
+      .catch((err) => next(err));
+  }
+);
 
 mondialRelayRouter.get(
   '/:id',
@@ -27,14 +30,16 @@ mondialRelayRouter.post(
   '/',
   MondialRelay.nameIsFree,
   MondialRelay.validateMondialRelay,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const mondialRelay = req.body as IMondialRelay;
-      mondialRelay.id_mondial_relay = await MondialRelay.create(mondialRelay);
-      res.status(201).json(mondialRelay);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const mondialRelay = req.body as IMondialRelay;
+        mondialRelay.id_mondial_relay = await MondialRelay.create(mondialRelay);
+        res.status(201).json(mondialRelay);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -42,35 +47,42 @@ mondialRelayRouter.put(
   '/:id',
   MondialRelay.nameIsFree,
   MondialRelay.validateMondialRelay,
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+  (req: Request, res: Response) => {
+    async () => {
+      const { id } = req.params;
 
-    const mondialRelayUpdated = await MondialRelay.update(
-      Number(id),
-      req.body as IMondialRelay
-    );
-    if (mondialRelayUpdated) {
-      res.status(200).send('Mondial Relay mis à jour');
-    } else {
-      throw new ErrorHandler(500, `Ce Mondial Relay ne peut pas être mis à jour`);
-    }
+      const mondialRelayUpdated = await MondialRelay.update(
+        Number(id),
+        req.body as IMondialRelay
+      );
+      if (mondialRelayUpdated) {
+        res.status(200).send('Mondial Relay mis à jour');
+      } else {
+        throw new ErrorHandler(
+          500,
+          `Ce Mondial Relay ne peut pas être mis à jour`
+        );
+      }
+    };
   }
 );
 
 mondialRelayRouter.delete(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const mondialRelayDeleted = await MondialRelay.destroy(Number(id));
-      if (mondialRelayDeleted) {
-        res.status(200).send('Mondial Relay supprimé');
-      } else {
-        throw new ErrorHandler(404, `Mondial Relay non trouvé`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { id } = req.params;
+        const mondialRelayDeleted = await MondialRelay.destroy(Number(id));
+        if (mondialRelayDeleted) {
+          res.status(200).send('Mondial Relay supprimé');
+        } else {
+          throw new ErrorHandler(404, `Mondial Relay non trouvé`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 

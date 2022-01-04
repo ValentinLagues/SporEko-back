@@ -29,19 +29,17 @@ const getAll = async (): Promise<IColor[]> => {
     .then(([results]) => results);
 };
 
-const recordExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const color = req.body as IColor;
-  color.id_color = parseInt(req.params.idColor);
-  const recordFound: IColor = await getById(color.id_color);
-  if (!recordFound) {
-    next(new ErrorHandler(404, `Couleur non trouvée`));
-  } else {
-    next();
-  }
+const recordExists = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const color = req.body as IColor;
+    color.id_color = parseInt(req.params.idColor);
+    const recordFound: IColor = await getById(color.id_color);
+    if (!recordFound) {
+      next(new ErrorHandler(404, `Couleur non trouvée`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getById = async (idColor: number): Promise<IColor> => {
@@ -51,14 +49,16 @@ const getById = async (idColor: number): Promise<IColor> => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const color = req.body as IColor;
-  const colorWithSameName: IColor = await getByName(color.name);
-  if (colorWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de couleur existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const color = req.body as IColor;
+    const colorWithSameName: IColor = await getByName(color.name);
+    if (colorWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de couleur existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getByName = async (name: string): Promise<IColor> => {

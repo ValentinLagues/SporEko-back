@@ -18,12 +18,12 @@ sportsRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { idSport } = req.params;
     Sport.getById(Number(idSport))
-      .then((sport:ISport) => {
+      .then((sport: ISport) => {
         if (sport === undefined) {
           res.status(404).send('Sport non trouvé');
         }
         res.status(200).json(sport);
-      })  
+      })
       .catch((err) => next(err));
   }
 );
@@ -32,14 +32,16 @@ sportsRouter.post(
   '/',
   Sport.nameIsFree,
   Sport.validateSport,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const sport = req.body as ISport;
-      sport.id_sport = await Sport.create(sport);
-      res.status(201).json(sport);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const sport = req.body as ISport;
+        sport.id_sport = await Sport.create(sport);
+        res.status(201).json(sport);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -47,35 +49,39 @@ sportsRouter.put(
   '/:idsport',
   Sport.nameIsFree,
   Sport.validateSport,
-  async (req: Request, res: Response) => {
-    const { idsport } = req.params;
+  (req: Request, res: Response) => {
+    async () => {
+      const { idsport } = req.params;
 
-    const sportUpdated = await Sport.update(
-      Number(idsport),
-      req.body as ISport
-    );
-    if (sportUpdated) {
-      res.status(200).send('Sport mis à jour');
-    } else {
-      throw new ErrorHandler(500, `Ce sport ne peut pas être mis à jour`);
-    }
+      const sportUpdated = await Sport.update(
+        Number(idsport),
+        req.body as ISport
+      );
+      if (sportUpdated) {
+        res.status(200).send('Sport mis à jour');
+      } else {
+        throw new ErrorHandler(500, `Ce sport ne peut pas être mis à jour`);
+      }
+    };
   }
 );
 
 sportsRouter.delete(
   '/:idsport',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { idsport } = req.params;
-      const sportDeleted = await Sport.destroy(Number(idsport));
-      if (sportDeleted) {
-        res.status(200).send('Sport supprimé');
-      } else {
-        throw new ErrorHandler(404, `Sport non trouvé`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { idsport } = req.params;
+        const sportDeleted = await Sport.destroy(Number(idsport));
+        if (sportDeleted) {
+          res.status(200).send('Sport supprimé');
+        } else {
+          throw new ErrorHandler(404, `Sport non trouvé`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 

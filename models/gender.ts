@@ -20,15 +20,18 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAllGenders = () => {
-  const sql = 'SELECT * FROM genders';
-  return connection.promise().query(sql);
-};
-
-const getGenderById = (id: number) => {
+const getAllGenders = (): Promise<IGender[]> => {
   return connection
     .promise()
-    .query<IGender[]>('SELECT * FROM genders WHERE id_gender = ? ', [id]);
+    .query<IGender[]>('SELECT * FROM genders')
+    .then(([results]) => results);
+};
+
+const getGenderById = (id: number): Promise<IGender> => {
+  return connection
+    .promise()
+    .query<IGender[]>('SELECT * FROM genders WHERE id_gender = ? ', [id])
+    .then(([result]) => result[0]);
 };
 
 const getGenderByName = (name: string) => {
@@ -38,14 +41,16 @@ const getGenderByName = (name: string) => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const gender = req.body as IGender;
-  const genderWithSameName: IGender = await getGenderByName(gender.name);
-  if (genderWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const gender = req.body as IGender;
+    const genderWithSameName: IGender = await getGenderByName(gender.name);
+    if (genderWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const createGender = (newGender: IGender): Promise<number> => {
@@ -57,10 +62,14 @@ const createGender = (newGender: IGender): Promise<number> => {
     .then(([results]) => results.insertId);
 };
 
-const updateGender = (id: number, name: object) => {
+const updateGender = (id: number, name: string): Promise<boolean> => {
   return connection
     .promise()
-    .query('UPDATE genders SET name = ?  WHERE id_gender = ? ', [name, id]);
+    .query<ResultSetHeader>(
+      'UPDATE genders SET name = ?  WHERE id_gender = ? ',
+      [name, id]
+    )
+    .then(([results]) => results.affectedRows === 1);
 };
 
 const destroyGender = (id: number) => {

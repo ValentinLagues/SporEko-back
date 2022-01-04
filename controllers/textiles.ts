@@ -18,12 +18,12 @@ textilesRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { idTextile } = req.params;
     Textile.getById(Number(idTextile))
-      .then((textile:ITextile) => {
+      .then((textile: ITextile) => {
         if (textile === undefined) {
           res.status(404).send('Matière non trouvée');
         }
         res.status(200).json(textile);
-      })  
+      })
       .catch((err) => next(err));
   }
 );
@@ -32,14 +32,16 @@ textilesRouter.post(
   '/',
   Textile.nameIsFree,
   Textile.validateTextile,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const textile = req.body as ITextile;
-      textile.id_textile = await Textile.create(textile);
-      res.status(201).json(textile);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const textile = req.body as ITextile;
+        textile.id_textile = await Textile.create(textile);
+        res.status(201).json(textile);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -47,35 +49,42 @@ textilesRouter.put(
   '/:idtextile',
   Textile.nameIsFree,
   Textile.validateTextile,
-  async (req: Request, res: Response) => {
-    const { idtextile } = req.params;
+  (req: Request, res: Response) => {
+    async () => {
+      const { idtextile } = req.params;
 
-    const textileUpdated = await Textile.update(
-      Number(idtextile),
-      req.body as ITextile
-    );
-    if (textileUpdated) {
-      res.status(200).send('Matière mis à jour');
-    } else {
-      throw new ErrorHandler(500, `Cette matière ne peut pas être mis à jour`);
-    }
+      const textileUpdated = await Textile.update(
+        Number(idtextile),
+        req.body as ITextile
+      );
+      if (textileUpdated) {
+        res.status(200).send('Matière mis à jour');
+      } else {
+        throw new ErrorHandler(
+          500,
+          `Cette matière ne peut pas être mis à jour`
+        );
+      }
+    };
   }
 );
 
 textilesRouter.delete(
   '/:idtextile',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { idtextile } = req.params;
-      const textileDeleted = await Textile.destroy(Number(idtextile));
-      if (textileDeleted) {
-        res.status(200).send('Matière supprimée');
-      } else {
-        throw new ErrorHandler(404, `Matière non trouvée`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { idtextile } = req.params;
+        const textileDeleted = await Textile.destroy(Number(idtextile));
+        if (textileDeleted) {
+          res.status(200).send('Matière supprimée');
+        } else {
+          throw new ErrorHandler(404, `Matière non trouvée`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 
@@ -150,4 +159,3 @@ export default textilesRouter;
 // });
 
 // module.exports = { textilesRouter };
-

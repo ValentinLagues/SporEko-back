@@ -32,14 +32,16 @@ colissimosRouter.post(
   '/',
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const colissimo = req.body as IColissimo;
-      colissimo.id_colissimo = await Colissimo.create(colissimo);
-      res.status(201).json(colissimo);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const colissimo = req.body as IColissimo;
+        colissimo.id_colissimo = await Colissimo.create(colissimo);
+        res.status(201).json(colissimo);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -48,35 +50,39 @@ colissimosRouter.put(
   Colissimo.recordExists,
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
-  async (req: Request, res: Response) => {
-    const { idColissimo } = req.params;
+  (req: Request, res: Response) => {
+    async () => {
+      const { idColissimo } = req.params;
 
-    const colissimoUpdated = await Colissimo.update(
-      Number(idColissimo),
-      req.body as IColissimo
-    );
-    if (colissimoUpdated) {
-      res.status(200).send(req.body);
-    } else {
-      throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
-    }
+      const colissimoUpdated = await Colissimo.update(
+        Number(idColissimo),
+        req.body as IColissimo
+      );
+      if (colissimoUpdated) {
+        res.status(200).send(req.body);
+      } else {
+        throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
+      }
+    };
   }
 );
 
 colissimosRouter.delete(
   '/:idColissimo',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { idColissimo } = req.params;
-      const colissimoDeleted = await Colissimo.destroy(Number(idColissimo));
-      if (colissimoDeleted) {
-        res.status(200).send('Colissimo supprimé');
-      } else {
-        throw new ErrorHandler(404, `Colissimo non trouvé`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { idColissimo } = req.params;
+        const colissimoDeleted = await Colissimo.destroy(Number(idColissimo));
+        if (colissimoDeleted) {
+          res.status(200).send('Colissimo supprimé');
+        } else {
+          throw new ErrorHandler(404, `Colissimo non trouvé`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 

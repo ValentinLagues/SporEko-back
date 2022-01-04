@@ -21,33 +21,37 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAllSizes = () => {
-  const sql = 'SELECT * FROM sizes';
-  return connection.promise().query(sql);
+const getAllSizes = (): Promise<ISize[]> => {
+  return connection
+    .promise()
+    .query<ISize[]>('SELECT * FROM sizes')
+    .then(([results]) => results);
 };
 
-const getSizeById = (id: number) => {
+const getSizeById = (id: number): Promise<ISize> => {
   return connection
     .promise()
     .query<ISize[]>('SELECT * FROM sizes WHERE id_size = ? ', [id])
     .then(([result]) => result[0]);
 };
 
-const getSizeByName = (name: string) => {
+const getSizeByName = (name: string): Promise<ISize> => {
   return connection
     .promise()
     .query<ISize[]>('SELECT * FROM sizes WHERE name = ? ', [name])
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const gender = req.body as ISize;
-  const genderWithSameName: ISize = await getSizeByName(gender.name);
-  if (genderWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
+  async () => {
+    const gender = req.body as ISize;
+    const genderWithSameName: ISize = await getSizeByName(gender.name);
+    if (genderWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const createSize = (newSize: ISize): Promise<number> => {
@@ -60,9 +64,13 @@ const createSize = (newSize: ISize): Promise<number> => {
     .then(([results]) => results.insertId);
 };
 
-const updateSize = (idSize: number, name: string, is_children: number) => {
+const updateSize = (
+  idSize: number,
+  name: string,
+  is_children: number
+): Promise<boolean> => {
   let sql = 'UPDATE sizes SET ';
-  const sqlValues: Array<any> = [];
+  const sqlValues: Array<string | number> = [];
   let oneValue = false;
   if (name) {
     sql += 'name = ? ';
@@ -82,10 +90,11 @@ const updateSize = (idSize: number, name: string, is_children: number) => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroySize = (id: number) => {
+const destroySize = (id: number): Promise<boolean> => {
   return connection
     .promise()
-    .query('DELETE FROM sizes WHERE id_size = ? ', [id]);
+    .query<ResultSetHeader>('DELETE FROM sizes WHERE id_size = ? ', [id])
+    .then(([results]) => results.affectedRows === 1);
 };
 
 export {

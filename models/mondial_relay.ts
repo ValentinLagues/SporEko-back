@@ -5,7 +5,11 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IMondialRelay from '../interfaces/IMondialRelay';
 
-const validateMondialRelay = (req: Request, res: Response, next: NextFunction) => {
+const validateMondialRelay = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -32,33 +36,42 @@ const getAll = (): Promise<IMondialRelay[]> => {
 const getById = (idMondialRelay: number): Promise<IMondialRelay> => {
   return connection
     .promise()
-    .query<IMondialRelay[]>('SELECT * FROM mondial_relay WHERE id_mondial_relay = ?', [
-      idMondialRelay,
-    ])
+    .query<IMondialRelay[]>(
+      'SELECT * FROM mondial_relay WHERE id_mondial_relay = ?',
+      [idMondialRelay]
+    )
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const mondialRelay = req.body as IMondialRelay;
-  const mondialRelayWithSameName: IMondialRelay = await getByName(mondialRelay.name);
-  if (mondialRelayWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de Mondial Relay existe déjà`));
-  } else {
-    next();
-  }
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
+    const mondialRelay = req.body as IMondialRelay;
+    const mondialRelayWithSameName: IMondialRelay = await getByName(
+      mondialRelay.name
+    );
+    if (mondialRelayWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de Mondial Relay existe déjà`));
+    } else {
+      next();
+    }
+  };
 };
 
 const getByName = (name: string): Promise<IMondialRelay> => {
   return connection
     .promise()
-    .query<IMondialRelay[]>('SELECT * FROM mondial_relay WHERE name = ?', [name])
+    .query<IMondialRelay[]>('SELECT * FROM mondial_relay WHERE name = ?', [
+      name,
+    ])
     .then(([results]) => results[0]);
 };
 
 const create = (newMondialRelay: IMondialRelay): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO mondial_relay SET ?', [newMondialRelay])
+    .query<ResultSetHeader>('INSERT INTO mondial_relay SET ?', [
+      newMondialRelay,
+    ])
     .then(([results]) => results.insertId);
 };
 
@@ -68,19 +81,20 @@ const update = (
 ): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE mondial_relay SET ? WHERE id_mondial_relay = ?', [
-      newAttributes,
-      idMondialRelay,
-    ])
+    .query<ResultSetHeader>(
+      'UPDATE mondial_relay SET ? WHERE id_mondial_relay = ?',
+      [newAttributes, idMondialRelay]
+    )
     .then(([results]) => results.affectedRows === 1);
 };
 
 const destroy = async (idMondialRelay: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM mondial_relay WHERE id_mondial_relay = ?', [
-      idMondialRelay,
-    ])
+    .query<ResultSetHeader>(
+      'DELETE FROM mondial_relay WHERE id_mondial_relay = ?',
+      [idMondialRelay]
+    )
     .then(([results]) => results.affectedRows === 1);
 };
 

@@ -1,36 +1,35 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, Router } from 'express';
 import ISize from '../interfaces/ISize';
 import { ErrorHandler } from '../helpers/errors';
 import * as Sizes from '../models/size';
 
-const sizesRouter = require('express').Router();
+const sizesRouter = Router();
 
-sizesRouter.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
+sizesRouter.get('/', (_req: Request, res: Response, next: NextFunction) => {
+  async () => {
     try {
-      await Sizes.getAllSizes().then(([result]) =>
-        res.status(200).json(result)
-      );
+      const results = await Sizes.getAllSizes();
+      res.status(200).json(results);
     } catch (err) {
       next(err);
     }
-  }
-);
+  };
+});
 
 sizesRouter.get(
   '/:idSize',
   (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { idSize } = req.params;
-      Sizes.getSizeById(Number(idSize)).then((result) => {
+    async () => {
+      try {
+        const { idSize } = req.params;
+        const result = await Sizes.getSizeById(Number(idSize));
         if (result) res.status(200).json(result);
         else
           res.status(404).send(`La taille avec id:${idSize} est introuvable.`);
-      });
-    } catch (err) {
-      next(err);
-    }
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -55,7 +54,7 @@ sizesRouter.put(
   Sizes.validateSize,
   async (req: Request, res: Response) => {
     const { idSize } = req.params;
-    const { name, is_children } = req.body;
+    const { name, is_children } = req.body as ISize;
     const sizeUpdated = await Sizes.updateSize(
       Number(idSize),
       name,
@@ -70,12 +69,13 @@ sizesRouter.put(
 );
 
 sizesRouter.delete('/:idSize', (req: Request, res: Response) => {
-  const { idSize } = req.params;
-  Sizes.destroySize(Number(idSize)).then((result: Array<any>) => {
-    if (result[0].affectedRows)
+  async () => {
+    const { idSize } = req.params;
+    const sizeDeleted = await Sizes.destroySize(Number(idSize));
+    if (sizeDeleted)
       res.status(201).json(`La taille avec l'id:${idSize} à était supprimé`);
     else res.status(404).json(`La taille avec l'id:${idSize} n'existe pas`);
-  });
+  };
 });
 
 export default sizesRouter;

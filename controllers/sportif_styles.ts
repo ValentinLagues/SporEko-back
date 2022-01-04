@@ -5,20 +5,25 @@ import { ErrorHandler } from '../helpers/errors';
 
 const sportifStylesRouter = Router();
 
-sportifStylesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  SportifStyles.getAll()
-    .then((sportifStyles: Array<ISportifStyles>) => {
-      res.status(200).json(sportifStyles);
-    })
-    .catch((err) => next(err));
-});
+sportifStylesRouter.get(
+  '/',
+  (req: Request, res: Response, next: NextFunction) => {
+    SportifStyles.getAll()
+      .then((sportifStyles: Array<ISportifStyles>) => {
+        res.status(200).json(sportifStyles);
+      })
+      .catch((err) => next(err));
+  }
+);
 
 sportifStylesRouter.get(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     SportifStyles.getById(Number(id))
-      .then((sportifStyles: ISportifStyles) => res.status(200).json(sportifStyles))
+      .then((sportifStyles: ISportifStyles) =>
+        res.status(200).json(sportifStyles)
+      )
       .catch((err) => next(err));
   }
 );
@@ -27,14 +32,18 @@ sportifStylesRouter.post(
   '/',
   SportifStyles.nameIsFree,
   SportifStyles.validateSportifStyles,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const sportifStyles = req.body as ISportifStyles;
-      sportifStyles.id_sportif_style = await SportifStyles.create(sportifStyles);
-      res.status(201).json(sportifStyles);
-    } catch (err) {
-      next(err);
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const sportifStyles = req.body as ISportifStyles;
+        sportifStyles.id_sportif_style = await SportifStyles.create(
+          sportifStyles
+        );
+        res.status(201).json(sportifStyles);
+      } catch (err) {
+        next(err);
+      }
+    };
   }
 );
 
@@ -52,25 +61,30 @@ sportifStylesRouter.put(
     if (sportifStylesUpdated) {
       res.status(200).send('Sportif Styles mis à jour');
     } else {
-      throw new ErrorHandler(500, `Ce Sportif Styles ne peut pas être mis à jour`);
+      throw new ErrorHandler(
+        500,
+        `Ce Sportif Styles ne peut pas être mis à jour`
+      );
     }
   }
 );
 
 sportifStylesRouter.delete(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const sportifStylesDeleted = await SportifStyles.destroy(Number(id));
-      if (sportifStylesDeleted) {
-        res.status(200).send('Sportif Styles supprimé');
-      } else {
-        throw new ErrorHandler(404, `Sportif Styles non trouvé`);
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
+      try {
+        const { id } = req.params;
+        const sportifStylesDeleted = await SportifStyles.destroy(Number(id));
+        if (sportifStylesDeleted) {
+          res.status(200).send('Sportif Styles supprimé');
+        } else {
+          throw new ErrorHandler(404, `Sportif Styles non trouvé`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
+    };
   }
 );
 
