@@ -68,12 +68,10 @@ const update = async (
 ): Promise<boolean> => {
   let sql = 'UPDATE sports SET ';
   const sqlValues: Array<string | number> = [];
-  let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
-    oneValue = true;
   }
   sql += ' WHERE id_sport = ?';
   sqlValues.push(idSport);

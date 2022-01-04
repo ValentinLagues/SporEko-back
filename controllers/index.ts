@@ -4,14 +4,14 @@ import usersRouter from './users';
 import gendersRouter from './genders';
 import sportsRouter from './sports';
 import sizesRouter from './sizes';
-// import conditionsRouter from './conditions';
-// import brandsRouter from './brands';
+import conditionsRouter from './conditions';
+import brandsRouter from './brands';
 import colorsRouter from './colors';
 import colissimosRouter from './colissimos';
 import mondialRelayRouter from './mondial_relay';
 import sportifStylesRouter from './sportif_styles';
 import textilesRouter from './textiles';
-// import categoriesRouter from './categories';
+import categoriesRouter from './categories';
 import authRouter from './auth';
 
 const setupRoutes = (app: express.Application) => {
@@ -20,14 +20,14 @@ const setupRoutes = (app: express.Application) => {
   app.use('/genders', gendersRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
-  // app.use('/conditions', conditionsRouter);
-  // app.use('/brands', brandsRouter);
+  app.use('/conditions', conditionsRouter);
+  app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);
   app.use('/colissimos', colissimosRouter);
   app.use('/mondialrelay', mondialRelayRouter);
   app.use('/sportifstyles', sportifStylesRouter);
   app.use('/textiles', textilesRouter);
-  // app.use('/categories', categoriesRouter);
+  app.use('/categories', categoriesRouter);
   app.use('/login', authRouter);
 };
 
