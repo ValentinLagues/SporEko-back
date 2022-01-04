@@ -20,21 +20,22 @@ const validateCategory = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = async (): Promise<ICategory[]> => {
+const getAll = (): Promise<ICategory[]> => {
   return connection
     .promise()
     .query<ICategory[]>('SELECT * FROM categories')
     .then(([results]) => results);
 };
 
-const getById = async (idCategory: number): Promise<ICategory> => {
+const getById = (idCategory: number): Promise<ICategory> => {
   return connection
     .promise()
     .query<ICategory[]>('SELECT * FROM categories WHERE id_category = ?', [idCategory])
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
   const category = req.body as ICategory;
   const categoryWithSameName: ICategory = await getByName(category.name);
   if (categoryWithSameName) {
@@ -42,6 +43,7 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   } else {
     next();
   }
+}
 };
 
 const getByName = async (name: string): Promise<ICategory> => {
@@ -67,12 +69,10 @@ const update = async (
 ): Promise<boolean> => {
   let sql = 'UPDATE categories SET ';
   const sqlValues: Array<string | number> = [];
-  let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
-    oneValue = true;
   }
   sql += ' WHERE id_category = ?';
   sqlValues.push(idCategory);

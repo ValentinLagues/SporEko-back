@@ -32,7 +32,8 @@ conditionsRouter.post(
   '/',
   Condition.nameIsFree,
   Condition.validateCondition,
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const condition = req.body as ICondition;
       condition.id_condition = await Condition.create(condition);
@@ -41,13 +42,15 @@ conditionsRouter.post(
       next(err);
     }
   }
+  }
 );
 
 conditionsRouter.put(
   '/:idCondition',
   Condition.nameIsFree,
   Condition.validateCondition,
-  async (req: Request, res: Response) => {
+  (req: Request, res: Response) => {
+    async () => {
     const { idCondition } = req.params;
     const conditionUpdated = await Condition.update(
       Number(idCondition),
@@ -59,11 +62,13 @@ conditionsRouter.put(
       throw new ErrorHandler(500, `Cet état ne peut pas être mise à jour`);
     }
   }
+  }
 );
 
 conditionsRouter.delete(
   '/:idCondition',
-  async (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    async () => {
     try {
       const { idCondition } = req.params;
       const conditionDeleted = await Condition.destroy(Number(idCondition));
@@ -75,6 +80,7 @@ conditionsRouter.delete(
     } catch (err) {
       next(err);
     }
+  }
   }
 );
 

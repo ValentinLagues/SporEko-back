@@ -20,21 +20,22 @@ const validateBrand = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getAll = async (): Promise<IBrand[]> => {
+const getAll = (): Promise<IBrand[]> => {
   return connection
     .promise()
     .query<IBrand[]>('SELECT * FROM brands')
     .then(([results]) => results);
 };
 
-const getById = async (idBrand: number): Promise<IBrand> => {
+const getById = (idBrand: number): Promise<IBrand> => {
   return connection
     .promise()
     .query<IBrand[]>('SELECT * FROM brands WHERE id_brand = ?', [idBrand])
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  async () => {
   const brand = req.body as IBrand;
   const brandWithSameName: IBrand = await getByName(brand.name);
   if (brandWithSameName) {
@@ -42,6 +43,7 @@ const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
   } else {
     next();
   }
+}
 };
 
 const getByName = async (name: string): Promise<IBrand> => {
@@ -67,12 +69,10 @@ const update = async (
 ): Promise<boolean> => {
   let sql = 'UPDATE brands SET ';
   const sqlValues: Array<string | number> = [];
-  let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
-    oneValue = true;
   }
   sql += ' WHERE id_brand = ?';
   sqlValues.push(idBrand);
