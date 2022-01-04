@@ -1,48 +1,102 @@
-const JoiCategories = require('joi');
-const dbCategories = require('../db-config');
+import connection from '../db-config.js';
+import { ResultSetHeader } from 'mysql2';
+import Joi from 'joi';
+import { NextFunction, Request, Response } from 'express';
+import { ErrorHandler } from '../helpers/errors';
+import ICategory from '../interfaces/ICategory';
 
-const connectDbCategories = dbCategories.connection.promise();
-
-const validateCategory = (data: object, forCreation = true) => {
-  const presence = forCreation ? 'required' : 'optional';
-  return JoiCategories.object({
-    name: JoiCategories.string().max(50).presence(presence),
-  }).validate(data, { abortEarly: false }).error;
+const validateCategory = (req: Request, res: Response, next: NextFunction) => {
+  let presence: Joi.PresenceMode = 'optional';
+  if (req.method === 'POST') {
+    presence = 'required';
+  }
+  const errors = Joi.object({
+    name: Joi.string().max(50).presence(presence),
+  }).validate(req.body, { abortEarly: false }).error;
+  if (errors) {
+    next(new ErrorHandler(422, errors.message));
+  } else {
+    next();
+  }
 };
 
-const findManyCategories = () => {
-  return connectDbCategories.query('SELECT * FROM categories');
+const getAll = async (): Promise<ICategory[]> => {
+  return connection
+    .promise()
+    .query<ICategory[]>('SELECT * FROM categories')
+    .then(([results]) => results);
 };
 
-const findOneCategory = (id: number) => {
-  return connectDbCategories.query('SELECT * FROM categories WHERE id_category = ?', [id]);
+const getById = async (idCategory: number): Promise<ICategory> => {
+  return connection
+    .promise()
+    .query<ICategory[]>('SELECT * FROM categories WHERE id_category = ?', [idCategory])
+    .then(([results]) => results[0]);
 };
 
-const findByCategoryName = (name: string) => {
-  return connectDbCategories.query('SELECT * FROM categories WHERE name = ?', [name]);
-}
-
-const createCategory = (newCategory: object) => {
-  return connectDbCategories.query('INSERT INTO categories SET ?', [newCategory]);
+const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {
+  const category = req.body as ICategory;
+  const categoryWithSameName: ICategory = await getByName(category.name);
+  if (categoryWithSameName) {
+    next(new ErrorHandler(409, `Cette categorie existe déjà`));
+  } else {
+    next();
+  }
 };
 
-const updateCategory = (id: number, newAttributes: object) => {
-  return connectDbCategories.query('UPDATE categories SET ? WHERE id_category = ?', [
-    newAttributes,
-    id,
-  ]);
+const getByName = async (name: string): Promise<ICategory> => {
+  return connection
+    .promise()
+    .query<ICategory[]>('SELECT * FROM categories WHERE name = ?', [name])
+    .then(([results]) => results[0]);
 };
 
-const destroyCategory = (id: number) => {
-  return connectDbCategories.query('DELETE FROM categories WHERE id_category = ?', [id]);
+const create = async (newCategory: ICategory): Promise<number> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>(
+      'INSERT INTO categories (name) VALUES (?)',
+      [newCategory.name]
+    )
+    .then(([results]) => results.insertId);
 };
 
-module.exports = {
+const update = async (
+  idCategory: number,
+  attibutesToUpdate: ICategory
+): Promise<boolean> => {
+  let sql = 'UPDATE categories SET ';
+  const sqlValues: Array<string | number> = [];
+  let oneValue = false;
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+    oneValue = true;
+  }
+  sql += ' WHERE id_category = ?';
+  sqlValues.push(idCategory);
+
+  return connection
+    .promise()
+    .query<ResultSetHeader>(sql, sqlValues)
+    .then(([results]) => results.affectedRows === 1);
+};
+
+const destroy = async (idCategory: number): Promise<boolean> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('DELETE FROM categories WHERE id_category = ?', [idCategory])
+    .then(([results]) => results.affectedRows === 1);
+};
+
+export {
   validateCategory,
-  findManyCategories,
-  findOneCategory,
-  findByCategoryName,
-  createCategory,
-  updateCategory,
-  destroyCategory,
+  getAll,
+  getById,
+  getByName,
+  nameIsFree,
+  create,
+  update,
+  destroy,
 };

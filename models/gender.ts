@@ -20,15 +20,9 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-<<<<<<< HEAD
-const findManyGenders = () => {
-  const sql = 'SELECT * FROM genders';
-  return dbGenders.connection.promise().query(sql)
-=======
 const getAllGenders = () => {
   const sql = 'SELECT * FROM genders';
   return connection.promise().query(sql);
->>>>>>> b9f02dc91de0753f5ee582067c486f79cd977b37
 };
 
 const getGenderById = (id: number) => {

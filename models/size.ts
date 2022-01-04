@@ -33,22 +33,11 @@ const getSizeById = (id: number) => {
     .then(([result]) => result[0]);
 };
 
-<<<<<<< HEAD
-const findManySizes = () => {
-  const sql = 'SELECT * FROM sizes';
-  return dbSizes.connection.promise().query(sql)
-=======
 const getSizeByName = (name: string) => {
   return connection
     .promise()
-<<<<<<< HEAD
-    .query('SELECT * FROM sizes WHERE name = ? ', [name])
-    .then(([results]: Array<Array<ISize>>) => results[0]);
->>>>>>> b9f02dc91de0753f5ee582067c486f79cd977b37
-=======
     .query<ISize[]>('SELECT * FROM sizes WHERE name = ? ', [name])
     .then(([results]) => results[0]);
->>>>>>> 657142ce54dbba5b36dd8bdf79d46794e2099d67
 };
 
 const nameIsFree = async (req: Request, res: Response, next: NextFunction) => {

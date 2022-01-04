@@ -1,76 +1,81 @@
-const categoriesRouter = require('express').Router();
-import { Request, Response } from 'express';
-const Category = require('../models/category');
+import { Request, Response, NextFunction, Router } from 'express';
+import * as Category from '../models/category';
+import ICategory from '../interfaces/ICategory';
+import { ErrorHandler } from '../helpers/errors';
 
-interface CategoryInfo {
-  name: string;
-}
+const categoriesRouter = Router();
 
-categoriesRouter.get('/', (req: Request, res: Response) => {
-  Category.findManyCategories().then(([result]: Array<any>) => {
-    res.status(200).json(result);
-  });
+categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  Category.getAll()
+    .then((categories: Array<ICategory>) => {
+      res.status(200).json(categories);
+    })
+    .catch((err) => next(err));
 });
 
-categoriesRouter.get('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  Category.findOneCategory(idcategory).then(([result]: Array<any>) => {
-    if (result.length > 0) {
-      res.json(result);
-    } else {
-      res.status(404).send('Category not found');
-    }
-  });
-});
-
-categoriesRouter.post('/', (req: Request, res: Response) => {
-  const category: CategoryInfo = req.body;
-  const joiErrors = Category.validateCategory(category);
-  if (joiErrors) {
-    res.status(422).send(joiErrors.details);
-  } else {
-    Category.createCategory(category)
-      .then(([createdCategory]: Array<any>) => {
-        const id = createdCategory.insertId;
-        res.status(201).json({ id, ...category });
+categoriesRouter.get(
+  '/:idCategory',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idCategory } = req.params;
+    Category.getById(Number(idCategory))
+      .then((category: ICategory) => {
+        if (category === undefined) {
+          res.status(404).send('Categorie non trouvée');
+        }
+        res.status(200).json(category);
       })
-      .catch((error: Array<any>) => {
-        res.status(500).send(error);
-      });
+      .catch((err) => next(err));
   }
-});
+);
 
-categoriesRouter.put('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  Category.findOneCategory(idcategory).then(([categoryFound]: Array<any>) => {
-    if (categoryFound.length > 0) {
-      const category: CategoryInfo = req.body;
-      const joiErrors = Category.validateCategory(category, false);
-      if (joiErrors) {
-        console.log('JoiErrors dans put category');
-        res.status(409).send(joiErrors.details);
+categoriesRouter.post(
+  '/',
+  Category.nameIsFree,
+  Category.validateCategory,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const category = req.body as ICategory;
+      category.id_category = await Category.create(category);
+      res.status(201).json(category);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+categoriesRouter.put(
+  '/:idCategory',
+  Category.nameIsFree,
+  Category.validateCategory,
+  async (req: Request, res: Response) => {
+    const { idCategory } = req.params;
+    const categoryUpdated = await Category.update(
+      Number(idCategory),
+      req.body as ICategory
+    );
+    if (categoryUpdated) {
+      res.status(200).send('Categorie mise à jour');
+    } else {
+      throw new ErrorHandler(500, `Cette categorie ne peut pas être mise à jour`);
+    }
+  }
+);
+
+categoriesRouter.delete(
+  '/:idCategory',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { idCategory } = req.params;
+      const categoryDeleted = await Category.destroy(Number(idCategory));
+      if (categoryDeleted) {
+        res.status(200).send('Categorie supprimée');
       } else {
-        Category.updateCategory(idcategory, category).then(() => {
-          res.status(200).json({ ...categoryFound[0], ...category });
-        });
+        throw new ErrorHandler(404, `Categorie non trouvée`);
       }
-    } else {
-      res.status(404).send('Category not found');
+    } catch (err) {
+      next(err);
     }
-  });
-});
+  }
+);
 
-categoriesRouter.delete('/:idcategory', (req: Request, res: Response) => {
-  const { idcategory } = req.params;
-  Category.findOneCategory(idcategory).then(([categoryFound]: Array<any>) => {
-    if (categoryFound.length > 0) {
-      Category.destroyCategory(idcategory).then(() => {
-        res.status(200).send('Category successfully deleted');
-      });
-    } else {
-      res.status(404).send('Category not found');
-    }
-  });
-});
-
-module.exports = { categoriesRouter };
+export default categoriesRouter;
