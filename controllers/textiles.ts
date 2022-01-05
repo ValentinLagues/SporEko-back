@@ -33,7 +33,7 @@ textilesRouter.post(
   Textile.nameIsFree,
   Textile.validateTextile,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const textile = req.body as ITextile;
         textile.id_textile = await Textile.create(textile);
@@ -41,7 +41,7 @@ textilesRouter.post(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 
@@ -50,7 +50,7 @@ textilesRouter.put(
   Textile.nameIsFree,
   Textile.validateTextile,
   (req: Request, res: Response) => {
-    async () => {
+    void (async () => {
       const { idtextile } = req.params;
 
       const textileUpdated = await Textile.update(
@@ -59,20 +59,22 @@ textilesRouter.put(
       );
       if (textileUpdated) {
         res.status(200).send('Matière mis à jour');
+      } else if (!textileUpdated) {
+        res.status(404).send('Textile not found');
       } else {
         throw new ErrorHandler(
           500,
           `Cette matière ne peut pas être mis à jour`
         );
       }
-    };
+    })();
   }
 );
 
 textilesRouter.delete(
   '/:idtextile',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const { idtextile } = req.params;
         const textileDeleted = await Textile.destroy(Number(idtextile));
@@ -84,7 +86,7 @@ textilesRouter.delete(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 

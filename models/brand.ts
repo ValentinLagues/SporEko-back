@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IBrand from '../interfaces/IBrand';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateBrand = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -19,6 +21,19 @@ const validateBrand = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const brand = req.body as IBrand;
+    const brandWithSameName: IBrand = await getByName(brand.name);
+    if (brandWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de marque existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (): Promise<IBrand[]> => {
   return connection
@@ -34,18 +49,6 @@ const getById = (idBrand: number): Promise<IBrand> => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
-  const brand = req.body as IBrand;
-  const brandWithSameName: IBrand = await getByName(brand.name);
-  if (brandWithSameName) {
-    next(new ErrorHandler(409, `Ce nom de marque existe déjà`));
-  } else {
-    next();
-  }
-}
-};
-
 const getByName = async (name: string): Promise<IBrand> => {
   return connection
     .promise()
@@ -56,10 +59,9 @@ const getByName = async (name: string): Promise<IBrand> => {
 const create = async (newBrand: IBrand): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'INSERT INTO brands (name) VALUES (?)',
-      [newBrand.name]
-    )
+    .query<ResultSetHeader>('INSERT INTO brands (name) VALUES (?)', [
+      newBrand.name,
+    ])
     .then(([results]) => results.insertId);
 };
 

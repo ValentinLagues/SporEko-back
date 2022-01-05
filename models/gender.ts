@@ -4,7 +4,7 @@ import { ErrorHandler } from '../helpers/errors';
 import { Request, Response, NextFunction } from 'express';
 import IGender from '../interfaces/IGender';
 import Joi from 'joi';
-
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
 const validateGender = (req: Request, res: Response, next: NextFunction) => {
   let required: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -20,6 +20,18 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const gender = req.body as IGender;
+    const genderWithSameName: IGender = await getGenderByName(gender.name);
+    if (genderWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+/* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllGenders = (): Promise<IGender[]> => {
   return connection
     .promise()
@@ -41,18 +53,6 @@ const getGenderByName = (name: string) => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
-    const gender = req.body as IGender;
-    const genderWithSameName: IGender = await getGenderByName(gender.name);
-    if (genderWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-    } else {
-      next();
-    }
-  };
-};
-
 const createGender = (newGender: IGender): Promise<number> => {
   return connection
     .promise()
@@ -72,10 +72,11 @@ const updateGender = (id: number, name: string): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroyGender = (id: number) => {
+const deleteGender = (id: number): Promise<boolean> => {
   return connection
     .promise()
-    .query('DELETE FROM genders WHERE id_gender = ?', [id]);
+    .query<ResultSetHeader>('DELETE FROM genders WHERE id_gender = ?', [id])
+    .then(([results]) => results.affectedRows === 1);
 };
 
 export {
@@ -85,6 +86,6 @@ export {
   getGenderById,
   createGender,
   updateGender,
-  destroyGender,
+  deleteGender,
   validateGender,
 };

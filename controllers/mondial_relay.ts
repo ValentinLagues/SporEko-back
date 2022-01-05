@@ -21,7 +21,12 @@ mondialRelayRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     MondialRelay.getById(Number(id))
-      .then((mondialRelay: IMondialRelay) => res.status(200).json(mondialRelay))
+      .then((mondialRelay: IMondialRelay) => {
+        if (mondialRelay === undefined) {
+          res.status(404).send('Mondial relay non trouvée');
+        }
+        res.status(200).json(mondialRelay);
+      })
       .catch((err) => next(err));
   }
 );
@@ -31,7 +36,7 @@ mondialRelayRouter.post(
   MondialRelay.nameIsFree,
   MondialRelay.validateMondialRelay,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const mondialRelay = req.body as IMondialRelay;
         mondialRelay.id_mondial_relay = await MondialRelay.create(mondialRelay);
@@ -39,7 +44,7 @@ mondialRelayRouter.post(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 
@@ -48,7 +53,7 @@ mondialRelayRouter.put(
   MondialRelay.nameIsFree,
   MondialRelay.validateMondialRelay,
   (req: Request, res: Response) => {
-    async () => {
+    void (async () => {
       const { id } = req.params;
 
       const mondialRelayUpdated = await MondialRelay.update(
@@ -57,20 +62,22 @@ mondialRelayRouter.put(
       );
       if (mondialRelayUpdated) {
         res.status(200).send('Mondial Relay mis à jour');
+      } else if (!mondialRelayUpdated) {
+        res.status(404).send('Mondial relay not found');
       } else {
         throw new ErrorHandler(
           500,
           `Ce Mondial Relay ne peut pas être mis à jour`
         );
       }
-    };
+    })();
   }
 );
 
 mondialRelayRouter.delete(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const { id } = req.params;
         const mondialRelayDeleted = await MondialRelay.destroy(Number(id));
@@ -82,7 +89,7 @@ mondialRelayRouter.delete(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 

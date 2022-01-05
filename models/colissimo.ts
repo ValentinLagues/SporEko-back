@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IColissimo from '../interfaces/IColissimo';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -14,7 +16,6 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
     id: Joi.number(),
     id_colissimo: Joi.number(),
     name: Joi.string().max(150).presence(presence),
-    weight: Joi.string().max(100).presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -24,22 +25,38 @@ const validateColissimo = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const recordExists = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const colissimo = req.body as IColissimo;
+    colissimo.id_colissimo = parseInt(req.params.idColissimo);
+    const recordFound: IColissimo = await getById(colissimo.id_colissimo);
+    if (!recordFound) {
+      next(new ErrorHandler(404, `Colissimo non trouvé`));
+    } else {
+      next();
+    }
+  })();
+};
+
+const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
+  void (async () => {
+    const colissimo = req.body as IColissimo;
+    const colissimoWithSameName: IColissimo = await getByName(colissimo.name);
+    if (colissimoWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de colissimo existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
+
 const getAll = (): Promise<IColissimo[]> => {
   return connection
     .promise()
     .query<IColissimo[]>('SELECT * FROM colissimo')
     .then(([results]) => results);
-};
-
-const recordExists = (req: Request, res: Response, next: NextFunction) => {
-  const colissimo = req.body as IColissimo;
-  colissimo.id_colissimo = parseInt(req.params.idColissimo);
-  const recordFound: IColissimo = await getById(colissimo.id_colissimo);
-  if (!recordFound) {
-    next(new ErrorHandler(404, `Colissimo non trouvé`));
-  } else {
-    next();
-  }
 };
 
 const getById = (idColissimo: number): Promise<IColissimo> => {
@@ -49,18 +66,6 @@ const getById = (idColissimo: number): Promise<IColissimo> => {
       idColissimo,
     ])
     .then(([results]) => results[0]);
-};
-
-const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
-  async () => {
-    const colissimo = req.body as IColissimo;
-    const colissimoWithSameName: IColissimo = await getByName(colissimo.name);
-    if (colissimoWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de colissimo existe déjà`));
-    } else {
-      next();
-    }
-  };
 };
 
 const getByName = async (name: string): Promise<IColissimo> => {
@@ -74,8 +79,8 @@ const create = async (newColissimo: IColissimo): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO colissimo (name, weight, price) VALUES (?, ?, ?)',
-      [newColissimo.name, newColissimo.weight, newColissimo.price]
+      'INSERT INTO colissimo (name, price) VALUES (?, ?)',
+      [newColissimo.name, newColissimo.price]
     )
     .then(([results]) => results.insertId);
 };
@@ -93,11 +98,7 @@ const update = async (
     sqlValues.push(attibutesToUpdate.name);
     oneValue = true;
   }
-  if (attibutesToUpdate.weight) {
-    sql += oneValue ? ', weight = ? ' : ' weight = ? ';
-    sqlValues.push(attibutesToUpdate.weight);
-    oneValue = true;
-  }
+
   if (attibutesToUpdate.price) {
     sql += oneValue ? ', price = ? ' : ' price = ? ';
     sqlValues.push(attibutesToUpdate.price);

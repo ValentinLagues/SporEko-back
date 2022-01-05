@@ -3,18 +3,17 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import ISport from '../interfaces/ISport';
+import IAthletics from '../interfaces/IAthletics';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateSport = (req: Request, res: Response, next: NextFunction) => {
+const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(80).presence(presence),
-    icon: Joi.string().max(255).presence(presence),
+    name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -24,10 +23,10 @@ const validateSport = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const sport = req.body as ISport;
-    const sportWithSameName: ISport = await getByName(sport.name);
-    if (sportWithSameName) {
-      next(new ErrorHandler(409, `Ce sport existe déjà`));
+    const Athletic = req.body as IAthletics;
+    const AthleticWithSameName: IAthletics = await getByName(Athletic.name);
+    if (AthleticWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de sportif_styles existe déjà`));
     } else {
       next();
     }
@@ -36,60 +35,55 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ISport[]> => {
+const getAll = (): Promise<IAthletics[]> => {
   return connection
     .promise()
-    .query<ISport[]>('SELECT * FROM sports')
+    .query<IAthletics[]>('SELECT * FROM athletics')
     .then(([results]) => results);
 };
 
-const getById = (idSport: number): Promise<ISport> => {
+const getById = (idAthletic: number): Promise<IAthletics> => {
   return connection
     .promise()
-    .query<ISport[]>('SELECT * FROM sports WHERE id_sport = ?', [idSport])
-    .then(([results]) => results[0]);
-};
-
-const getByName = (name: string): Promise<ISport> => {
-  return connection
-    .promise()
-    .query<ISport[]>('SELECT * FROM sports WHERE name = ?', [name])
-    .then(([results]) => results[0]);
-};
-
-const create = (newSport: ISport): Promise<number> => {
-  return connection
-    .promise()
-    .query<ResultSetHeader>('INSERT INTO sports (name) VALUES (?)', [
-      newSport.name,
+    .query<IAthletics[]>('SELECT * FROM athletics WHERE id_athletic = ?', [
+      idAthletic,
     ])
+    .then(([results]) => results[0]);
+};
+
+const getByName = (name: string): Promise<IAthletics> => {
+  return connection
+    .promise()
+    .query<IAthletics[]>('SELECT * FROM athletics WHERE name = ?', [name])
+    .then(([results]) => results[0]);
+};
+
+const create = (newAthletic: IAthletics): Promise<number> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('INSERT INTO athletics SET ?', [newAthletic])
     .then(([results]) => results.insertId);
 };
 
 const update = (
-  idSport: number,
-  attibutesToUpdate: ISport
+  idAthletic: number,
+  newAttributes: IAthletics
 ): Promise<boolean> => {
-  let sql = 'UPDATE sports SET ';
-  const sqlValues: Array<string | number> = [];
-
-  if (attibutesToUpdate.name) {
-    sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
-  }
-  sql += ' WHERE id_sport = ?';
-  sqlValues.push(idSport);
-
   return connection
     .promise()
-    .query<ResultSetHeader>(sql, sqlValues)
+    .query<ResultSetHeader>('UPDATE athletics SET ? WHERE id_athletic = ?', [
+      newAttributes,
+      idAthletic,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = (idSport: number): Promise<boolean> => {
+const destroy = (idAthletic: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM sports WHERE id_sport = ?', [idSport])
+    .query<ResultSetHeader>('DELETE FROM athletics WHERE id_athletic = ?', [
+      idAthletic,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
@@ -101,5 +95,5 @@ export {
   create,
   update,
   destroy,
-  validateSport,
+  validateAthletics,
 };

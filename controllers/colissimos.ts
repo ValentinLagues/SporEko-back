@@ -33,7 +33,7 @@ colissimosRouter.post(
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const colissimo = req.body as IColissimo;
         colissimo.id_colissimo = await Colissimo.create(colissimo);
@@ -41,7 +41,7 @@ colissimosRouter.post(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 
@@ -51,7 +51,7 @@ colissimosRouter.put(
   Colissimo.nameIsFree,
   Colissimo.validateColissimo,
   (req: Request, res: Response) => {
-    async () => {
+    void (async () => {
       const { idColissimo } = req.params;
 
       const colissimoUpdated = await Colissimo.update(
@@ -63,14 +63,14 @@ colissimosRouter.put(
       } else {
         throw new ErrorHandler(500, `Ce colissimo ne peut pas être mis à jour`);
       }
-    };
+    })();
   }
 );
 
 colissimosRouter.delete(
   '/:idColissimo',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const { idColissimo } = req.params;
         const colissimoDeleted = await Colissimo.destroy(Number(idColissimo));
@@ -82,7 +82,7 @@ colissimosRouter.delete(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 

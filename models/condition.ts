@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import ICondition from '../interfaces/ICondition';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateCondition = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -20,6 +22,20 @@ const validateCondition = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const condition = req.body as ICondition;
+    const conditionWithSameName: ICondition = await getByName(condition.name);
+    if (conditionWithSameName) {
+      next(new ErrorHandler(409, `Cet état existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
+
 const getAll = (): Promise<ICondition[]> => {
   return connection
     .promise()
@@ -30,40 +46,29 @@ const getAll = (): Promise<ICondition[]> => {
 const getById = (idCondition: number): Promise<ICondition> => {
   return connection
     .promise()
-    .query<ICondition[]>('SELECT * FROM conditions WHERE id_condition = ?', [idCondition])
+    .query<ICondition[]>('SELECT * FROM conditions WHERE id_condition = ?', [
+      idCondition,
+    ])
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
-  const condition = req.body as ICondition;
-  const conditionWithSameName: ICondition = await getByName(condition.name);
-  if (conditionWithSameName) {
-    next(new ErrorHandler(409, `Cet état existe déjà`));
-  } else {
-    next();
-  }
-}
-};
-
-const getByName = async (name: string): Promise<ICondition> => {
+const getByName = (name: string): Promise<ICondition> => {
   return connection
     .promise()
     .query<ICondition[]>('SELECT * FROM conditions WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = async (newCondition: ICondition): Promise<number> => {
+const create = (newCondition: ICondition): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'INSERT INTO conditions (name) VALUES (?)',
-      [newCondition.name]
-    )
+    .query<ResultSetHeader>('INSERT INTO conditions (name) VALUES (?)', [
+      newCondition.name,
+    ])
     .then(([results]) => results.insertId);
 };
 
-const update = async (
+const update = (
   idCondition: number,
   attibutesToUpdate: ICondition
 ): Promise<boolean> => {
@@ -83,10 +88,12 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idCondition: number): Promise<boolean> => {
+const destroy = (idCondition: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM conditions WHERE id_condition = ?', [idCondition])
+    .query<ResultSetHeader>('DELETE FROM conditions WHERE id_condition = ?', [
+      idCondition,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 

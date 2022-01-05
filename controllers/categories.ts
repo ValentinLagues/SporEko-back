@@ -33,15 +33,15 @@ categoriesRouter.post(
   Category.nameIsFree,
   Category.validateCategory,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
-    try {
-      const category = req.body as ICategory;
-      category.id_category = await Category.create(category);
-      res.status(201).json(category);
-    } catch (err) {
-      next(err);
-    }
-  }
+    void (async () => {
+      try {
+        const category = req.body as ICategory;
+        category.id_category = await Category.create(category);
+        res.status(201).json(category);
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
@@ -49,38 +49,42 @@ categoriesRouter.put(
   '/:idCategory',
   Category.nameIsFree,
   Category.validateCategory,
-  (req: Request, res: Response) => {
-    async () => {
-    const { idCategory } = req.params;
-    const categoryUpdated = await Category.update(
-      Number(idCategory),
-      req.body as ICategory
-    );
-    if (categoryUpdated) {
-      res.status(200).send('Categorie mise à jour');
-    } else {
-      throw new ErrorHandler(500, `Cette categorie ne peut pas être mise à jour`);
-    }
-  }
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const { idCategory } = req.params;
+        const categoryUpdated = await Category.update(
+          Number(idCategory),
+          req.body as ICategory
+        );
+        if (categoryUpdated) {
+          res.status(200).send('Category updated');
+        } else {
+          res.status(404).send('Category not found');
+        }
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
 categoriesRouter.delete(
   '/:idCategory',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
-    try {
-      const { idCategory } = req.params;
-      const categoryDeleted = await Category.destroy(Number(idCategory));
-      if (categoryDeleted) {
-        res.status(200).send('Categorie supprimée');
-      } else {
-        throw new ErrorHandler(404, `Categorie non trouvée`);
+    void (async () => {
+      try {
+        const { idCategory } = req.params;
+        const categoryDeleted = await Category.destroy(Number(idCategory));
+        if (categoryDeleted) {
+          res.status(200).send('Categorie supprimée');
+        } else {
+          throw new ErrorHandler(404, `Categorie non trouvée`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
-  }
+    })();
   }
 );
 

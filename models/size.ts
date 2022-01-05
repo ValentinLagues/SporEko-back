@@ -5,6 +5,8 @@ import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
 import Joi from 'joi';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateSize = (req: Request, res: Response, next: NextFunction) => {
   let required: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -20,6 +22,20 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
+const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
+  void (async () => {
+    const gender = req.body as ISize;
+    const genderWithSameName: ISize = await getSizeByName(gender.name);
+    if (genderWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAllSizes = (): Promise<ISize[]> => {
   return connection
@@ -42,18 +58,6 @@ const getSizeByName = (name: string): Promise<ISize> => {
     .then(([results]) => results[0]);
 };
 
-const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
-  async () => {
-    const gender = req.body as ISize;
-    const genderWithSameName: ISize = await getSizeByName(gender.name);
-    if (genderWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-    } else {
-      next();
-    }
-  };
-};
-
 const createSize = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
@@ -69,6 +73,7 @@ const updateSize = (
   name: string,
   is_children: number
 ): Promise<boolean> => {
+  console.log('1');
   let sql = 'UPDATE sizes SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
@@ -90,7 +95,7 @@ const updateSize = (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroySize = (id: number): Promise<boolean> => {
+const deleteSize = (id: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM sizes WHERE id_size = ? ', [id])
@@ -103,7 +108,7 @@ export {
   getSizeById,
   createSize,
   updateSize,
-  destroySize,
+  deleteSize,
   validateSize,
   getSizeByName,
 };

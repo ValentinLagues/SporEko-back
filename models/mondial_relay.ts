@@ -4,6 +4,7 @@ import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IMondialRelay from '../interfaces/IMondialRelay';
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateMondialRelay = (
   req: Request,
@@ -16,7 +17,6 @@ const validateMondialRelay = (
   }
   const errors = Joi.object({
     name: Joi.string().max(150).presence(presence),
-    weight: Joi.string().max(100).presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -25,6 +25,21 @@ const validateMondialRelay = (
     next();
   }
 };
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const mondialRelay = req.body as IMondialRelay;
+    const mondialRelayWithSameName: IMondialRelay = await getByName(
+      mondialRelay.name
+    );
+    if (mondialRelayWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de Mondial Relay existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (): Promise<IMondialRelay[]> => {
   return connection
@@ -41,20 +56,6 @@ const getById = (idMondialRelay: number): Promise<IMondialRelay> => {
       [idMondialRelay]
     )
     .then(([results]) => results[0]);
-};
-
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
-    const mondialRelay = req.body as IMondialRelay;
-    const mondialRelayWithSameName: IMondialRelay = await getByName(
-      mondialRelay.name
-    );
-    if (mondialRelayWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de Mondial Relay existe déjà`));
-    } else {
-      next();
-    }
-  };
 };
 
 const getByName = (name: string): Promise<IMondialRelay> => {

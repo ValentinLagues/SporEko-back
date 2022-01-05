@@ -34,7 +34,7 @@ colorsRouter.post(
   Color.codeIsFree,
   Color.validateColor,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const color = req.body as IColor;
         color.id_color = await Color.create(color);
@@ -42,7 +42,7 @@ colorsRouter.post(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 
@@ -53,7 +53,7 @@ colorsRouter.put(
   Color.codeIsFree,
   Color.validateColor,
   (req: Request, res: Response) => {
-    async () => {
+    void (async () => {
       const { idColor } = req.params;
 
       const colorUpdated = await Color.update(
@@ -68,14 +68,14 @@ colorsRouter.put(
           `Cette Couleur ne peut pas être mise à jour`
         );
       }
-    };
+    })();
   }
 );
 
 colorsRouter.delete(
   '/:idColor',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
+    void (async () => {
       try {
         const { idColor } = req.params;
         const colorDeleted = await Color.destroy(Number(idColor));
@@ -87,7 +87,7 @@ colorsRouter.delete(
       } catch (err) {
         next(err);
       }
-    };
+    })();
   }
 );
 

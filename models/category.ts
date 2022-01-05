@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import ICategory from '../interfaces/ICategory';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateCategory = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -19,6 +21,19 @@ const validateCategory = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const category = req.body as ICategory;
+    const categoryWithSameName: ICategory = await getByName(category.name);
+    if (categoryWithSameName) {
+      next(new ErrorHandler(409, `Cette categorie existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
+/* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (): Promise<ICategory[]> => {
   return connection
@@ -30,20 +45,10 @@ const getAll = (): Promise<ICategory[]> => {
 const getById = (idCategory: number): Promise<ICategory> => {
   return connection
     .promise()
-    .query<ICategory[]>('SELECT * FROM categories WHERE id_category = ?', [idCategory])
+    .query<ICategory[]>('SELECT * FROM categories WHERE id_category = ?', [
+      idCategory,
+    ])
     .then(([results]) => results[0]);
-};
-
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
-  const category = req.body as ICategory;
-  const categoryWithSameName: ICategory = await getByName(category.name);
-  if (categoryWithSameName) {
-    next(new ErrorHandler(409, `Cette categorie existe déjà`));
-  } else {
-    next();
-  }
-}
 };
 
 const getByName = async (name: string): Promise<ICategory> => {
@@ -56,10 +61,9 @@ const getByName = async (name: string): Promise<ICategory> => {
 const create = async (newCategory: ICategory): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'INSERT INTO categories (name) VALUES (?)',
-      [newCategory.name]
-    )
+    .query<ResultSetHeader>('INSERT INTO categories (name) VALUES (?)', [
+      newCategory.name,
+    ])
     .then(([results]) => results.insertId);
 };
 
@@ -86,7 +90,9 @@ const update = async (
 const destroy = async (idCategory: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM categories WHERE id_category = ?', [idCategory])
+    .query<ResultSetHeader>('DELETE FROM categories WHERE id_category = ?', [
+      idCategory,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 

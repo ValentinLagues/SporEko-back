@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IColor from '../interfaces/IColor';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateColor = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -21,16 +23,8 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
-
-const getAll = async (): Promise<IColor[]> => {
-  return connection
-    .promise()
-    .query<IColor[]>('SELECT * FROM colors')
-    .then(([results]) => results);
-};
-
 const recordExists = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
+  void (async () => {
     const color = req.body as IColor;
     color.id_color = parseInt(req.params.idColor);
     const recordFound: IColor = await getById(color.id_color);
@@ -39,18 +33,10 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     } else {
       next();
     }
-  };
+  })();
 };
-
-const getById = async (idColor: number): Promise<IColor> => {
-  return connection
-    .promise()
-    .query<IColor[]>('SELECT * FROM colors WHERE id_color = ?', [idColor])
-    .then(([results]) => results[0]);
-};
-
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  async () => {
+  void (async () => {
     const color = req.body as IColor;
     const colorWithSameName: IColor = await getByName(color.name);
     if (colorWithSameName) {
@@ -58,7 +44,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     } else {
       next();
     }
-  };
+  })();
+};
+/* ------------------------------------------------Models----------------------------------------------------------- */
+
+const getAll = async (): Promise<IColor[]> => {
+  return connection
+    .promise()
+    .query<IColor[]>('SELECT * FROM colors')
+    .then(([results]) => results);
+};
+
+const getById = async (idColor: number): Promise<IColor> => {
+  return connection
+    .promise()
+    .query<IColor[]>('SELECT * FROM colors WHERE id_color = ?', [idColor])
+    .then(([results]) => results[0]);
 };
 
 const getByName = async (name: string): Promise<IColor> => {

@@ -6,6 +6,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IUser from '../interfaces/IUser';
 
+/* ------------------------------------------------Midlleware----------------------------------------------------------- */
+
 const validateUser = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
@@ -44,6 +46,41 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const recordExists = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const user = req.body as IUser;
+    user.id_user = parseInt(req.params.idUser);
+    const recordFound: IUser = await getById(user.id_user);
+    if (!recordFound) {
+      next(new ErrorHandler(404, `Utilisateur non trouvé`));
+    } else {
+      next();
+    }
+  })();
+};
+const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const user = req.body as IUser;
+    const userWithSameEmail: IUser = await getByEmail(user.email);
+    if (userWithSameEmail) {
+      next(new ErrorHandler(409, `Cet email existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
+  void (async () => {
+    const user = req.body as IUser;
+    const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
+    if (userWithSamePseudo) {
+      next(new ErrorHandler(409, `Ce pseudo existe déjà`));
+    } else {
+      next();
+    }
+  })();
+};
+
 const hashingOptions: Options & { raw?: false } = {
   type: argon2.argon2id,
   memoryCost: 2 ** 16,
@@ -62,26 +99,13 @@ const verifyPassword = (
   return argon2.verify(hashedPassword, password, hashingOptions);
 };
 
+/* ------------------------------------------------Models----------------------------------------------------------- */
+
 const getAll = async (): Promise<IUser[]> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users')
     .then(([results]) => results);
-};
-
-const recordExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = req.body as IUser;
-  user.id_user = parseInt(req.params.idUser);
-  const recordFound: IUser = await getById(user.id_user);
-  if (!recordFound) {
-    next(new ErrorHandler(404, `Utilisateur non trouvé`));
-  } else {
-    next();
-  }
 };
 
 const getById = async (idUser: number): Promise<IUser> => {
@@ -91,35 +115,11 @@ const getById = async (idUser: number): Promise<IUser> => {
     .then(([results]) => results[0]);
 };
 
-const emailIsFree = async (req: Request, res: Response, next: NextFunction) => {
-  const user = req.body as IUser;
-  const userWithSameEmail: IUser = await getByEmail(user.email);
-  if (userWithSameEmail) {
-    next(new ErrorHandler(409, `Cet email existe déjà`));
-  } else {
-    next();
-  }
-};
-
 const getByEmail = async (email: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE email = ?', [email])
     .then(([results]) => results[0]);
-};
-
-const pseudoIsFree = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = req.body as IUser;
-  const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
-  if (userWithSamePseudo) {
-    next(new ErrorHandler(409, `Ce pseudo existe déjà`));
-  } else {
-    next();
-  }
 };
 
 const getByPseudo = async (pseudo: string): Promise<IUser> => {

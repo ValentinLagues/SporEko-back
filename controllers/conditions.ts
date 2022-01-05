@@ -30,18 +30,18 @@ conditionsRouter.get(
 
 conditionsRouter.post(
   '/',
-  Condition.nameIsFree,
   Condition.validateCondition,
+  Condition.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
-    try {
-      const condition = req.body as ICondition;
-      condition.id_condition = await Condition.create(condition);
-      res.status(201).json(condition);
-    } catch (err) {
-      next(err);
-    }
-  }
+    void (async () => {
+      try {
+        const condition = req.body as ICondition;
+        condition.id_condition = await Condition.create(condition);
+        res.status(201).json(condition);
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
@@ -50,37 +50,39 @@ conditionsRouter.put(
   Condition.nameIsFree,
   Condition.validateCondition,
   (req: Request, res: Response) => {
-    async () => {
-    const { idCondition } = req.params;
-    const conditionUpdated = await Condition.update(
-      Number(idCondition),
-      req.body as ICondition
-    );
-    if (conditionUpdated) {
-      res.status(200).send('Etat mis à jour');
-    } else {
-      throw new ErrorHandler(500, `Cet état ne peut pas être mise à jour`);
-    }
-  }
+    void (async () => {
+      const { idCondition } = req.params;
+      const conditionUpdated = await Condition.update(
+        Number(idCondition),
+        req.body as ICondition
+      );
+      if (conditionUpdated) {
+        res.status(200).send('Etat mis à jour');
+      } else if (!conditionUpdated) {
+        res.status(404).send('Condition not found');
+      } else {
+        throw new ErrorHandler(500, `Cet état ne peut pas être mise à jour`);
+      }
+    })();
   }
 );
 
 conditionsRouter.delete(
   '/:idCondition',
   (req: Request, res: Response, next: NextFunction) => {
-    async () => {
-    try {
-      const { idCondition } = req.params;
-      const conditionDeleted = await Condition.destroy(Number(idCondition));
-      if (conditionDeleted) {
-        res.status(200).send('Etat supprimé');
-      } else {
-        throw new ErrorHandler(404, `Etat non trouvé`);
+    void (async () => {
+      try {
+        const { idCondition } = req.params;
+        const conditionDeleted = await Condition.destroy(Number(idCondition));
+        if (conditionDeleted) {
+          res.status(200).send('Etat supprimé');
+        } else {
+          throw new ErrorHandler(404, `Etat non trouvé`);
+        }
+      } catch (err) {
+        next(err);
       }
-    } catch (err) {
-      next(err);
-    }
-  }
+    })();
   }
 );
 
