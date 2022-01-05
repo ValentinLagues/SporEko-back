@@ -3,17 +3,17 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import ITextile from '../interfaces/ITextile';
+import IAthletics from '../interfaces/IAthletics';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateTextile = (req: Request, res: Response, next: NextFunction) => {
+const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(80).presence(presence),
+    name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -23,74 +23,66 @@ const validateTextile = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const textile = req.body as ITextile;
-    const textileWithSameName: ITextile = await getByName(textile.name);
-    if (textileWithSameName) {
-      next(new ErrorHandler(409, `Cette matière existe déjà`));
+    const Athletic = req.body as IAthletics;
+    const AthleticWithSameName: IAthletics = await getByName(Athletic.name);
+    if (AthleticWithSameName) {
+      next(new ErrorHandler(409, `Ce nom de sportif_styles existe déjà`));
     } else {
       next();
     }
   })();
 };
+
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<ITextile[]> => {
+const getAll = (): Promise<IAthletics[]> => {
   return connection
     .promise()
-    .query<ITextile[]>('SELECT * FROM textiles')
+    .query<IAthletics[]>('SELECT * FROM athletics')
     .then(([results]) => results);
 };
 
-const getById = async (idTextile: number): Promise<ITextile> => {
+const getById = (idAthletic: number): Promise<IAthletics> => {
   return connection
     .promise()
-    .query<ITextile[]>('SELECT * FROM textiles WHERE id_textile = ?', [
-      idTextile,
+    .query<IAthletics[]>('SELECT * FROM athletics WHERE id_athletic = ?', [
+      idAthletic,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = async (name: string): Promise<ITextile> => {
+const getByName = (name: string): Promise<IAthletics> => {
   return connection
     .promise()
-    .query<ITextile[]>('SELECT * FROM textiles WHERE name = ?', [name])
+    .query<IAthletics[]>('SELECT * FROM athletics WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = async (newTextile: ITextile): Promise<number> => {
+const create = (newAthletic: IAthletics): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO textiles (name) VALUES (?)', [
-      newTextile.name,
-    ])
+    .query<ResultSetHeader>('INSERT INTO athletics SET ?', [newAthletic])
     .then(([results]) => results.insertId);
 };
 
-const update = async (
-  idTextile: number,
-  attibutesToUpdate: ITextile
+const update = (
+  idAthletic: number,
+  newAttributes: IAthletics
 ): Promise<boolean> => {
-  let sql = 'UPDATE textiles SET ';
-  const sqlValues: Array<string | number> = [];
-
-  if (attibutesToUpdate.name) {
-    sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
-  }
-  sql += ' WHERE id_textile = ?';
-  sqlValues.push(idTextile);
-
   return connection
     .promise()
-    .query<ResultSetHeader>(sql, sqlValues)
+    .query<ResultSetHeader>('UPDATE athletics SET ? WHERE id_athletic = ?', [
+      newAttributes,
+      idAthletic,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idTextile: number): Promise<boolean> => {
+const destroy = (idAthletic: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM textiles WHERE id_textile = ?', [
-      idTextile,
+    .query<ResultSetHeader>('DELETE FROM athletics WHERE id_athletic = ?', [
+      idAthletic,
     ])
     .then(([results]) => results.affectedRows === 1);
 };
@@ -103,5 +95,5 @@ export {
   create,
   update,
   destroy,
-  validateTextile,
+  validateAthletics,
 };
