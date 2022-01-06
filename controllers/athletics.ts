@@ -34,7 +34,7 @@ athleticsRouter.post(
     void (async () => {
       try {
         const athletics = req.body as IAthletics;
-        athletics.id_sportif_style = await Athletics.create(athletics);
+        athletics.id_athletic = await Athletics.create(athletics);
         res.status(201).json(athletics);
       } catch (err) {
         next(err);

@@ -28,7 +28,7 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     isarchived: Joi.number().integer().min(0).max(1).presence(presence),
     id_gender: Joi.number().integer().min(1).presence(presence),
     adress_complement: Joi.string().max(255),
-    id_sportif_style: Joi.number().integer().min(1),
+    id_athletic: Joi.number().integer().min(1),
     birthday: Joi.string().max(50).presence(presence),
     phone: Joi.string().max(14).presence(presence),
     creation_date: Joi.string(),
@@ -134,7 +134,7 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender, adress_complement, id_sportif_style, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newUser.lastname,
         newUser.firstname,
@@ -148,7 +148,7 @@ const create = async (newUser: IUser): Promise<number> => {
         newUser.isarchived,
         newUser.id_gender,
         newUser.adress_complement,
-        newUser.id_sportif_style,
+        newUser.id_athletic,
         newUser.birthday,
         newUser.phone,
         newUser.pseudo,
@@ -226,9 +226,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.adress_complement);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_sportif_style) {
-    sql += oneValue ? ', id_sportif_style = ? ' : ' id_sportif_style = ? ';
-    sqlValues.push(attibutesToUpdate.id_sportif_style);
+  if (attibutesToUpdate.id_athletic) {
+    sql += oneValue ? ', id_athletic = ? ' : ' id_athletic = ? ';
+    sqlValues.push(attibutesToUpdate.id_athletic);
     oneValue = true;
   }
   if (attibutesToUpdate.birthday) {
