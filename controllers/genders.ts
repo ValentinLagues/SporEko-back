@@ -72,7 +72,6 @@ gendersRouter.put(
 gendersRouter.delete('/:idGender', (req: Request, res: Response) => {
   const { idGender } = req.params;
   Genders.destroyGender(Number(idGender)).then((result: Array<any>) => {
-    console.log(result);
     if (result[0].affectedRows)
       res.status(201).json(`Le genre avec l'id:${idGender} à été supprimé`);
     else res.status(404).json(`Le genre avec l'id:${idGender} n'existe pas`);

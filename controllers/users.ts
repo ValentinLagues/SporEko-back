@@ -13,7 +13,6 @@ usersRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     User.getAll()
       .then((user: Array<IUser>) => {
-        console.log('getAll ok');
         res.status(200).json(user);
       })
       .catch((err) => next(err));

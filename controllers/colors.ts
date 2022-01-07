@@ -53,7 +53,6 @@ colorsRouter.post(
         name: color.name,
         color_code: color.color_code,
       };
-      console.log(color);
       res.status(201).json(color);
     } catch (err) {
       next(err);
