@@ -30,8 +30,6 @@ offersRouter.get(
 
 offersRouter.post(
   '/',
-  Offer.nameIsFree,
-  Offer.codeIsFree,
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
@@ -49,8 +47,6 @@ offersRouter.post(
 offersRouter.put(
   '/:idOffer',
   Offer.recordExists,
-  Offer.nameIsFree,
-  Offer.codeIsFree,
   Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
@@ -61,11 +57,11 @@ offersRouter.put(
         req.body as IOffer
       );
       if (offerUpdated) {
-        res.status(200).send('Couleur mise à jour');
+        res.status(200).send('Annonce mise à jour');
       } else {
         throw new ErrorHandler(
           500,
-          `Cette Couleur ne peut pas être mise à jour`
+          `Cette annonce ne peut pas être mise à jour`
         );
       }
     })();
