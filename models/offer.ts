@@ -21,16 +21,16 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     description: Joi.string().max(5000).presence(presence),
     id_sport: Joi.number().integer().presence(presence),
     id_gender: Joi.number().integer().presence(presence),
-    id_child: Joi.number().integer(),
+    id_child: Joi.number().integer().allow(null),
     id_category: Joi.number().integer().presence(presence),
-    id_clothes: Joi.number().integer(),
-    id_shoe: Joi.number().integer(),
-    id_accessory: Joi.number().integer(),
-    id_brand: Joi.number().integer(),
-    id_textile: Joi.number().integer(),
-    id_size: Joi.number().integer(),
-    id_color1: Joi.number().integer(),
-    id_color2: Joi.number().integer(),
+    id_clothes: Joi.number().integer().allow(null),
+    id_shoe: Joi.number().integer().allow(null),
+    id_accessory: Joi.number().integer().allow(null),
+    id_brand: Joi.number().integer().allow(null),
+    id_textile: Joi.number().integer().allow(null),
+    id_size: Joi.number().integer().allow(null),
+    id_color1: Joi.number().integer().allow(null),
+    id_color2: Joi.number().integer().allow(null),
     id_condition: Joi.number().integer().presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),
     id_weight: Joi.number().integer().presence(presence),
@@ -84,10 +84,140 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<IOffer[]> => {
+const getAll = async (
+  sortBy: string,
+  order: string,
+  // firstItem: string,
+  // limit: string,
+  id_user_seller: number,
+  id_sport: number,
+  id_gender: number,
+  id_child: number,
+  id_category: number,
+  id_clothes: number,
+  id_shoe: number,
+  id_accessory: number,
+  id_brand: number,
+  id_textile: number,
+  id_size: number,
+  id_color1: number,
+  id_color2: number,
+  id_condition: number,
+  minPrice: number,
+  maxPrice: number
+): Promise<IOffer[]> => {
+  if (sortBy === 'id') {
+    sortBy = 'id_offer';
+  }
+
+  let sql = `SELECT * FROM offers`;
+  let oneValue = false;
+
+  if (id_user_seller) {
+    sql += ` WHERE id_user_seller = ${id_user_seller}`;
+    oneValue = true;
+  }
+  if (id_sport) {
+    sql += oneValue
+      ? ` AND id_sport = ${id_sport}`
+      : ` WHERE id_sport = ${id_sport}`;
+    oneValue = true;
+  }
+  if (id_gender) {
+    sql += oneValue
+      ? ` AND id_gender = ${id_gender}`
+      : ` WHERE id_gender = ${id_gender}`;
+    oneValue = true;
+  }
+  if (id_child) {
+    sql += oneValue
+      ? ` AND id_child = ${id_child}`
+      : ` WHERE id_child = ${id_child}`;
+    oneValue = true;
+  }
+  if (id_category) {
+    sql += oneValue
+      ? ` AND id_category = ${id_category}`
+      : ` WHERE id_category = ${id_category}`;
+    oneValue = true;
+  }
+  if (id_clothes) {
+    sql += oneValue
+      ? ` AND id_clothes = ${id_clothes}`
+      : ` WHERE id_clothes = ${id_clothes}`;
+    oneValue = true;
+  }
+  if (id_shoe) {
+    sql += oneValue
+      ? ` AND id_shoe = ${id_shoe}`
+      : ` WHERE id_shoe = ${id_shoe}`;
+    oneValue = true;
+  }
+  if (id_accessory) {
+    sql += oneValue
+      ? ` AND id_accessory = ${id_accessory}`
+      : ` WHERE id_accessory = ${id_accessory}`;
+    oneValue = true;
+  }
+  if (id_brand) {
+    sql += oneValue
+      ? ` AND id_brand = ${id_brand}`
+      : ` WHERE id_brand = ${id_brand}`;
+    oneValue = true;
+  }
+  if (id_textile) {
+    sql += oneValue
+      ? ` AND id_textile = ${id_textile}`
+      : ` WHERE id_textile = ${id_textile}`;
+    oneValue = true;
+  }
+  if (id_size) {
+    sql += oneValue
+      ? ` AND id_size = ${id_size}`
+      : ` WHERE id_size = ${id_size}`;
+    oneValue = true;
+  }
+  if (id_color1) {
+    sql += oneValue
+      ? ` AND id_color1 = ${id_color1}`
+      : ` WHERE id_color1 = ${id_color1}`;
+    oneValue = true;
+  }
+  if (id_color2) {
+    sql += oneValue
+      ? ` AND id_color2 = ${id_color2}`
+      : ` WHERE id_color2 = ${id_color2}`;
+    oneValue = true;
+  }
+  if (id_condition) {
+    sql += oneValue
+      ? ` AND id_condition = ${id_condition}`
+      : ` WHERE id_condition = ${id_condition}`;
+    oneValue = true;
+  }
+  if (minPrice || minPrice === 0) {
+    if (maxPrice) {
+      sql += oneValue
+        ? ` AND price BETWEEN ${minPrice} AND ${maxPrice}`
+        : ` WHERE price BETWEEN ${minPrice} AND ${maxPrice}`;
+      oneValue = true;
+    } else {
+      sql += oneValue
+        ? ` AND price > ${minPrice}`
+        : ` WHERE price > ${minPrice}`;
+      oneValue = true;
+    }
+  }
+
+  sql += ` ORDER BY ${sortBy} ${order}`;
+
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
+
   return connection
     .promise()
-    .query<IOffer[]>('SELECT * FROM offers')
+    .query<IOffer[]>(sql)
     .then(([results]) => results);
 };
 
@@ -101,7 +231,53 @@ const getById = async (idOffer: number): Promise<IOffer> => {
 const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO offers SET ?', [newOffer])
+    .query<ResultSetHeader>(
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, id_child, id_category, id_clothes, id_shoe, id_accessory, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, id_weight, hand_delivery, colissimo_delivery, mondial_relay_delivery, isarchived, isdraft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        newOffer.id_user_seller,
+        newOffer.picture1,
+        newOffer.title,
+        newOffer.description,
+        newOffer.id_sport,
+        newOffer.id_gender,
+        newOffer.id_child,
+        newOffer.id_category,
+        newOffer.id_clothes,
+        newOffer.id_shoe,
+        newOffer.id_accessory,
+        newOffer.id_brand,
+        newOffer.id_textile,
+        newOffer.id_size,
+        newOffer.id_color1,
+        newOffer.id_color2,
+        newOffer.id_condition,
+        newOffer.price,
+        newOffer.id_weight,
+        newOffer.hand_delivery,
+        newOffer.colissimo_delivery,
+        newOffer.mondial_relay_delivery,
+        newOffer.isarchived,
+        newOffer.isdraft,
+        newOffer.picture2,
+        newOffer.picture3,
+        newOffer.picture4,
+        newOffer.picture5,
+        newOffer.picture6,
+        newOffer.picture7,
+        newOffer.picture8,
+        newOffer.picture9,
+        newOffer.picture10,
+        newOffer.picture11,
+        newOffer.picture12,
+        newOffer.picture13,
+        newOffer.picture14,
+        newOffer.picture15,
+        newOffer.picture16,
+        newOffer.picture17,
+        newOffer.picture18,
+        newOffer.picture19,
+      ]
+    )
     .then(([results]) => results.insertId);
 };
 

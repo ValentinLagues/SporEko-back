@@ -35,10 +35,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<IBrand[]> => {
+const getAll = (
+  sortBy: string = 'id_brand',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IBrand[]> => {
+  let sql = `SELECT * FROM brands ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_brand';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IBrand[]>('SELECT * FROM brands')
+    .query<IBrand[]>(sql)
     .then(([results]) => results);
 };
 

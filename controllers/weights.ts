@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const weightsRouter = Router();
 
 weightsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Weight.getAll()
+  let sortBy: string = 'id_weight';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Weight.getAll(sortBy, order)
     .then((weights: Array<IWeight>) => {
       res.status(200).json(weights);
     })

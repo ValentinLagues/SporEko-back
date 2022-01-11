@@ -5,7 +5,22 @@ import * as Clothes from '../models/clothes';
 const clothesRouter = Router();
 
 clothesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Clothes.getAllClothes()
+  let sortBy: string = 'id_clothes';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Clothes.getAllClothes(sortBy, order)
     .then((results) => res.status(200).json(results))
     .catch((err) => next(err));
 });

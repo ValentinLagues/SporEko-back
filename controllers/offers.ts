@@ -5,13 +5,88 @@ import { ErrorHandler } from '../helpers/errors';
 
 const offersRouter = Router();
 
-offersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Offer.getAll()
-    .then((offers: Array<IOffer>) => {
-      res.status(200).json(offers);
-    })
-    .catch((err) => next(err));
-});
+interface IFilter {
+  sort: string | undefined;
+  // firstItem: number;
+  // limit: number;
+  id_user_seller: number | undefined;
+  id_sport: number | undefined;
+  id_gender: number | undefined;
+  id_child: number | undefined;
+  id_category: number | undefined;
+  id_clothes: number | undefined;
+  id_shoe: number | undefined;
+  id_accessory: number | undefined;
+  id_brand: number | undefined;
+  id_textile: number | undefined;
+  id_size: number | undefined;
+  id_color1: number | undefined;
+  id_color2: number | undefined;
+  id_condition: number | undefined;
+  minPrice: number | undefined;
+  maxPrice: number | undefined;
+}
+
+offersRouter.get(
+  '/',
+  (req: Request<IFilter>, res: Response, next: NextFunction) => {
+    let sortBy: string = 'creation_date';
+    let order: string = 'DESC';
+
+    const {
+      sort,
+      // firstItem,
+      // limit,
+      id_user_seller,
+      id_sport,
+      id_gender,
+      id_child,
+      id_category,
+      id_clothes,
+      id_shoe,
+      id_accessory,
+      id_brand,
+      id_textile,
+      id_size,
+      id_color1,
+      id_color2,
+      id_condition,
+      minPrice,
+      maxPrice,
+    } = req.query;
+    if (sort) {
+      const sortToArray = sort.toString().split(' ');
+      sortBy = sortToArray[0];
+      order = sortToArray[1];
+    }
+    Offer.getAll(
+      sortBy,
+      order,
+      // firstItem,
+      // limit,
+      Number(id_user_seller),
+      Number(id_sport),
+      Number(id_gender),
+      Number(id_child),
+      Number(id_category),
+      Number(id_clothes),
+      Number(id_shoe),
+      Number(id_accessory),
+      Number(id_brand),
+      Number(id_textile),
+      Number(id_size),
+      Number(id_color1),
+      Number(id_color2),
+      Number(id_condition),
+      Number(minPrice),
+      Number(maxPrice)
+    )
+      .then((offers: Array<IOffer>) => {
+        res.status(200).json(offers);
+      })
+      .catch((err) => next(err));
+  }
+);
 
 offersRouter.get(
   '/:idOffer',

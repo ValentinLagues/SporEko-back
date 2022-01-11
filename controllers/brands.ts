@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const brandsRouter = Router();
 
 brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Brand.getAll()
+  let sortBy: string = 'id_brand';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Brand.getAll(sortBy, order)
     .then((brands: Array<IBrand>) => {
       res.status(200).json(brands);
     })

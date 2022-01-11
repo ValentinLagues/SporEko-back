@@ -34,10 +34,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<ITextile[]> => {
+const getAll = async (
+  sortBy: string = 'id_textile',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ITextile[]> => {
+  let sql = `SELECT * FROM textiles ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_textile';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ITextile[]>('SELECT * FROM textiles')
+    .query<ITextile[]>(sql)
     .then(([results]) => results);
 };
 

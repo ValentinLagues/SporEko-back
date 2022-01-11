@@ -36,10 +36,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ISport[]> => {
+const getAll = (
+  sortBy: string = 'id_sport',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ISport[]> => {
+  let sql = `SELECT * FROM sports ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_sport';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ISport[]>('SELECT * FROM sports')
+    .query<ISport[]>(sql)
     .then(([results]) => results);
 };
 

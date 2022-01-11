@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const conditionsRouter = Router();
 
 conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Condition.getAll()
+  let sortBy: string = 'id_condition';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Condition.getAll(sortBy, order)
     .then((conditions: Array<ICondition>) => {
       res.status(200).json(conditions);
     })
