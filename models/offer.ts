@@ -215,6 +215,8 @@ const getAll = async (
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
 
+  console.log(sql);
+
   return connection
     .promise()
     .query<IOffer[]>(sql)
