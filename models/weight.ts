@@ -14,7 +14,6 @@ const validateWeight = (req: Request, res: Response, next: NextFunction) => {
   }
   const errors = Joi.object({
     name: Joi.string().max(80).presence(presence),
-    icon: Joi.string().max(255).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -36,10 +35,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<IWeight[]> => {
+const getAll = (
+  sortBy: string = 'id_weight',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IWeight[]> => {
+  let sql = `SELECT * FROM weights ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_weight';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IWeight[]>('SELECT * FROM weights')
+    .query<IWeight[]>(sql)
     .then(([results]) => results);
 };
 

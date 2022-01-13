@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const colorsRouter = Router();
 
 colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Color.getAll()
+  let sortBy: string = 'id_color';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Color.getAll(sortBy, order)
     .then((colors: Array<IColor>) => {
       res.status(200).json(colors);
     })

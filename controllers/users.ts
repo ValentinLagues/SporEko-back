@@ -11,7 +11,22 @@ usersRouter.get(
   Auth.userConnected,
   Auth.userIsAdmin,
   (req: Request, res: Response, next: NextFunction) => {
-    User.getAll()
+    let sortBy: string = 'id_user';
+    let order: string = 'ASC';
+
+    const {
+      sort,
+      // firstItem,
+      // limit
+    } = req.query;
+
+    if (sort) {
+      const sortToArray = sort.toString().split(' ');
+      sortBy = sortToArray[0];
+      order = sortToArray[1];
+    }
+
+    User.getAll(sortBy, order)
       .then((user: Array<IUser>) => {
         res.status(200).json(user);
       })

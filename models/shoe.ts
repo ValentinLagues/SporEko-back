@@ -14,7 +14,6 @@ const validateShoe = (req: Request, res: Response, next: NextFunction) => {
   }
   const errors = Joi.object({
     name: Joi.string().max(80).presence(presence),
-    icon: Joi.string().max(255).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -36,10 +35,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<IShoe[]> => {
+const getAll = (
+  sortBy: string = 'id_shoe',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IShoe[]> => {
+  let sql = `SELECT * FROM shoes ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_shoe';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IShoe[]>('SELECT * FROM shoes')
+    .query<IShoe[]>(sql)
     .then(([results]) => results);
 };
 

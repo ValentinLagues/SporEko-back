@@ -8,7 +8,22 @@ const accessoriesRouter = Router();
 accessoriesRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    Accessory.getAll()
+    let sortBy: string = 'id_accessory';
+    let order: string = 'ASC';
+
+    const {
+      sort,
+      // firstItem,
+      // limit
+    } = req.query;
+
+    if (sort) {
+      const sortToArray = sort.toString().split(' ');
+      sortBy = sortToArray[0];
+      order = sortToArray[1];
+    }
+
+    Accessory.getAll(sortBy, order)
       .then((accessories: Array<IAccessory>) => {
         res.status(200).json(accessories);
       })

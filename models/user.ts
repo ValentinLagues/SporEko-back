@@ -101,10 +101,22 @@ const verifyPassword = (
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<IUser[]> => {
+const getAll = async (
+  sortBy: string = 'id_user',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IUser[]> => {
+  let sql = `SELECT * FROM users ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_user';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IUser[]>('SELECT * FROM users')
+    .query<IUser[]>(sql)
     .then(([results]) => results);
 };
 

@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const athleticsRouter = Router();
 
 athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Athletics.getAll()
+  let sortBy: string = 'id_athletics';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Athletics.getAll(sortBy, order)
     .then((athletics: Array<IAthletics>) => {
       res.status(200).json(athletics);
     })

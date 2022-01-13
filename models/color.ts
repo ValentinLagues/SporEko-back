@@ -48,10 +48,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<IColor[]> => {
+const getAll = async (
+  sortBy: string = 'id_color',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IColor[]> => {
+  let sql = `SELECT * FROM colors ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_color';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IColor[]>('SELECT * FROM colors')
+    .query<IColor[]>(sql)
     .then(([results]) => results);
 };
 

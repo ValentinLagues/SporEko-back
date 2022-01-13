@@ -52,10 +52,22 @@ const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<IColissimo[]> => {
+const getAll = (
+  sortBy: string = 'id_colissimo',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IColissimo[]> => {
+  let sql = `SELECT * FROM colissimo ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_colissimo';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IColissimo[]>('SELECT * FROM colissimo')
+    .query<IColissimo[]>(sql)
     .then(([results]) => results);
 };
 

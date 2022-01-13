@@ -5,7 +5,22 @@ import * as Genders from '../models/gender';
 const gendersRouter = Router();
 
 gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Genders.getAllGenders()
+  let sortBy: string = 'id_gender';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Genders.getAllGenders(sortBy, order)
     .then((results) => res.status(200).json(results))
     .catch((err) => next(err));
 });

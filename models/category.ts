@@ -35,10 +35,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ICategory[]> => {
+const getAll = (
+  sortBy: string = 'id_category',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ICategory[]> => {
+  let sql = `SELECT * FROM categories ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_category';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ICategory[]>('SELECT * FROM categories')
+    .query<ICategory[]>(sql)
     .then(([results]) => results);
 };
 
