@@ -12,11 +12,9 @@ interface IFilter {
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  id_child: number | undefined;
+  ischild: number | undefined;
   id_category: number | undefined;
-  id_clothes: number | undefined;
-  id_shoe: number | undefined;
-  id_accessory: number | undefined;
+  id_item: number | undefined;
   id_brand: number | undefined;
   id_textile: number | undefined;
   id_size: number | undefined;
@@ -40,11 +38,9 @@ offersRouter.get(
       id_user_seller,
       id_sport,
       id_gender,
-      id_child,
+      ischild,
       id_category,
-      id_clothes,
-      id_shoe,
-      id_accessory,
+      id_item,
       id_brand,
       id_textile,
       id_size,
@@ -67,11 +63,9 @@ offersRouter.get(
       Number(id_user_seller),
       Number(id_sport),
       Number(id_gender),
-      Number(id_child),
+      Number(ischild),
       Number(id_category),
-      Number(id_clothes),
-      Number(id_shoe),
-      Number(id_accessory),
+      Number(id_item),
       Number(id_brand),
       Number(id_textile),
       Number(id_size),
@@ -95,7 +89,7 @@ offersRouter.get(
     Offer.getById(Number(idOffer))
       .then((offer: IOffer) => {
         if (offer === undefined) {
-          res.status(404).send('Couleur non trouvée');
+          res.status(404).send('Annonce non trouvée');
         }
         res.status(200).json(offer);
       })
@@ -151,9 +145,9 @@ offersRouter.delete(
         const { idOffer } = req.params;
         const offerDeleted = await Offer.destroy(Number(idOffer));
         if (offerDeleted) {
-          res.status(200).send('Couleur supprimée');
+          res.status(200).send('Annonce supprimée');
         } else {
-          throw new ErrorHandler(404, `Couleur non trouvée`);
+          throw new ErrorHandler(404, `Annonce non trouvée`);
         }
       } catch (err) {
         next(err);

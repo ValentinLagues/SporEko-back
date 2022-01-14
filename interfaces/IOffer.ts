@@ -9,11 +9,9 @@ export default interface IOffer extends RowDataPacket {
   description: string;
   id_sport: number;
   id_gender: number;
-  id_child: number;
+  ischild: number;
   id_category: number;
-  id_clothes: number;
-  id_shoe: number;
-  id_accessory: number;
+  id_item: number;
   id_brand: number;
   id_textile: number;
   id_size: number;

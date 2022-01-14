@@ -2,7 +2,6 @@ import express from 'express';
 import usersRouter from './users';
 import offersRouter from './offers';
 import gendersRouter from './genders';
-import childrenRouter from './children';
 import sportsRouter from './sports';
 import sizesRouter from './sizes';
 import conditionsRouter from './conditions';
@@ -13,9 +12,7 @@ import mondialRelayRouter from './mondial_relay';
 import athleticsRouter from './athletics';
 import textilesRouter from './textiles';
 import categoriesRouter from './categories';
-import clothesRouter from './clothes';
-import shoesRouter from './shoes';
-import accessoriesRouter from './accessories';
+import itemsRouter from './items';
 import weightsRouter from './weights';
 import authRouter from './auth';
 
@@ -23,7 +20,6 @@ const setupRoutes = (app: express.Application) => {
   app.use('/users', usersRouter);
   app.use('/offers', offersRouter);
   app.use('/genders', gendersRouter);
-  app.use('/children', childrenRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
   app.use('/conditions', conditionsRouter);
@@ -34,9 +30,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/athletics', athleticsRouter);
   app.use('/textiles', textilesRouter);
   app.use('/categories', categoriesRouter);
-  app.use('/clothes', clothesRouter);
-  app.use('/shoes', shoesRouter);
-  app.use('/accessories', accessoriesRouter);
+  app.use('/items', itemsRouter);
   app.use('/weights', weightsRouter);
   app.use('/login', authRouter);
 };
