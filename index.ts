@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 const corsOptions: cors.CorsOptions = {
-  origin: 'http://localhost:3000',
+  origin: process.env.CORS_ORIGINS,
   credentials: true,
   maxAge: 3600,
 };

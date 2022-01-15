@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const categoriesRouter = Router();
 
 categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Category.getAll()
+  let sortBy: string = 'id_category';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Category.getAll(sortBy, order)
     .then((categories: Array<ICategory>) => {
       res.status(200).json(categories);
     })

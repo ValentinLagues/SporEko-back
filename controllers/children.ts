@@ -5,7 +5,22 @@ import * as Children from '../models/child';
 const childrenRouter = Router();
 
 childrenRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Children.getAllChildren()
+  let sortBy: string = 'id_child';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Children.getAllChildren(sortBy, order)
     .then((results) => res.status(200).json(results))
     .catch((err) => next(err));
 });

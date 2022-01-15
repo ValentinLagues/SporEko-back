@@ -32,10 +32,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   })();
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
-const getAllChildren = (): Promise<IChild[]> => {
+const getAllChildren = (
+  sortBy: string = 'id_child',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IChild[]> => {
+  let sql = `SELECT * FROM children ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_child';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IChild[]>('SELECT * FROM children')
+    .query<IChild[]>(sql)
     .then(([results]) => results);
 };
 

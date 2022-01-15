@@ -36,10 +36,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ICondition[]> => {
+const getAll = (
+  sortBy: string = 'id_condition',
+  order: string = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ICondition[]> => {
+  let sql = `SELECT * FROM conditions ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_condition';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ICondition[]>('SELECT * FROM conditions')
+    .query<ICondition[]>(sql)
     .then(([results]) => results);
 };
 

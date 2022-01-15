@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const colissimosRouter = Router();
 
 colissimosRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Colissimo.getAll()
+  let sortBy: string = 'id_colissimo';
+  let order: string = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Colissimo.getAll(sortBy, order)
     .then((colissimos: Array<IColissimo>) => {
       res.status(200).json(colissimos);
     })
