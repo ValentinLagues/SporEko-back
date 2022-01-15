@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const colorsRouter = Router();
 
 colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Color.getAll()
+  let sortBy = 'id_color';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Color.getAll(sortBy, order)
     .then((colors: Array<IColor>) => {
       res.status(200).json(colors);
     })
@@ -20,7 +35,7 @@ colorsRouter.get(
     Color.getById(Number(idColor))
       .then((color: IColor) => {
         if (color === undefined) {
-          res.status(404).send('Couleur non trouvée');
+          res.status(404).send('Color not found');
         }
         res.status(200).json(color);
       })
@@ -61,12 +76,9 @@ colorsRouter.put(
         req.body as IColor
       );
       if (colorUpdated) {
-        res.status(200).send('Couleur mise à jour');
+        res.status(200).send('Color updated');
       } else {
-        throw new ErrorHandler(
-          500,
-          `Cette Couleur ne peut pas être mise à jour`
-        );
+        throw new ErrorHandler(500, `Color can't be updated`);
       }
     })();
   }
@@ -80,9 +92,9 @@ colorsRouter.delete(
         const { idColor } = req.params;
         const colorDeleted = await Color.destroy(Number(idColor));
         if (colorDeleted) {
-          res.status(200).send('Couleur supprimée');
+          res.status(200).send('Color deleted');
         } else {
-          throw new ErrorHandler(404, `Couleur non trouvée`);
+          throw new ErrorHandler(404, `Color not found`);
         }
       } catch (err) {
         next(err);

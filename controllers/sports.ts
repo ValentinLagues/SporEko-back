@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const sportsRouter = Router();
 
 sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Sport.getAll()
+  let sortBy = 'id_sport';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Sport.getAll(sortBy, order)
     .then((sports: Array<ISport>) => {
       res.status(200).json(sports);
     })
@@ -20,7 +35,7 @@ sportsRouter.get(
     Sport.getById(Number(idSport))
       .then((sport: ISport) => {
         if (sport === undefined) {
-          res.status(404).send('Sport non trouvé');
+          res.status(404).send('Sport not found');
         }
         res.status(200).json(sport);
       })
@@ -58,11 +73,11 @@ sportsRouter.put(
         req.body as ISport
       );
       if (sportUpdated) {
-        res.status(200).send('Sport mis à jour');
+        res.status(200).send('Sport updated');
       } else if (!sportUpdated) {
         res.status(404).send('Sport not found');
       } else {
-        throw new ErrorHandler(500, `Ce sport ne peut pas être mis à jour`);
+        throw new ErrorHandler(500, `Sport can't be updated`);
       }
     })();
   }
@@ -76,9 +91,9 @@ sportsRouter.delete(
         const { idsport } = req.params;
         const sportDeleted = await Sport.destroy(Number(idsport));
         if (sportDeleted) {
-          res.status(200).send('Sport supprimé');
+          res.status(200).send('Sport deleted');
         } else {
-          throw new ErrorHandler(404, `Sport non trouvé`);
+          throw new ErrorHandler(404, `Sport not found`);
         }
       } catch (err) {
         next(err);

@@ -1,0 +1,48 @@
+import { RowDataPacket } from 'mysql2';
+
+export default interface IOffer extends RowDataPacket {
+  id_offer: number;
+  creation_date: string;
+  id_user_seller: number;
+  picture1: string;
+  title: string;
+  description: string;
+  id_sport: number;
+  id_gender: number;
+  ischild: number;
+  id_category: number;
+  id_item: number;
+  id_brand: number;
+  id_textile: number;
+  id_size: number;
+  id_color1: number;
+  id_color2: number;
+  id_condition: number;
+  price: number;
+  id_weight: number;
+  id_user_buyer: number;
+  purchase_date: string;
+  hand_delivery: number;
+  colissimo_delivery: number;
+  mondial_relay_delivery: number;
+  isarchived: number;
+  isdraft: number;
+  picture2: string;
+  picture3: string;
+  picture4: string;
+  picture5: string;
+  picture6: string;
+  picture7: string;
+  picture8: string;
+  picture9: string;
+  picture10: string;
+  picture11: string;
+  picture12: string;
+  picture13: string;
+  picture14: string;
+  picture15: string;
+  picture16: string;
+  picture17: string;
+  picture18: string;
+  picture19: string;
+}

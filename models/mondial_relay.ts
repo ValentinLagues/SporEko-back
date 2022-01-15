@@ -41,10 +41,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<IMondialRelay[]> => {
+const getAll = (
+  sortBy = 'id_mondial_relay',
+  order = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<IMondialRelay[]> => {
+  const sql = `SELECT * FROM mondial_relay ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_mondial_relay';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<IMondialRelay[]>('SELECT * FROM mondial_relay')
+    .query<IMondialRelay[]>(sql)
     .then(([results]) => results);
 };
 

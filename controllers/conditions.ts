@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const conditionsRouter = Router();
 
 conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Condition.getAll()
+  let sortBy = 'id_condition';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Condition.getAll(sortBy, order)
     .then((conditions: Array<ICondition>) => {
       res.status(200).json(conditions);
     })
@@ -20,7 +35,7 @@ conditionsRouter.get(
     Condition.getById(Number(idCondition))
       .then((condition: ICondition) => {
         if (condition === undefined) {
-          res.status(404).send('Etat non trouvé');
+          res.status(404).send('Condition not found');
         }
         res.status(200).json(condition);
       })
@@ -57,11 +72,11 @@ conditionsRouter.put(
         req.body as ICondition
       );
       if (conditionUpdated) {
-        res.status(200).send('Etat mis à jour');
+        res.status(200).send('Condition updated');
       } else if (!conditionUpdated) {
         res.status(404).send('Condition not found');
       } else {
-        throw new ErrorHandler(500, `Cet état ne peut pas être mise à jour`);
+        throw new ErrorHandler(500, `Condition can't be updated`);
       }
     })();
   }
@@ -75,9 +90,9 @@ conditionsRouter.delete(
         const { idCondition } = req.params;
         const conditionDeleted = await Condition.destroy(Number(idCondition));
         if (conditionDeleted) {
-          res.status(200).send('Etat supprimé');
+          res.status(200).send('Condition deleted');
         } else {
-          throw new ErrorHandler(404, `Etat non trouvé`);
+          throw new ErrorHandler(404, `Condition not found`);
         }
       } catch (err) {
         next(err);

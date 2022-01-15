@@ -4,10 +4,25 @@ import * as Sizes from '../models/size';
 
 const sizesRouter = Router();
 
-sizesRouter.get('/', (_req: Request, res: Response, next: NextFunction) => {
+sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  let sortBy = 'id_size';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
   void (async () => {
     try {
-      const results = await Sizes.getAllSizes();
+      const results = await Sizes.getAllSizes(sortBy, order);
       res.status(200).json(results);
     } catch (err) {
       next(err);

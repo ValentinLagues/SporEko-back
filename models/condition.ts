@@ -27,7 +27,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const condition = req.body as ICondition;
     const conditionWithSameName: ICondition = await getByName(condition.name);
     if (conditionWithSameName) {
-      next(new ErrorHandler(409, `Cet état existe déjà`));
+      next(new ErrorHandler(409, `Condition name already exists`));
     } else {
       next();
     }
@@ -36,10 +36,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ICondition[]> => {
+const getAll = (
+  sortBy = 'id_condition',
+  order = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ICondition[]> => {
+  const sql = `SELECT * FROM conditions ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_condition';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ICondition[]>('SELECT * FROM conditions')
+    .query<ICondition[]>(sql)
     .then(([results]) => results);
 };
 

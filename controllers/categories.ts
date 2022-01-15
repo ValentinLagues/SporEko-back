@@ -2,11 +2,27 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Category from '../models/category';
 import ICategory from '../interfaces/ICategory';
 import { ErrorHandler } from '../helpers/errors';
+import * as Item from '../models/item';
 
 const categoriesRouter = Router();
 
 categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Category.getAll()
+  let sortBy = 'id_category';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Category.getAll(sortBy, order)
     .then((categories: Array<ICategory>) => {
       res.status(200).json(categories);
     })
@@ -20,10 +36,20 @@ categoriesRouter.get(
     Category.getById(Number(idCategory))
       .then((category: ICategory) => {
         if (category === undefined) {
-          res.status(404).send('Categorie non trouvée');
+          res.status(404).send('Category not found');
         }
         res.status(200).json(category);
       })
+      .catch((err) => next(err));
+  }
+);
+
+categoriesRouter.get(
+  '/:idCategory/items',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idCategory } = req.params;
+    Item.getItemsByCategory(Number(idCategory))
+      .then((results) => res.status(200).json(results))
       .catch((err) => next(err));
   }
 );
@@ -77,9 +103,9 @@ categoriesRouter.delete(
         const { idCategory } = req.params;
         const categoryDeleted = await Category.destroy(Number(idCategory));
         if (categoryDeleted) {
-          res.status(200).send('Categorie supprimée');
+          res.status(200).send('Category deleted');
         } else {
-          throw new ErrorHandler(404, `Categorie non trouvée`);
+          throw new ErrorHandler(404, `Category not found`);
         }
       } catch (err) {
         next(err);

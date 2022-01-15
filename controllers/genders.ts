@@ -5,7 +5,22 @@ import * as Genders from '../models/gender';
 const gendersRouter = Router();
 
 gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Genders.getAllGenders()
+  let sortBy = 'id_gender';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Genders.getAllGenders(sortBy, order)
     .then((results) => res.status(200).json(results))
     .catch((err) => next(err));
 });
@@ -27,7 +42,7 @@ gendersRouter.get(
 gendersRouter.post(
   '/',
   Genders.validateGender,
-  Genders.nameIsFree,
+  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     const gender = req.body as IGender;
     Genders.createGender(gender)
@@ -41,15 +56,16 @@ gendersRouter.post(
 gendersRouter.put(
   '/:idGender',
   Genders.validateGender,
-  Genders.nameIsFree,
+  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const { idGender } = req.params;
-        const { name } = req.body as IGender;
+        const { adult_name, child_name } = req.body as IGender;
         const genderUpdated = await Genders.updateGender(
           Number(idGender),
-          name
+          adult_name,
+          child_name
         );
         if (genderUpdated) {
           res.status(200).send('Gender updated');

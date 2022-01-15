@@ -6,7 +6,22 @@ import { ErrorHandler } from '../helpers/errors';
 const athleticsRouter = Router();
 
 athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  Athletics.getAll()
+  let sortBy = 'id_athletic';
+  let order = 'ASC';
+
+  const {
+    sort,
+    // firstItem,
+    // limit
+  } = req.query;
+
+  if (sort) {
+    const sortToArray = sort.toString().split(' ');
+    sortBy = sortToArray[0];
+    order = sortToArray[1];
+  }
+
+  Athletics.getAll(sortBy, order)
     .then((athletics: Array<IAthletics>) => {
       res.status(200).json(athletics);
     })
@@ -34,7 +49,7 @@ athleticsRouter.post(
     void (async () => {
       try {
         const athletics = req.body as IAthletics;
-        athletics.id_sportif_style = await Athletics.create(athletics);
+        athletics.id_athletic = await Athletics.create(athletics);
         res.status(201).json(athletics);
       } catch (err) {
         next(err);
@@ -55,14 +70,11 @@ athleticsRouter.put(
         req.body as IAthletics
       );
       if (athleticUpdated) {
-        res.status(200).send('Sportif Styles mis à jour');
+        res.status(200).send('Athletic updated');
       } else if (!athleticUpdated) {
-        res.status(404).send('Size not found');
+        res.status(404).send('Athletic not found');
       } else {
-        throw new ErrorHandler(
-          500,
-          `Ce Sportif Styles ne peut pas être mis à jour`
-        );
+        throw new ErrorHandler(500, `Athletic can't be updated`);
       }
     })();
   }
@@ -76,9 +88,9 @@ athleticsRouter.delete(
         const { id } = req.params;
         const athleticsDeleted = await Athletics.destroy(Number(id));
         if (athleticsDeleted) {
-          res.status(200).send('Sportif Styles supprimé');
+          res.status(200).send('Athletic deleted');
         } else {
-          throw new ErrorHandler(404, `Sportif Styles non trouvé`);
+          throw new ErrorHandler(404, `Athletic not found`);
         }
       } catch (err) {
         next(err);

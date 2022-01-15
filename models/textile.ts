@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const textile = req.body as ITextile;
     const textileWithSameName: ITextile = await getByName(textile.name);
     if (textileWithSameName) {
-      next(new ErrorHandler(409, `Cette matière existe déjà`));
+      next(new ErrorHandler(409, `Textile name already exists`));
     } else {
       next();
     }
@@ -34,10 +34,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (): Promise<ITextile[]> => {
+const getAll = async (
+  sortBy = 'id_textile',
+  order = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ITextile[]> => {
+  const sql = `SELECT * FROM textiles ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_textile';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ITextile[]>('SELECT * FROM textiles')
+    .query<ITextile[]>(sql)
     .then(([results]) => results);
 };
 

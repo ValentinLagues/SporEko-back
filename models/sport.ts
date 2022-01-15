@@ -27,7 +27,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const sport = req.body as ISport;
     const sportWithSameName: ISport = await getByName(sport.name);
     if (sportWithSameName) {
-      next(new ErrorHandler(409, `Ce sport existe déjà`));
+      next(new ErrorHandler(409, `Sport name already exists`));
     } else {
       next();
     }
@@ -36,10 +36,22 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = (): Promise<ISport[]> => {
+const getAll = (
+  sortBy = 'id_sport',
+  order = 'ASC'
+  // firstItem: string,
+  // limit: string
+): Promise<ISport[]> => {
+  const sql = `SELECT * FROM sports ORDER BY ${sortBy} ${order}`;
+  if (sortBy === 'id') {
+    sortBy = 'id_sport';
+  }
+  // if (limit) {
+  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  // }
   return connection
     .promise()
-    .query<ISport[]>('SELECT * FROM sports')
+    .query<ISport[]>(sql)
     .then(([results]) => results);
 };
 

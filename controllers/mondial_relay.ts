@@ -8,7 +8,22 @@ const mondialRelayRouter = Router();
 mondialRelayRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    MondialRelay.getAll()
+    let sortBy = 'id_mondialRelay';
+    let order = 'ASC';
+
+    const {
+      sort,
+      // firstItem,
+      // limit
+    } = req.query;
+
+    if (sort) {
+      const sortToArray = sort.toString().split(' ');
+      sortBy = sortToArray[0];
+      order = sortToArray[1];
+    }
+
+    MondialRelay.getAll(sortBy, order)
       .then((mondialRelay: Array<IMondialRelay>) => {
         res.status(200).json(mondialRelay);
       })

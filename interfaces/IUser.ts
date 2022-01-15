@@ -14,8 +14,9 @@ export default interface IUser extends RowDataPacket {
   isadmin: number;
   isarchived: number;
   id_gender: number;
+  id_country: number;
   adress_complement: string;
-  id_sportif_style: number;
+  id_athletic: number;
   birthday: string;
   phone: string;
   creation_date: string;

@@ -11,7 +11,22 @@ usersRouter.get(
   Auth.userConnected,
   Auth.userIsAdmin,
   (req: Request, res: Response, next: NextFunction) => {
-    User.getAll()
+    let sortBy = 'id_user';
+    let order = 'ASC';
+
+    const {
+      sort,
+      // firstItem,
+      // limit
+    } = req.query;
+
+    if (sort) {
+      const sortToArray = sort.toString().split(' ');
+      sortBy = sortToArray[0];
+      order = sortToArray[1];
+    }
+
+    User.getAll(sortBy, order)
       .then((user: Array<IUser>) => {
         res.status(200).json(user);
       })
@@ -27,7 +42,7 @@ usersRouter.get(
     User.getById(Number(idUser))
       .then((user: IUser) => {
         if (user === undefined) {
-          res.status(404).send('Utilisateur non trouvé');
+          res.status(404).send('User not found');
         }
         res.status(200).json(user);
       })
@@ -69,10 +84,7 @@ usersRouter.put(
       if (userUpdated) {
         res.status(200).send(req.body);
       } else {
-        throw new ErrorHandler(
-          500,
-          `Cet utilisateur ne peut pas être mis à jour`
-        );
+        throw new ErrorHandler(500, `User can't be updated`);
       }
     })();
   }
@@ -88,9 +100,9 @@ usersRouter.delete(
         const { idUser } = req.params;
         const userDeleted = await User.destroy(Number(idUser));
         if (userDeleted) {
-          res.status(200).send('Utilisateur supprimé');
+          res.status(200).send('User deleted');
         } else {
-          throw new ErrorHandler(404, `Utilisateur non trouvé`);
+          throw new ErrorHandler(404, `User not found`);
         }
       } catch (err) {
         next(err);
