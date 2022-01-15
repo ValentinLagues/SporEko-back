@@ -87,7 +87,9 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
 const getAll = async (): Promise<IOffer[]> => {
   return connection
     .promise()
-    .query<IOffer[]>('SELECT * FROM offers')
+    .query<IOffer[]>(
+      'select * from offers as o INNER JOIN sports as s on (o.id_sport = s.id_sport)'
+    )
     .then(([results]) => results);
 };
 

@@ -8,11 +8,13 @@ import 'dotenv/config';
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.use(
-  cors({
-    origin: '*',
-  })
-);
+const corsOptions: cors.CorsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+  maxAge: 3600,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
