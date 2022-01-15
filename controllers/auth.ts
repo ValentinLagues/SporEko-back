@@ -25,7 +25,12 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               user.isadmin
             );
             res.cookie('user_token', token);
-            res.send(`Bienvenue ${user.pseudo}`);
+            res.json({
+              id: user.id_user,
+              pseudo: user.pseudo,
+              picture: user.picture,
+              admin: user.isadmin,
+            });
           } else throw new ErrorHandler(401, 'Email or password incorrect');
         }
       })

@@ -7,8 +7,8 @@ import * as Item from '../models/item';
 const categoriesRouter = Router();
 
 categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_category';
-  let order: string = 'ASC';
+  let sortBy = 'id_category';
+  let order = 'ASC';
 
   const {
     sort,

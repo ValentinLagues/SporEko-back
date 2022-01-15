@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const textilesRouter = Router();
 
 textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_textile';
-  let order: string = 'ASC';
+  let sortBy = 'id_textile';
+  let order = 'ASC';
 
   const {
     sort,

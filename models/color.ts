@@ -49,12 +49,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = async (
-  sortBy: string = 'id_color',
-  order: string = 'ASC'
+  sortBy = 'id_color',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IColor[]> => {
-  let sql = `SELECT * FROM colors ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM colors ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_color';
   }

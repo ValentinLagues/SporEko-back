@@ -102,12 +102,12 @@ const verifyPassword = (
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = async (
-  sortBy: string = 'id_user',
-  order: string = 'ASC'
+  sortBy = 'id_user',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IUser[]> => {
-  let sql = `SELECT * FROM users ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM users ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_user';
   }
