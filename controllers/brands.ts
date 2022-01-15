@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const brandsRouter = Router();
 
 brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_brand';
-  let order: string = 'ASC';
+  let sortBy = 'id_brand';
+  let order = 'ASC';
 
   const {
     sort,

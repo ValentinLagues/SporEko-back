@@ -23,12 +23,12 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllGenders = (
-  sortBy: string = 'id_gender',
-  order: string = 'ASC'
+  sortBy = 'id_gender',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IGender[]> => {
-  let sql = `SELECT * FROM genders ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM genders ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_gender';
   }

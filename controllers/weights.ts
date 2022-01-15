@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const weightsRouter = Router();
 
 weightsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_weight';
-  let order: string = 'ASC';
+  let sortBy = 'id_weight';
+  let order = 'ASC';
 
   const {
     sort,

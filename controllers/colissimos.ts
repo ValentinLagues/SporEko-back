@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const colissimosRouter = Router();
 
 colissimosRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_colissimo';
-  let order: string = 'ASC';
+  let sortBy = 'id_colissimo';
+  let order = 'ASC';
 
   const {
     sort,

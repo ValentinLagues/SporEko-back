@@ -24,7 +24,9 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               Number(user.id_user),
               user.isadmin
             );
-            res.cookie('user_token', token);
+            res.cookie('user_token', token, {
+              secure: false,
+            });
             res.json({
               id: user.id_user,
               pseudo: user.pseudo,

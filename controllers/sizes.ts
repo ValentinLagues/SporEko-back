@@ -5,8 +5,8 @@ import * as Sizes from '../models/size';
 const sizesRouter = Router();
 
 sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_size';
-  let order: string = 'ASC';
+  let sortBy = 'id_size';
+  let order = 'ASC';
 
   const {
     sort,

@@ -40,12 +40,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllDeliverer_price = (
-  sortBy: string = 'id_deliverer_price',
-  order: string = 'ASC'
+  sortBy = 'id_deliverer_price',
+  order = 'ASC'
   // firstDeliverer_price: string,
   // limit: string
 ): Promise<IDeliverer_price[]> => {
-  let sql = `SELECT * FROM deliverer_prices ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM deliverer_prices ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_deliverer_price';
   }

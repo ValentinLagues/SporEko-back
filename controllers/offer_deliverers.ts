@@ -8,8 +8,8 @@ const offer_deliverersRouter = Router();
 offer_deliverersRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy: string = 'id_offer_deliverer';
-    let order: string = 'ASC';
+    let sortBy = 'id_offer_deliverer';
+    let order = 'ASC';
 
     const {
       sort,

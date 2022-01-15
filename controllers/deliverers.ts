@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const deliverersRouter = Router();
 
 deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_deliverer';
-  let order: string = 'ASC';
+  let sortBy = 'id_deliverer';
+  let order = 'ASC';
 
   const {
     sort,

@@ -36,12 +36,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy: string = 'id_athletic',
-  order: string = 'ASC'
+  sortBy = 'id_athletic',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IAthletics[]> => {
-  let sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_athletic';
   }

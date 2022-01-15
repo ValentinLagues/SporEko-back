@@ -43,12 +43,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy: string = 'id_offer_deliverer',
-  order: string = 'ASC'
+  sortBy = 'id_offer_deliverer',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IOffer_deliverer[]> => {
-  let sql = `SELECT * FROM offer_deliverers ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM offer_deliverers ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_offer_deliverer';
   }

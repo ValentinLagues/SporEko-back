@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const sportsRouter = Router();
 
 sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_sport';
-  let order: string = 'ASC';
+  let sortBy = 'id_sport';
+  let order = 'ASC';
 
   const {
     sort,

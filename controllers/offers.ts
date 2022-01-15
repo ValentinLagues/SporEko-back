@@ -28,8 +28,8 @@ interface IFilter {
 offersRouter.get(
   '/',
   (req: Request<IFilter>, res: Response, next: NextFunction) => {
-    let sortBy: string = 'creation_date';
-    let order: string = 'DESC';
+    let sortBy = 'creation_date';
+    let order = 'DESC';
 
     const {
       sort,

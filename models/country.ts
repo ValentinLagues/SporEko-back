@@ -3,17 +3,17 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import ICategory from '../interfaces/ICategory';
+import ICountries from '../interfaces/ICountries';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateCategory = (req: Request, res: Response, next: NextFunction) => {
+const validatecountries = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(50).presence(presence),
+    name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -23,10 +23,10 @@ const validateCategory = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const category = req.body as ICategory;
-    const categoryWithSameName: ICategory = await getByName(category.name);
-    if (categoryWithSameName) {
-      next(new ErrorHandler(409, `Category name already exists`));
+    const Country = req.body as ICountries;
+    const CountryWithSameName: ICountries = await getByName(Country.name);
+    if (CountryWithSameName) {
+      next(new ErrorHandler(409, `Country name already exists`));
     } else {
       next();
     }
@@ -36,80 +36,70 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_category',
+  sortBy = 'id_country',
   order = 'ASC'
   // firstItem: string,
   // limit: string
-): Promise<ICategory[]> => {
-  const sql = `SELECT * FROM categories ORDER BY ${sortBy} ${order}`;
+): Promise<ICountries[]> => {
+  const sql = `SELECT * FROM countries ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
-    sortBy = 'id_category';
+    sortBy = 'id_country';
   }
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
   return connection
     .promise()
-    .query<ICategory[]>(sql)
+    .query<ICountries[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idCategory: number): Promise<ICategory> => {
+const getById = (idCountry: number): Promise<ICountries> => {
   return connection
     .promise()
-    .query<ICategory[]>('SELECT * FROM categories WHERE id_category = ?', [
-      idCategory,
+    .query<ICountries[]>('SELECT * FROM countries WHERE id_country = ?', [
+      idCountry,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = async (name: string): Promise<ICategory> => {
+const getByName = (name: string): Promise<ICountries> => {
   return connection
     .promise()
-    .query<ICategory[]>('SELECT * FROM categories WHERE name = ?', [name])
+    .query<ICountries[]>('SELECT * FROM countries WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = async (newCategory: ICategory): Promise<number> => {
+const create = (newCountry: ICountries): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO categories (name) VALUES (?)', [
-      newCategory.name,
-    ])
+    .query<ResultSetHeader>('INSERT INTO countries SET ?', [newCountry])
     .then(([results]) => results.insertId);
 };
 
-const update = async (
-  idCategory: number,
-  attibutesToUpdate: ICategory
+const update = (
+  idCountry: number,
+  newAttributes: ICountries
 ): Promise<boolean> => {
-  let sql = 'UPDATE categories SET ';
-  const sqlValues: Array<string | number> = [];
-
-  if (attibutesToUpdate.name) {
-    sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
-  }
-  sql += ' WHERE id_category = ?';
-  sqlValues.push(idCategory);
-
   return connection
     .promise()
-    .query<ResultSetHeader>(sql, sqlValues)
+    .query<ResultSetHeader>('UPDATE countries SET ? WHERE id_country = ?', [
+      newAttributes,
+      idCountry,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idCategory: number): Promise<boolean> => {
+const destroy = (idCountry: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM categories WHERE id_category = ?', [
-      idCategory,
+    .query<ResultSetHeader>('DELETE FROM countries WHERE id_country = ?', [
+      idCountry,
     ])
     .then(([results]) => results.affectedRows === 1);
 };
 
 export {
-  validateCategory,
   getAll,
   getById,
   getByName,
@@ -117,4 +107,5 @@ export {
   create,
   update,
   destroy,
+  validatecountries,
 };

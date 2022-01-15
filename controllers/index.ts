@@ -18,11 +18,13 @@ import categoriesRouter from './categories';
 import itemsRouter from './items';
 import weightsRouter from './weights';
 import authRouter from './auth';
+import countriesRouter from './countries';
 
 const setupRoutes = (app: express.Application) => {
   app.use('/users', usersRouter);
   app.use('/offers', offersRouter);
   app.use('/genders', gendersRouter);
+  app.use('/countries', countriesRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
   app.use('/conditions', conditionsRouter);

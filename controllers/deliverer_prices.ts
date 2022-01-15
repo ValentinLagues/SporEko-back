@@ -7,8 +7,8 @@ const deliverer_pricesRouter = Router();
 deliverer_pricesRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy: string = 'id_deliverer_price';
-    let order: string = 'ASC';
+    let sortBy = 'id_deliverer_price';
+    let order = 'ASC';
 
     const {
       sort,

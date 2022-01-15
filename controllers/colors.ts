@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const colorsRouter = Router();
 
 colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_color';
-  let order: string = 'ASC';
+  let sortBy = 'id_color';
+  let order = 'ASC';
 
   const {
     sort,
