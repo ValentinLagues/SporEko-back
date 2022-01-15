@@ -5,6 +5,7 @@ import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IUser from '../interfaces/IUser';
+import multer from 'multer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -45,6 +46,8 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
+const upload = multer({ dest: 'img/' });
 
 const recordExists = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
@@ -282,6 +285,7 @@ const destroy = async (idUser: number): Promise<boolean> => {
 };
 
 export {
+  upload,
   getAll,
   getById,
   recordExists,
