@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const category = req.body as ICategory;
     const categoryWithSameName: ICategory = await getByName(category.name);
     if (categoryWithSameName) {
-      next(new ErrorHandler(409, `Cette categorie existe déjà`));
+      next(new ErrorHandler(409, `Category name already exists`));
     } else {
       next();
     }
@@ -36,12 +36,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_category',
-  order = 'ASC'
+  sortBy: string = 'id_category',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<ICategory[]> => {
-  const sql = `SELECT * FROM categories ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM categories ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_category';
   }

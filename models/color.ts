@@ -29,7 +29,7 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     color.id_color = parseInt(req.params.idColor);
     const recordFound: IColor = await getById(color.id_color);
     if (!recordFound) {
-      next(new ErrorHandler(404, `Couleur non trouvée`));
+      next(new ErrorHandler(404, `Color not found`));
     } else {
       next();
     }
@@ -40,7 +40,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const color = req.body as IColor;
     const colorWithSameName: IColor = await getByName(color.name);
     if (colorWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de couleur existe déjà`));
+      next(new ErrorHandler(409, `Color name already exists`));
     } else {
       next();
     }
@@ -85,7 +85,7 @@ const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
   const colorWithSameCode: IColor = await getByCode(color.color_code);
   if (colorWithSameCode) {
-    next(new ErrorHandler(409, `Ce code couleur existe déjà`));
+    next(new ErrorHandler(409, `Color code already exists`));
   } else {
     next();
   }

@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const weight = req.body as IWeight;
     const weightWithSameName: IWeight = await getByName(weight.name);
     if (weightWithSameName) {
-      next(new ErrorHandler(409, `Ce weight existe déjà`));
+      next(new ErrorHandler(409, `Weight name already exists`));
     } else {
       next();
     }
@@ -36,12 +36,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_weight',
-  order = 'ASC'
+  sortBy: string = 'id_weight',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IWeight[]> => {
-  const sql = `SELECT * FROM weights ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM weights ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_weight';
   }

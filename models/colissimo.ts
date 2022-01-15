@@ -53,12 +53,12 @@ const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_colissimo',
-  order = 'ASC'
+  sortBy: string = 'id_colissimo',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IColissimo[]> => {
-  const sql = `SELECT * FROM colissimo ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM colissimo ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_colissimo';
   }

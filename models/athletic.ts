@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const Athletic = req.body as IAthletics;
     const AthleticWithSameName: IAthletics = await getByName(Athletic.name);
     if (AthleticWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de style de sportif existe déjà`));
+      next(new ErrorHandler(409, `Athletic name already exists`));
     } else {
       next();
     }
@@ -36,12 +36,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_athletic',
-  order = 'ASC'
+  sortBy: string = 'id_athletic',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IAthletics[]> => {
-  const sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_athletic';
   }

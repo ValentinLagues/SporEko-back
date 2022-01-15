@@ -42,12 +42,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_mondial_relay',
-  order = 'ASC'
+  sortBy: string = 'id_mondial_relay',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IMondialRelay[]> => {
-  const sql = `SELECT * FROM mondial_relay ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM mondial_relay ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_mondial_relay';
   }

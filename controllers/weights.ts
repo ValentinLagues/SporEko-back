@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const weightsRouter = Router();
 
 weightsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_weight';
-  let order = 'ASC';
+  let sortBy: string = 'id_weight';
+  let order: string = 'ASC';
 
   const {
     sort,
@@ -35,7 +35,7 @@ weightsRouter.get(
     Weight.getById(Number(idWeight))
       .then((weight: IWeight) => {
         if (weight === undefined) {
-          res.status(404).send('Weight non trouvé');
+          res.status(404).send('Weight not found');
         }
         res.status(200).json(weight);
       })
@@ -73,11 +73,11 @@ weightsRouter.put(
         req.body as IWeight
       );
       if (weightUpdated) {
-        res.status(200).send('Weight mis à jour');
+        res.status(200).send('Weight updated');
       } else if (!weightUpdated) {
         res.status(404).send('Weight not found');
       } else {
-        throw new ErrorHandler(500, `Ce weight ne peut pas être mis à jour`);
+        throw new ErrorHandler(500, `Weight can't be updated`);
       }
     })();
   }
@@ -91,9 +91,9 @@ weightsRouter.delete(
         const { idweight } = req.params;
         const weightDeleted = await Weight.destroy(Number(idweight));
         if (weightDeleted) {
-          res.status(200).send('Weight supprimé');
+          res.status(200).send('Weight deleted');
         } else {
-          throw new ErrorHandler(404, `Weight non trouvé`);
+          throw new ErrorHandler(404, `Weight not found`);
         }
       } catch (err) {
         next(err);

@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const brand = req.body as IBrand;
     const brandWithSameName: IBrand = await getByName(brand.name);
     if (brandWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de marque existe déjà`));
+      next(new ErrorHandler(409, `Brand name already exists`));
     } else {
       next();
     }
@@ -36,12 +36,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_brand',
-  order = 'ASC'
+  sortBy: string = 'id_brand',
+  order: string = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IBrand[]> => {
-  const sql = `SELECT * FROM brands ORDER BY ${sortBy} ${order}`;
+  let sql = `SELECT * FROM brands ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_brand';
   }
