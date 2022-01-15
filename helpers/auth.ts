@@ -11,7 +11,12 @@ const calculateToken = (
   userIsAdmin = 0
 ) => {
   return jwt.sign(
-    { pseudo: userPseudo, avatar: userPicture, id: userId, admin: userIsAdmin },
+    {
+      pseudo: userPseudo,
+      picture: userPicture,
+      id: userId,
+      admin: userIsAdmin,
+    },
     process.env.PRIVATE_KEY as string
   );
 };

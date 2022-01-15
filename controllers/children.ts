@@ -5,8 +5,8 @@ import * as Children from '../models/child';
 const childrenRouter = Router();
 
 childrenRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_child';
-  let order: string = 'ASC';
+  let sortBy = 'id_child';
+  let order = 'ASC';
 
   const {
     sort,

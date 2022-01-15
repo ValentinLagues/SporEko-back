@@ -8,8 +8,8 @@ const mondialRelayRouter = Router();
 mondialRelayRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy: string = 'id_mondialRelay';
-    let order: string = 'ASC';
+    let sortBy = 'id_mondialRelay';
+    let order = 'ASC';
 
     const {
       sort,

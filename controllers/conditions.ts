@@ -6,8 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const conditionsRouter = Router();
 
 conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_condition';
-  let order: string = 'ASC';
+  let sortBy = 'id_condition';
+  let order = 'ASC';
 
   const {
     sort,
