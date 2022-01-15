@@ -8,8 +8,8 @@ const accessoriesRouter = Router();
 accessoriesRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy: string = 'id_accessory';
-    let order: string = 'ASC';
+    let sortBy = 'id_accessory';
+    let order = 'ASC';
 
     const {
       sort,

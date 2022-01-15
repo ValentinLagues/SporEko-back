@@ -5,8 +5,8 @@ import * as Genders from '../models/gender';
 const gendersRouter = Router();
 
 gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy: string = 'id_gender';
-  let order: string = 'ASC';
+  let sortBy = 'id_gender';
+  let order = 'ASC';
 
   const {
     sort,

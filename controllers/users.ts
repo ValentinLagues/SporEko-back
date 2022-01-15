@@ -11,8 +11,8 @@ usersRouter.get(
   Auth.userConnected,
   Auth.userIsAdmin,
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy: string = 'id_user';
-    let order: string = 'ASC';
+    let sortBy = 'id_user';
+    let order = 'ASC';
 
     const {
       sort,

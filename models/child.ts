@@ -33,12 +33,12 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllChildren = (
-  sortBy: string = 'id_child',
-  order: string = 'ASC'
+  sortBy = 'id_child',
+  order = 'ASC'
   // firstItem: string,
   // limit: string
 ): Promise<IChild[]> => {
-  let sql = `SELECT * FROM children ORDER BY ${sortBy} ${order}`;
+  const sql = `SELECT * FROM children ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_child';
   }
