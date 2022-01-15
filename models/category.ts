@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const category = req.body as ICategory;
     const categoryWithSameName: ICategory = await getByName(category.name);
     if (categoryWithSameName) {
-      next(new ErrorHandler(409, `Cette categorie existe déjà`));
+      next(new ErrorHandler(409, `Category name already exists`));
     } else {
       next();
     }

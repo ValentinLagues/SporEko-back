@@ -70,14 +70,11 @@ athleticsRouter.put(
         req.body as IAthletics
       );
       if (athleticUpdated) {
-        res.status(200).send('Sportif Styles mis à jour');
+        res.status(200).send('Athletic updated');
       } else if (!athleticUpdated) {
-        res.status(404).send('Size not found');
+        res.status(404).send('Athletic not found');
       } else {
-        throw new ErrorHandler(
-          500,
-          `Ce Sportif Styles ne peut pas être mis à jour`
-        );
+        throw new ErrorHandler(500, `Athletic can't be updated`);
       }
     })();
   }
@@ -91,9 +88,9 @@ athleticsRouter.delete(
         const { id } = req.params;
         const athleticsDeleted = await Athletics.destroy(Number(id));
         if (athleticsDeleted) {
-          res.status(200).send('Sportif Styles supprimé');
+          res.status(200).send('Athletic deleted');
         } else {
-          throw new ErrorHandler(404, `Sportif Styles non trouvé`);
+          throw new ErrorHandler(404, `Athletic not found`);
         }
       } catch (err) {
         next(err);

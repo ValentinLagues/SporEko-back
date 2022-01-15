@@ -2,5 +2,6 @@ import { RowDataPacket } from 'mysql2';
 
 export default interface IGender extends RowDataPacket {
   id_gender: number;
-  name: string;
+  adult_name: string;
+  child_name: string;
 }

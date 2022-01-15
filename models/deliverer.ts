@@ -3,17 +3,17 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import IShoe from '../interfaces/IShoe';
+import IDeliverer from '../interfaces/IDeliverer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateShoe = (req: Request, res: Response, next: NextFunction) => {
+const validateDeliverer = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(80).presence(presence),
+    name: Joi.string().max(50).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -21,12 +21,13 @@ const validateShoe = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const shoe = req.body as IShoe;
-    const shoeWithSameName: IShoe = await getByName(shoe.name);
-    if (shoeWithSameName) {
-      next(new ErrorHandler(409, `Ce shoe existe déjà`));
+    const deliverer = req.body as IDeliverer;
+    const delivererWithSameName: IDeliverer = await getByName(deliverer.name);
+    if (delivererWithSameName) {
+      next(new ErrorHandler(409, `Deliverer name already exists`));
     } else {
       next();
     }
@@ -36,57 +37,62 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy: string = 'id_shoe',
+  sortBy: string = 'id_deliverer',
   order: string = 'ASC'
   // firstItem: string,
   // limit: string
-): Promise<IShoe[]> => {
-  let sql = `SELECT * FROM shoes ORDER BY ${sortBy} ${order}`;
+): Promise<IDeliverer[]> => {
+  let sql = `SELECT * FROM deliverers ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
-    sortBy = 'id_shoe';
+    sortBy = 'id_deliverer';
   }
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
   return connection
     .promise()
-    .query<IShoe[]>(sql)
+    .query<IDeliverer[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idShoe: number): Promise<IShoe> => {
+const getById = (idDeliverer: number): Promise<IDeliverer> => {
   return connection
     .promise()
-    .query<IShoe[]>('SELECT * FROM shoes WHERE id_shoe = ?', [idShoe])
+    .query<IDeliverer[]>('SELECT * FROM deliverers WHERE id_deliverer = ?', [
+      idDeliverer,
+    ])
     .then(([results]) => results[0]);
 };
 
-const getByName = (name: string): Promise<IShoe> => {
+const getByName = (name: string): Promise<IDeliverer> => {
   return connection
     .promise()
-    .query<IShoe[]>('SELECT * FROM shoes WHERE name = ?', [name])
+    .query<IDeliverer[]>('SELECT * FROM deliverers WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = (newShoe: IShoe): Promise<number> => {
+const create = (newDeliverer: IDeliverer): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO shoes (name) VALUES (?)', [
-      newShoe.name,
+    .query<ResultSetHeader>('INSERT INTO deliverers (name) VALUES (?)', [
+      newDeliverer.name,
     ])
     .then(([results]) => results.insertId);
 };
 
-const update = (idShoe: number, attibutesToUpdate: IShoe): Promise<boolean> => {
-  let sql = 'UPDATE shoes SET ';
+const update = (
+  idDeliverer: number,
+  attibutesToUpdate: IDeliverer
+): Promise<boolean> => {
+  let sql = 'UPDATE deliverers SET ';
   const sqlValues: Array<string | number> = [];
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
   }
-  sql += ' WHERE id_shoe = ?';
-  sqlValues.push(idShoe);
+  sql += ' WHERE id_deliverer = ?';
+  sqlValues.push(idDeliverer);
 
   return connection
     .promise()
@@ -94,14 +100,17 @@ const update = (idShoe: number, attibutesToUpdate: IShoe): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = (idShoe: number): Promise<boolean> => {
+const destroy = (idDeliverer: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM shoes WHERE id_shoe = ?', [idShoe])
+    .query<ResultSetHeader>('DELETE FROM deliverers WHERE id_deliverer = ?', [
+      idDeliverer,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
 export {
+  validateDeliverer,
   getAll,
   getById,
   getByName,
@@ -109,5 +118,4 @@ export {
   create,
   update,
   destroy,
-  validateShoe,
 };
