@@ -23,21 +23,14 @@ interface ICookie {
 const userConnected = (req: Request, res: Response, next: NextFunction) => {
   const myCookie = req.cookies as ICookie;
   if (!myCookie.user_token) {
-    next(
-      new ErrorHandler(401, 'Utilisateur non reconnu, veuillez vous connecter')
-    );
+    next(new ErrorHandler(401, 'Unauthorized, please connect'));
   } else {
     req.userInfo = jwt.verify(
       myCookie.user_token,
       process.env.PRIVATE_KEY as string
     ) as IUserInfo;
     if (req.userInfo === undefined) {
-      next(
-        new ErrorHandler(
-          401,
-          'Utilisateur non reconnu, veuillez vous connecter'
-        )
-      );
+      next(new ErrorHandler(401, 'Unauthorized, please connect'));
     } else {
       next();
     }
@@ -46,7 +39,7 @@ const userConnected = (req: Request, res: Response, next: NextFunction) => {
 
 const userIsAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (req.userInfo === undefined || !req.userInfo.admin) {
-    next(new ErrorHandler(403, 'Utilisateur non autorisé'));
+    next(new ErrorHandler(403, 'Forbidden'));
   } else {
     next();
   }

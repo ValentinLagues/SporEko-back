@@ -21,17 +21,6 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-//   void (async () => {
-//     const gender = req.body as IGender;
-//     const genderWithSameName: IGender = await getGenderByName(gender.name);
-//     if (genderWithSameName) {
-//       next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-//     } else {
-//       next();
-//     }
-//   })();
-// };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllGenders = (
   sortBy: string = 'id_gender',
@@ -58,13 +47,6 @@ const getGenderById = (id: number): Promise<IGender> => {
     .query<IGender[]>('SELECT * FROM genders WHERE id_gender = ? ', [id])
     .then(([result]) => result[0]);
 };
-
-// const getGenderByName = (name: string) => {
-//   return connection
-//     .promise()
-//     .query<IGender[]>('SELECT * FROM genders WHERE name = ?', [name])
-//     .then(([results]) => results[0]);
-// };
 
 const createGender = (newGender: IGender): Promise<number> => {
   return connection
@@ -112,9 +94,7 @@ const deleteGender = (id: number): Promise<boolean> => {
 };
 
 export {
-  // getGenderByName,
   getAllGenders,
-  // nameIsFree,
   getGenderById,
   createGender,
   updateGender,

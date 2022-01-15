@@ -74,7 +74,7 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     offer.id_offer = parseInt(req.params.idOffer);
     const recordFound: IOffer = await getById(offer.id_offer);
     if (!recordFound) {
-      next(new ErrorHandler(404, `Couleur non trouvée`));
+      next(new ErrorHandler(404, `Offer not found`));
     } else {
       next();
     }
@@ -198,8 +198,6 @@ const getAll = async (
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
-
-  console.log(sql);
 
   return connection
     .promise()

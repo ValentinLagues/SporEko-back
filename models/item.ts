@@ -27,7 +27,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const item = req.body as IItem;
     const itemWithSameName: IItem = await getItemByName(item.name);
     if (itemWithSameName) {
-      next(new ErrorHandler(409, `Ce nom d'article' existe déjà`));
+      next(new ErrorHandler(409, `Item name already exists`));
     } else {
       next();
     }
@@ -65,6 +65,13 @@ const getItemByName = (name: string) => {
     .promise()
     .query<IItem[]>('SELECT * FROM items WHERE name = ?', [name])
     .then(([results]) => results[0]);
+};
+
+const getItemsByCategory = (id_category: number) => {
+  return connection
+    .promise()
+    .query<IItem[]>('SELECT * FROM items WHERE id_category = ?', [id_category])
+    .then(([results]) => results);
 };
 
 const createItem = (newItem: IItem): Promise<number> => {
@@ -116,6 +123,7 @@ export {
   getAllItem,
   nameIsFree,
   getItemById,
+  getItemsByCategory,
   createItem,
   updateItem,
   deleteItem,

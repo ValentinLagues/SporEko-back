@@ -89,7 +89,7 @@ offersRouter.get(
     Offer.getById(Number(idOffer))
       .then((offer: IOffer) => {
         if (offer === undefined) {
-          res.status(404).send('Annonce non trouvée');
+          res.status(404).send('Offer not found');
         }
         res.status(200).json(offer);
       })
@@ -126,12 +126,9 @@ offersRouter.put(
         req.body as IOffer
       );
       if (offerUpdated) {
-        res.status(200).send('Annonce mise à jour');
+        res.status(200).send('Offer updated');
       } else {
-        throw new ErrorHandler(
-          500,
-          `Cette annonce ne peut pas être mise à jour`
-        );
+        throw new ErrorHandler(500, `Offer can't be updated`);
       }
     })();
   }
@@ -145,9 +142,9 @@ offersRouter.delete(
         const { idOffer } = req.params;
         const offerDeleted = await Offer.destroy(Number(idOffer));
         if (offerDeleted) {
-          res.status(200).send('Annonce supprimée');
+          res.status(200).send('Offer deleted');
         } else {
-          throw new ErrorHandler(404, `Annonce non trouvée`);
+          throw new ErrorHandler(404, `Offer not found`);
         }
       } catch (err) {
         next(err);
