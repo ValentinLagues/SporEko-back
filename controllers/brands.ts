@@ -35,7 +35,7 @@ brandsRouter.get(
     Brand.getById(Number(idBrand))
       .then((brand: IBrand) => {
         if (brand === undefined) {
-          res.status(404).send('Marque non trouvée');
+          res.status(404).send('Brand not found');
         }
         res.status(200).json(brand);
       })
@@ -92,9 +92,9 @@ brandsRouter.delete(
         const { idBrand } = req.params;
         const brandDeleted = await Brand.destroy(Number(idBrand));
         if (brandDeleted) {
-          res.status(200).send('Marque supprimée');
+          res.status(200).send('Brand deleted');
         } else {
-          throw new ErrorHandler(404, `Marque non trouvée`);
+          throw new ErrorHandler(404, `Brand not found`);
         }
       } catch (err) {
         next(err);

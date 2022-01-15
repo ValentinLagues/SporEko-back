@@ -52,7 +52,7 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     user.id_user = parseInt(req.params.idUser);
     const recordFound: IUser = await getById(user.id_user);
     if (!recordFound) {
-      next(new ErrorHandler(404, `Utilisateur non trouvé`));
+      next(new ErrorHandler(404, `User not found`));
     } else {
       next();
     }
@@ -63,7 +63,7 @@ const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
     const user = req.body as IUser;
     const userWithSameEmail: IUser = await getByEmail(user.email);
     if (userWithSameEmail) {
-      next(new ErrorHandler(409, `Cet email existe déjà`));
+      next(new ErrorHandler(409, `Email already exists`));
     } else {
       next();
     }
@@ -74,7 +74,7 @@ const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
     const user = req.body as IUser;
     const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
     if (userWithSamePseudo) {
-      next(new ErrorHandler(409, `Ce pseudo existe déjà`));
+      next(new ErrorHandler(409, `Pseudo already exists`));
     } else {
       next();
     }

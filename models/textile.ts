@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const textile = req.body as ITextile;
     const textileWithSameName: ITextile = await getByName(textile.name);
     if (textileWithSameName) {
-      next(new ErrorHandler(409, `Cette matière existe déjà`));
+      next(new ErrorHandler(409, `Textile name already exists`));
     } else {
       next();
     }
