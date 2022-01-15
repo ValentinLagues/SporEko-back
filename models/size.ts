@@ -28,7 +28,7 @@ const nameIsFree = (req: Request, _res: Response, next: NextFunction) => {
     const gender = req.body as ISize;
     const genderWithSameName: ISize = await getSizeByName(gender.name);
     if (genderWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
+      next(new ErrorHandler(409, `Size name already exists`));
     } else {
       next();
     }

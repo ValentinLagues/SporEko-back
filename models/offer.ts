@@ -21,11 +21,9 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     description: Joi.string().max(5000).presence(presence),
     id_sport: Joi.number().integer().presence(presence),
     id_gender: Joi.number().integer().presence(presence),
-    id_child: Joi.number().integer().allow(null),
+    ischild: Joi.number().integer().min(0).max(1).presence(presence),
     id_category: Joi.number().integer().presence(presence),
-    id_clothes: Joi.number().integer().allow(null),
-    id_shoe: Joi.number().integer().allow(null),
-    id_accessory: Joi.number().integer().allow(null),
+    id_item: Joi.number().integer().allow(null),
     id_brand: Joi.number().integer().allow(null),
     id_textile: Joi.number().integer().allow(null),
     id_size: Joi.number().integer().allow(null),
@@ -76,7 +74,7 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     offer.id_offer = parseInt(req.params.idOffer);
     const recordFound: IOffer = await getById(offer.id_offer);
     if (!recordFound) {
-      next(new ErrorHandler(404, `Couleur non trouvée`));
+      next(new ErrorHandler(404, `Offer not found`));
     } else {
       next();
     }
@@ -92,11 +90,9 @@ const getAll = async (
   id_user_seller: number,
   id_sport: number,
   id_gender: number,
-  id_child: number,
+  ischild: number,
   id_category: number,
-  id_clothes: number,
-  id_shoe: number,
-  id_accessory: number,
+  id_item: number,
   id_brand: number,
   id_textile: number,
   id_size: number,
@@ -129,10 +125,10 @@ const getAll = async (
       : ` WHERE id_gender = ${id_gender}`;
     oneValue = true;
   }
-  if (id_child) {
+  if (ischild) {
     sql += oneValue
-      ? ` AND id_child = ${id_child}`
-      : ` WHERE id_child = ${id_child}`;
+      ? ` AND ischild = ${ischild}`
+      : ` WHERE ischild = ${ischild}`;
     oneValue = true;
   }
   if (id_category) {
@@ -141,22 +137,10 @@ const getAll = async (
       : ` WHERE id_category = ${id_category}`;
     oneValue = true;
   }
-  if (id_clothes) {
+  if (id_item) {
     sql += oneValue
-      ? ` AND id_clothes = ${id_clothes}`
-      : ` WHERE id_clothes = ${id_clothes}`;
-    oneValue = true;
-  }
-  if (id_shoe) {
-    sql += oneValue
-      ? ` AND id_shoe = ${id_shoe}`
-      : ` WHERE id_shoe = ${id_shoe}`;
-    oneValue = true;
-  }
-  if (id_accessory) {
-    sql += oneValue
-      ? ` AND id_accessory = ${id_accessory}`
-      : ` WHERE id_accessory = ${id_accessory}`;
+      ? ` AND id_item = ${id_item}`
+      : ` WHERE id_item = ${id_item}`;
     oneValue = true;
   }
   if (id_brand) {
@@ -215,8 +199,6 @@ const getAll = async (
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
 
-  console.log(sql);
-
   return connection
     .promise()
     .query<IOffer[]>(sql)
@@ -234,7 +216,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, id_child, id_category, id_clothes, id_shoe, id_accessory, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, id_weight, hand_delivery, colissimo_delivery, mondial_relay_delivery, isarchived, isdraft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, ischild, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, id_weight, hand_delivery, colissimo_delivery, mondial_relay_delivery, isarchived, isdraft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newOffer.id_user_seller,
         newOffer.picture1,
@@ -242,11 +224,9 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.description,
         newOffer.id_sport,
         newOffer.id_gender,
-        newOffer.id_child,
+        newOffer.ischild,
         newOffer.id_category,
-        newOffer.id_clothes,
-        newOffer.id_shoe,
-        newOffer.id_accessory,
+        newOffer.id_item,
         newOffer.id_brand,
         newOffer.id_textile,
         newOffer.id_size,
@@ -316,9 +296,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_child) {
-    sql += oneValue ? ', id_child = ? ' : ' id_child = ? ';
-    sqlValues.push(attibutesToUpdate.id_child);
+  if (attibutesToUpdate.ischild) {
+    sql += oneValue ? ', ischild = ? ' : ' ischild = ? ';
+    sqlValues.push(attibutesToUpdate.ischild);
     oneValue = true;
   }
   if (attibutesToUpdate.id_category) {
@@ -326,19 +306,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_category);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_clothes) {
-    sql += oneValue ? ', id_clothes = ? ' : ' id_clothes = ? ';
-    sqlValues.push(attibutesToUpdate.id_clothes);
-    oneValue = true;
-  }
-  if (attibutesToUpdate.id_shoe) {
-    sql += oneValue ? ', id_shoe = ? ' : ' id_shoe = ? ';
-    sqlValues.push(attibutesToUpdate.id_shoe);
-    oneValue = true;
-  }
-  if (attibutesToUpdate.id_accessory) {
-    sql += oneValue ? ', id_accessory = ? ' : ' id_accessory = ? ';
-    sqlValues.push(attibutesToUpdate.id_accessory);
+  if (attibutesToUpdate.id_item) {
+    sql += oneValue ? ', id_item = ? ' : ' id_item = ? ';
+    sqlValues.push(attibutesToUpdate.id_item);
     oneValue = true;
   }
   if (attibutesToUpdate.id_brand) {

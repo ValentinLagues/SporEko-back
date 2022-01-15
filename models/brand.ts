@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const brand = req.body as IBrand;
     const brandWithSameName: IBrand = await getByName(brand.name);
     if (brandWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de marque existe déjà`));
+      next(new ErrorHandler(409, `Brand name already exists`));
     } else {
       next();
     }

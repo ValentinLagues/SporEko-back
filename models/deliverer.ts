@@ -3,11 +3,11 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import IAccessory from '../interfaces/IAccessory';
+import IDeliverer from '../interfaces/IDeliverer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateAccessory = (req: Request, res: Response, next: NextFunction) => {
+const validateDeliverer = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -21,12 +21,13 @@ const validateAccessory = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
+
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const accessory = req.body as IAccessory;
-    const accessoryWithSameName: IAccessory = await getByName(accessory.name);
-    if (accessoryWithSameName) {
-      next(new ErrorHandler(409, `Cette categorie existe déjà`));
+    const deliverer = req.body as IDeliverer;
+    const delivererWithSameName: IDeliverer = await getByName(deliverer.name);
+    if (delivererWithSameName) {
+      next(new ErrorHandler(409, `Deliverer name already exists`));
     } else {
       next();
     }
@@ -36,62 +37,62 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_accessory',
+  sortBy = 'id_deliverer',
   order = 'ASC'
   // firstItem: string,
   // limit: string
-): Promise<IAccessory[]> => {
-  const sql = `SELECT * FROM accessories ORDER BY ${sortBy} ${order}`;
+): Promise<IDeliverer[]> => {
+  const sql = `SELECT * FROM deliverers ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
-    sortBy = 'id_accessory';
+    sortBy = 'id_deliverer';
   }
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
   return connection
     .promise()
-    .query<IAccessory[]>(sql)
+    .query<IDeliverer[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idAccessory: number): Promise<IAccessory> => {
+const getById = (idDeliverer: number): Promise<IDeliverer> => {
   return connection
     .promise()
-    .query<IAccessory[]>('SELECT * FROM accessories WHERE id_accessory = ?', [
-      idAccessory,
+    .query<IDeliverer[]>('SELECT * FROM deliverers WHERE id_deliverer = ?', [
+      idDeliverer,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = async (name: string): Promise<IAccessory> => {
+const getByName = (name: string): Promise<IDeliverer> => {
   return connection
     .promise()
-    .query<IAccessory[]>('SELECT * FROM accessories WHERE name = ?', [name])
+    .query<IDeliverer[]>('SELECT * FROM deliverers WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = async (newAccessory: IAccessory): Promise<number> => {
+const create = (newDeliverer: IDeliverer): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO accessories (name) VALUES (?)', [
-      newAccessory.name,
+    .query<ResultSetHeader>('INSERT INTO deliverers (name) VALUES (?)', [
+      newDeliverer.name,
     ])
     .then(([results]) => results.insertId);
 };
 
-const update = async (
-  idAccessory: number,
-  attibutesToUpdate: IAccessory
+const update = (
+  idDeliverer: number,
+  attibutesToUpdate: IDeliverer
 ): Promise<boolean> => {
-  let sql = 'UPDATE accessories SET ';
+  let sql = 'UPDATE deliverers SET ';
   const sqlValues: Array<string | number> = [];
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
   }
-  sql += ' WHERE id_accessory = ?';
-  sqlValues.push(idAccessory);
+  sql += ' WHERE id_deliverer = ?';
+  sqlValues.push(idDeliverer);
 
   return connection
     .promise()
@@ -99,17 +100,17 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idAccessory: number): Promise<boolean> => {
+const destroy = (idDeliverer: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('DELETE FROM accessories WHERE id_accessory = ?', [
-      idAccessory,
+    .query<ResultSetHeader>('DELETE FROM deliverers WHERE id_deliverer = ?', [
+      idDeliverer,
     ])
     .then(([results]) => results.affectedRows === 1);
 };
 
 export {
-  validateAccessory,
+  validateDeliverer,
   getAll,
   getById,
   getByName,

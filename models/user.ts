@@ -25,6 +25,7 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
     picture: Joi.string().max(255),
+    id_country: Joi.number().integer().min(1).presence(presence),
     isadmin: Joi.number().integer().min(0).max(1).presence(presence),
     isarchived: Joi.number().integer().min(0).max(1).presence(presence),
     id_gender: Joi.number().integer().min(1).presence(presence),
@@ -55,7 +56,7 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     user.id_user = parseInt(req.params.idUser);
     const recordFound: IUser = await getById(user.id_user);
     if (!recordFound) {
-      next(new ErrorHandler(404, `Utilisateur non trouvé`));
+      next(new ErrorHandler(404, `User not found`));
     } else {
       next();
     }
@@ -66,7 +67,7 @@ const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
     const user = req.body as IUser;
     const userWithSameEmail: IUser = await getByEmail(user.email);
     if (userWithSameEmail) {
-      next(new ErrorHandler(409, `Cet email existe déjà`));
+      next(new ErrorHandler(409, `Email already exists`));
     } else {
       next();
     }
@@ -77,7 +78,7 @@ const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
     const user = req.body as IUser;
     const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
     if (userWithSamePseudo) {
-      next(new ErrorHandler(409, `Ce pseudo existe déjà`));
+      next(new ErrorHandler(409, `Pseudo already exists`));
     } else {
       next();
     }
@@ -149,7 +150,7 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newUser.lastname,
         newUser.firstname,
@@ -162,6 +163,7 @@ const create = async (newUser: IUser): Promise<number> => {
         newUser.isadmin,
         newUser.isarchived,
         newUser.id_gender,
+        newUser.id_country,
         newUser.adress_complement,
         newUser.id_athletic,
         newUser.birthday,
@@ -211,9 +213,10 @@ const update = async (
     sqlValues.push(attibutesToUpdate.email);
     oneValue = true;
   }
-  if (attibutesToUpdate.hash_password) {
+  if (attibutesToUpdate.password) {
+    const hash_password = await hashPassword(attibutesToUpdate.password);
     sql += oneValue ? ', hash_password = ? ' : ' hash_password = ? ';
-    sqlValues.push(attibutesToUpdate.hash_password);
+    sqlValues.push(hash_password);
     oneValue = true;
   }
   if (attibutesToUpdate.picture) {
@@ -234,6 +237,11 @@ const update = async (
   if (attibutesToUpdate.id_gender) {
     sql += oneValue ? ', id_gender = ? ' : ' id_gender = ? ';
     sqlValues.push(attibutesToUpdate.id_gender);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.id_country) {
+    sql += oneValue ? ', id_country = ? ' : ' id_country = ? ';
+    sqlValues.push(attibutesToUpdate.id_country);
     oneValue = true;
   }
   if (attibutesToUpdate.adress_complement) {

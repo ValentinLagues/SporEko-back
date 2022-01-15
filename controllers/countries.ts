@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Athletics from '../models/athletic';
-import IAthletics from '../interfaces/IAthletics';
+import * as Countries from '../models/country';
+import ICountries from '../interfaces/ICountries';
 import { ErrorHandler } from '../helpers/errors';
 
-const athleticsRouter = Router();
+const countriesRouter = Router();
 
-athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_athletic';
+countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
+  let sortBy = 'id_country';
   let order = 'ASC';
 
   const {
@@ -21,36 +21,36 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     order = sortToArray[1];
   }
 
-  Athletics.getAll(sortBy, order)
-    .then((athletics: Array<IAthletics>) => {
-      res.status(200).json(athletics);
+  Countries.getAll(sortBy, order)
+    .then((countries: Array<ICountries>) => {
+      res.status(200).json(countries);
     })
     .catch((err) => next(err));
 });
 
-athleticsRouter.get(
+countriesRouter.get(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    Athletics.getById(Number(id))
-      .then((athletic: IAthletics) => {
-        if (athletic) res.status(200).json(athletic);
-        else res.status(404).send(`Athletic id:${id} not found.`);
+    Countries.getById(Number(id))
+      .then((country: ICountries) => {
+        if (country) res.status(200).json(country);
+        else res.status(404).send(`Country id:${id} not found.`);
       })
       .catch((err) => next(err));
   }
 );
 
-athleticsRouter.post(
+countriesRouter.post(
   '/',
-  Athletics.nameIsFree,
-  Athletics.validateAthletics,
+  Countries.nameIsFree,
+  Countries.validatecountries,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const athletics = req.body as IAthletics;
-        athletics.id_athletic = await Athletics.create(athletics);
-        res.status(201).json(athletics);
+        const countries = req.body as ICountries;
+        countries.id_country = await countries.create(countries);
+        res.status(201).json(countries);
       } catch (err) {
         next(err);
       }
@@ -58,20 +58,20 @@ athleticsRouter.post(
   }
 );
 
-athleticsRouter.put(
+countriesRouter.put(
   '/:id',
-  Athletics.nameIsFree,
-  Athletics.validateAthletics,
+  Countries.nameIsFree,
+  Countries.validatecountries,
   (req: Request, res: Response) => {
     void (async () => {
       const { id } = req.params;
-      const athleticUpdated = await Athletics.update(
+      const countryUpdated = await Countries.update(
         Number(id),
-        req.body as IAthletics
+        req.body as ICountries
       );
-      if (athleticUpdated) {
+      if (countryUpdated) {
         res.status(200).send('Athletic updated');
-      } else if (!athleticUpdated) {
+      } else if (!countryUpdated) {
         res.status(404).send('Athletic not found');
       } else {
         throw new ErrorHandler(500, `Athletic can't be updated`);
@@ -80,14 +80,14 @@ athleticsRouter.put(
   }
 );
 
-athleticsRouter.delete(
+countriesRouter.delete(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const { id } = req.params;
-        const athleticsDeleted = await Athletics.destroy(Number(id));
-        if (athleticsDeleted) {
+        const countriesDeleted = await Countries.destroy(Number(id));
+        if (countriesDeleted) {
           res.status(200).send('Athletic deleted');
         } else {
           throw new ErrorHandler(404, `Athletic not found`);
@@ -99,4 +99,4 @@ athleticsRouter.delete(
   }
 );
 
-export default athleticsRouter;
+export default countriesRouter;

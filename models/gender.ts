@@ -11,7 +11,8 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
     required = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(50).presence(required),
+    adult_name: Joi.string().max(50).presence(required),
+    child_name: Joi.string().max(50).presence(required),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -20,17 +21,6 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
-  void (async () => {
-    const gender = req.body as IGender;
-    const genderWithSameName: IGender = await getGenderByName(gender.name);
-    if (genderWithSameName) {
-      next(new ErrorHandler(409, `Ce nom de genre existe déjà`));
-    } else {
-      next();
-    }
-  })();
-};
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllGenders = (
   sortBy = 'id_gender',
@@ -58,29 +48,41 @@ const getGenderById = (id: number): Promise<IGender> => {
     .then(([result]) => result[0]);
 };
 
-const getGenderByName = (name: string) => {
-  return connection
-    .promise()
-    .query<IGender[]>('SELECT * FROM genders WHERE name = ?', [name])
-    .then(([results]) => results[0]);
-};
-
 const createGender = (newGender: IGender): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO genders SET name = ? ', [
-      newGender.name,
-    ])
+    .query<ResultSetHeader>(
+      'INSERT INTO genders (adult_name, child_name) VALUES (?, ?)',
+      [newGender.adult_name, newGender.child_name]
+    )
     .then(([results]) => results.insertId);
 };
 
-const updateGender = (id: number, name: string): Promise<boolean> => {
+const updateGender = (
+  id: number,
+  adult_name: string,
+  child_name: string
+): Promise<boolean> => {
+  let sql = 'UPDATE genders SET ';
+  const sqlValues: Array<string | number> = [];
+  let oneValue = false;
+
+  if (adult_name) {
+    sql += 'adult_name = ? ';
+    sqlValues.push(adult_name);
+    oneValue = true;
+  }
+  if (child_name) {
+    sql += oneValue ? ', child_name = ? ' : ' child_name = ? ';
+    sqlValues.push(child_name);
+    oneValue = true;
+  }
+  sql += ' WHERE id_gender = ?';
+  sqlValues.push(id);
+
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'UPDATE genders SET name = ?  WHERE id_gender = ? ',
-      [name, id]
-    )
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
 };
 
@@ -92,9 +94,7 @@ const deleteGender = (id: number): Promise<boolean> => {
 };
 
 export {
-  getGenderByName,
   getAllGenders,
-  nameIsFree,
   getGenderById,
   createGender,
   updateGender,

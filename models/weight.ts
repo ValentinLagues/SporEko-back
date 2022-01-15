@@ -26,7 +26,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const weight = req.body as IWeight;
     const weightWithSameName: IWeight = await getByName(weight.name);
     if (weightWithSameName) {
-      next(new ErrorHandler(409, `Ce weight existe déjà`));
+      next(new ErrorHandler(409, `Weight name already exists`));
     } else {
       next();
     }

@@ -27,7 +27,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const condition = req.body as ICondition;
     const conditionWithSameName: ICondition = await getByName(condition.name);
     if (conditionWithSameName) {
-      next(new ErrorHandler(409, `Cet état existe déjà`));
+      next(new ErrorHandler(409, `Condition name already exists`));
     } else {
       next();
     }

@@ -42,7 +42,7 @@ gendersRouter.get(
 gendersRouter.post(
   '/',
   Genders.validateGender,
-  Genders.nameIsFree,
+  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     const gender = req.body as IGender;
     Genders.createGender(gender)
@@ -56,15 +56,16 @@ gendersRouter.post(
 gendersRouter.put(
   '/:idGender',
   Genders.validateGender,
-  Genders.nameIsFree,
+  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const { idGender } = req.params;
-        const { name } = req.body as IGender;
+        const { adult_name, child_name } = req.body as IGender;
         const genderUpdated = await Genders.updateGender(
           Number(idGender),
-          name
+          adult_name,
+          child_name
         );
         if (genderUpdated) {
           res.status(200).send('Gender updated');
