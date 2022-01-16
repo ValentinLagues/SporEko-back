@@ -12,6 +12,7 @@ export default interface IUser extends RowDataPacket {
   hash_password: string;
   picture: string;
   isadmin: number;
+  isprofessional: number;
   isarchived: number;
   id_gender: number;
   id_country: number;

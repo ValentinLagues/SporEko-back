@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { handleError } from './helpers/errors';
 import setupRoutes from './controllers';
+import path from 'path';
 import 'dotenv/config';
 
 const app = express();
@@ -15,7 +16,7 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
 app.use(cookieParser());
 
