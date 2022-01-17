@@ -48,7 +48,6 @@ offer_deliverersRouter.get(
 
 offer_deliverersRouter.post(
   '/',
-  Offer_deliverer.nameIsFree,
   Offer_deliverer.validateOffer_deliverer,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
@@ -66,15 +65,18 @@ offer_deliverersRouter.post(
 );
 
 offer_deliverersRouter.put(
-  '/:idoffer_deliverer',
-  Offer_deliverer.nameIsFree,
+  '/:idOffer_deliverer',
   Offer_deliverer.validateOffer_deliverer,
   (req: Request, res: Response) => {
     void (async () => {
+<<<<<<< HEAD
       const { idoffer_deliverer } = req.params as IOffer_deliverer;
+=======
+      const { idOffer_deliverer } = req.params;
+>>>>>>> 370f8001eac8a7718fdbaad86b0d3b0755bdd2eb
 
       const offer_delivererUpdated = await Offer_deliverer.update(
-        Number(idoffer_deliverer),
+        Number(idOffer_deliverer),
         req.body as IOffer_deliverer
       );
       if (offer_delivererUpdated) {
@@ -89,13 +91,13 @@ offer_deliverersRouter.put(
 );
 
 offer_deliverersRouter.delete(
-  '/:idoffer_deliverer',
+  '/:idOffer_deliverer',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idoffer_deliverer } = req.params;
+        const { idOffer_deliverer } = req.params;
         const offer_delivererDeleted = await Offer_deliverer.destroy(
-          Number(idoffer_deliverer)
+          Number(idOffer_deliverer)
         );
         if (offer_delivererDeleted) {
           res.status(200).send('Offer_deliverer deleted');

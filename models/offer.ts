@@ -23,7 +23,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     id_gender: Joi.number().integer().presence(presence),
     ischild: Joi.number().integer().min(0).max(1).presence(presence),
     id_category: Joi.number().integer().presence(presence),
-    id_item: Joi.number().integer().allow(null),
+    id_item: Joi.number().integer().presence(presence),
     id_brand: Joi.number().integer().allow(null),
     id_textile: Joi.number().integer().allow(null),
     id_size: Joi.number().integer().allow(null),
@@ -31,16 +31,10 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     id_color2: Joi.number().integer().allow(null),
     id_condition: Joi.number().integer().presence(presence),
     price: Joi.number().positive().precision(2).strict().presence(presence),
-    id_weight: Joi.number().integer().presence(presence),
+    weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
     hand_delivery: Joi.number().integer().min(0).max(1).presence(presence),
-    colissimo_delivery: Joi.number().integer().min(0).max(1).presence(presence),
-    mondial_relay_delivery: Joi.number()
-      .integer()
-      .min(0)
-      .max(1)
-      .presence(presence),
     isarchived: Joi.number().integer().min(0).max(1).presence(presence),
     isdraft: Joi.number().integer().min(0).max(1).presence(presence),
     picture2: Joi.string().max(255),
@@ -61,6 +55,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     picture17: Joi.string().max(255),
     picture18: Joi.string().max(255),
     picture19: Joi.string().max(255),
+    picture20: Joi.string().max(255),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -216,7 +211,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, ischild, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, id_weight, hand_delivery, colissimo_delivery, mondial_relay_delivery, isarchived, isdraft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, ischild, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, hand_delivery, isarchived, isdraft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newOffer.id_user_seller,
         newOffer.picture1,
@@ -234,10 +229,8 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.id_color2,
         newOffer.id_condition,
         newOffer.price,
-        newOffer.id_weight,
+        newOffer.weight,
         newOffer.hand_delivery,
-        newOffer.colissimo_delivery,
-        newOffer.mondial_relay_delivery,
         newOffer.isarchived,
         newOffer.isdraft,
         newOffer.picture2,
@@ -258,6 +251,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.picture17,
         newOffer.picture18,
         newOffer.picture19,
+        newOffer.picture20,
       ]
     )
     .then(([results]) => results.insertId);
@@ -364,18 +358,6 @@ const update = async (
   if (attibutesToUpdate.hand_delivery) {
     sql += oneValue ? ', hand_delivery = ? ' : ' hand_delivery = ? ';
     sqlValues.push(attibutesToUpdate.hand_delivery);
-    oneValue = true;
-  }
-  if (attibutesToUpdate.colissimo_delivery) {
-    sql += oneValue ? ', colissimo_delivery = ? ' : ' colissimo_delivery = ? ';
-    sqlValues.push(attibutesToUpdate.colissimo_delivery);
-    oneValue = true;
-  }
-  if (attibutesToUpdate.mondial_relay_delivery) {
-    sql += oneValue
-      ? ', mondial_relay_delivery = ? '
-      : ' mondial_relay_delivery = ? ';
-    sqlValues.push(attibutesToUpdate.mondial_relay_delivery);
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
