@@ -85,7 +85,6 @@ const updateSize = (
   name: string,
   is_children: number
 ): Promise<boolean> => {
-  console.log('1');
   let sql = 'UPDATE sizes SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
