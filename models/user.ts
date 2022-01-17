@@ -1,5 +1,5 @@
 import connection from '../db-config.js';
-import { ResultSetHeader } from 'mysql2';
+import { Field, ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
@@ -13,33 +13,32 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
+    console.log(req.file);
+    req.file;
   }
   const errors = Joi.object({
     id: Joi.number(),
     id_user: Joi.number(),
     lastname: Joi.string().max(255).presence(presence),
     firstname: Joi.string().max(255).presence(presence),
-    adress: Joi.string().max(255).presence(presence),
-    zipcode: Joi.number().integer().max(99999).presence(presence),
-    city: Joi.string().max(255).presence(presence),
+    adress: Joi.string().max(255),
+    zipcode: Joi.number().integer().max(99999),
+    city: Joi.string().max(255),
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
     picture: Joi.string().max(255),
     id_country: Joi.number().integer().min(1).presence(presence),
-    isadmin: Joi.number().integer().min(0).max(1).presence(presence),
-    isarchived: Joi.number().integer().min(0).max(1).presence(presence),
+    isadmin: Joi.number().integer().min(0).max(1),
+    isarchived: Joi.number().integer().min(0).max(1),
+    isprofessional: Joi.number().integer().min(0).max(1).presence(presence),
     id_gender: Joi.number().integer().min(1).presence(presence),
     adress_complement: Joi.string().max(255),
     id_athletic: Joi.number().integer().min(1),
-    birthday: Joi.string().max(50).presence(presence),
-    phone: Joi.string().max(14).presence(presence),
+    birthday: Joi.string().max(50),
+    phone: Joi.string().max(14),
     creation_date: Joi.string(),
     pseudo: Joi.string().max(25).presence(presence),
-    authentified_by_facebook: Joi.number()
-      .integer()
-      .min(0)
-      .max(1)
-      .presence(presence),
+    authentified_by_facebook: Joi.number().integer().min(0).max(1),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -47,8 +46,6 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     next();
   }
 };
-
-const upload = multer({ dest: 'img/' });
 
 const recordExists = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
@@ -103,9 +100,37 @@ const verifyPassword = (
   return argon2.verify(hashedPassword, password, hashingOptions);
 };
 
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, './imageUser');
+  },
+  filename: function (_req, file, cb) {
+    cb(null, new Date().getTime() + file.originalname);
+  },
+});
+
+const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+  //reject file
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png'
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error('error'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 },
+  fileFilter: fileFilter,
+});
+
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (
+const getAll = (
   sortBy = 'id_user',
   order = 'ASC'
   // firstItem: string,
@@ -124,21 +149,21 @@ const getAll = async (
     .then(([results]) => results);
 };
 
-const getById = async (idUser: number): Promise<IUser> => {
+const getById = (idUser: number): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE id_user = ?', [idUser])
     .then(([results]) => results[0]);
 };
 
-const getByEmail = async (email: string): Promise<IUser> => {
+const getByEmail = (email: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE email = ?', [email])
     .then(([results]) => results[0]);
 };
 
-const getByPseudo = async (pseudo: string): Promise<IUser> => {
+const getByPseudo = (pseudo: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE pseudo = ?', [pseudo])
@@ -150,7 +175,7 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, isprofessional, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newUser.lastname,
         newUser.firstname,
@@ -158,6 +183,7 @@ const create = async (newUser: IUser): Promise<number> => {
         newUser.zipcode,
         newUser.city,
         newUser.email,
+        newUser.isprofessional,
         hashedPassword,
         newUser.picture,
         newUser.isadmin,
@@ -234,6 +260,11 @@ const update = async (
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
+  if (attibutesToUpdate.isprofessional) {
+    sql += oneValue ? ', isprofessional = ? ' : ' isprofessional = ? ';
+    sqlValues.push(attibutesToUpdate.isprofessional);
+    oneValue = true;
+  }
   if (attibutesToUpdate.id_gender) {
     sql += oneValue ? ', id_gender = ? ' : ' id_gender = ? ';
     sqlValues.push(attibutesToUpdate.id_gender);
@@ -285,6 +316,15 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
+const updateImage = (idUser: number, picture: string): Promise<boolean> => {
+  const sql = 'UPDATE users SET picture = ? WHERE id_user = ? ';
+
+  return connection
+    .promise()
+    .query<ResultSetHeader>(sql, [picture, idUser])
+    .then(([results]) => results.affectedRows === 1);
+};
+
 const destroy = async (idUser: number): Promise<boolean> => {
   return connection
     .promise()
@@ -303,6 +343,7 @@ export {
   pseudoIsFree,
   create,
   update,
+  updateImage,
   destroy,
   validateUser,
   verifyPassword,

@@ -52,18 +52,43 @@ usersRouter.get(
 
 usersRouter.post(
   '/',
-  Auth.userConnected,
   User.emailIsFree,
   User.pseudoIsFree,
+  User.upload.single('imageUser'),
   User.validateUser,
+
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
+        console.log(req.file);
+        const picture = `${req.protocol}://${req.get('host')}/imageUser/${
+          req.file?.filename
+        }`;
         const user = req.body as IUser;
-        user.id_user = await User.create(user);
+        user.id_user = await User.create({ ...user, picture: picture });
         res.status(201).json(user);
       } catch (err) {
         next(err);
+      }
+    })();
+  }
+);
+
+usersRouter.put(
+  '/image/:id',
+  Auth.userConnected,
+  User.upload.single('imageUser'),
+  (req: Request, res: Response) => {
+    void (async () => {
+      const idUser = req.params.id;
+      const picture = `${req.protocol}://${req.get('host')}/imageUser/${
+        req.file?.filename
+      }`;
+      const userUpdated = await User.updateImage(Number(idUser), picture);
+      if (userUpdated) {
+        res.status(200).send({ picture: picture, ...req.file });
+      } else {
+        throw new ErrorHandler(500, `Image can't be updated`);
       }
     })();
   }
@@ -79,7 +104,6 @@ usersRouter.put(
   (req: Request, res: Response) => {
     void (async () => {
       const { idUser } = req.params;
-
       const userUpdated = await User.update(Number(idUser), req.body as IUser);
       if (userUpdated) {
         res.status(200).send(req.body);
