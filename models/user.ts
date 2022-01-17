@@ -1,5 +1,5 @@
 import connection from '../db-config.js';
-import { ResultSetHeader } from 'mysql2';
+import { Field, ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
@@ -11,8 +11,10 @@ import multer from 'multer';
 
 const validateUser = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
-  if (req.method === '') {
+  if (req.method === 'POST') {
     presence = 'required';
+    console.log(req.file);
+    req.file;
   }
   const errors = Joi.object({
     id: Joi.number(),
@@ -100,7 +102,7 @@ const verifyPassword = (
 
 const storage = multer.diskStorage({
   destination: function (_req, _file, cb) {
-    cb(null, './images');
+    cb(null, './imageUser');
   },
   filename: function (_req, file, cb) {
     cb(null, new Date().getTime() + file.originalname);
@@ -116,7 +118,7 @@ const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
   ) {
     cb(null, true);
   } else {
-    cb(new Error("Le fichier n'est pas au bon format!"), false);
+    cb(new Error('error'), false);
   }
 };
 
@@ -128,7 +130,7 @@ const upload = multer({
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (
+const getAll = (
   sortBy = 'id_user',
   order = 'ASC'
   // firstItem: string,
@@ -147,21 +149,21 @@ const getAll = async (
     .then(([results]) => results);
 };
 
-const getById = async (idUser: number): Promise<IUser> => {
+const getById = (idUser: number): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE id_user = ?', [idUser])
     .then(([results]) => results[0]);
 };
 
-const getByEmail = async (email: string): Promise<IUser> => {
+const getByEmail = (email: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE email = ?', [email])
     .then(([results]) => results[0]);
 };
 
-const getByPseudo = async (pseudo: string): Promise<IUser> => {
+const getByPseudo = (pseudo: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE pseudo = ?', [pseudo])
@@ -314,10 +316,7 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const updateImage = async (
-  idUser: number,
-  picture: string
-): Promise<boolean> => {
+const updateImage = (idUser: number, picture: string): Promise<boolean> => {
   const sql = 'UPDATE users SET picture = ? WHERE id_user = ? ';
 
   return connection

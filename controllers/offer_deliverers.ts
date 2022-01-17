@@ -71,7 +71,7 @@ offer_deliverersRouter.put(
   Offer_deliverer.validateOffer_deliverer,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idoffer_deliverer } = req.params;
+      const { idoffer_deliverer } = req.params as IOffer_deliverer;
 
       const offer_delivererUpdated = await Offer_deliverer.update(
         Number(idoffer_deliverer),
