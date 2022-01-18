@@ -4,19 +4,21 @@ import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IOffer from '../interfaces/IOffer';
+import multer from 'multer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
-  if (req.method === 'POST') {
+  if (req.method === '') {
     presence = 'required';
   }
+  console.log(req.file);
   const errors = Joi.object({
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
     id_user_seller: Joi.number().integer().presence(presence),
-    picture1: Joi.string().max(255).presence(presence),
+    picture1: Joi.string().max(255),
     title: Joi.string().max(255).presence(presence),
     description: Joi.string().max(5000).presence(presence),
     id_sport: Joi.number().integer().presence(presence),
@@ -30,7 +32,8 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     id_color1: Joi.number().integer().allow(null),
     id_color2: Joi.number().integer().allow(null),
     id_condition: Joi.number().integer().presence(presence),
-    price: Joi.number().positive().precision(2).strict().presence(presence),
+    // price: Joi.number().positive().precision(2).strict().presence(presence),
+    price: Joi.number().integer(),
     weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
@@ -75,6 +78,35 @@ const recordExists = (req: Request, res: Response, next: NextFunction) => {
     }
   })();
 };
+
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, './imagesOffers');
+  },
+  filename: function (_req, file, cb) {
+    cb(null, new Date().getTime() + file.originalname);
+  },
+});
+
+const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+  //reject file
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png'
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error('error!'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 },
+  fileFilter: fileFilter,
+});
+
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = async (
@@ -460,6 +492,11 @@ const update = async (
     sqlValues.push(attibutesToUpdate.picture19);
     oneValue = true;
   }
+  if (attibutesToUpdate.picture20) {
+    sql += oneValue ? ', picture20 = ? ' : ' picture20 = ? ';
+    sqlValues.push(attibutesToUpdate.picture20);
+    oneValue = true;
+  }
 
   sql += ' WHERE id_offer = ?';
   sqlValues.push(idOffer);
@@ -485,4 +522,5 @@ export {
   update,
   destroy,
   validateOffer,
+  upload,
 };

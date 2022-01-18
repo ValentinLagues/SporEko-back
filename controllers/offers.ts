@@ -99,11 +99,17 @@ offersRouter.get(
 
 offersRouter.post(
   '/',
+  Offer.upload.single('imagesOffers'),
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.file);
     void (async () => {
       try {
-        const offer = req.body as IOffer;
+        const patatate = `${req.protocol}://${req.get('host')}/imagesOffers/${
+          req.file?.filename
+        }`;
+
+        const offer = { ...req.body, picture1: patatate } as IOffer;
         offer.id_offer = await Offer.create(offer);
         res.status(201).json(offer);
       } catch (err) {
