@@ -14,11 +14,12 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   console.log(req.file);
+  console.log(req.body);
   const errors = Joi.object({
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
     id_user_seller: Joi.number().integer().presence(presence),
-    picture1: Joi.string().max(255),
+    picture1: Joi.string().max(255).presence(presence),
     title: Joi.string().max(255).presence(presence),
     description: Joi.string().max(5000).presence(presence),
     id_sport: Joi.number().integer().presence(presence),
@@ -32,8 +33,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     id_color1: Joi.number().integer().allow(null),
     id_color2: Joi.number().integer().allow(null),
     id_condition: Joi.number().integer().presence(presence),
-    // price: Joi.number().positive().precision(2).strict().presence(presence),
-    price: Joi.number().integer(),
+    price: Joi.number().precision(2).presence(presence),
     weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
@@ -251,7 +251,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.description,
         newOffer.id_sport,
         newOffer.id_gender,
-        newOffer.is__child,
+        newOffer.is_child,
         newOffer.id_category,
         newOffer.id_item,
         newOffer.id_brand,

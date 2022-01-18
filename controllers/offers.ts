@@ -98,18 +98,38 @@ offersRouter.get(
 );
 
 offersRouter.post(
-  '/',
+  '/images',
   Offer.upload.single('imagesOffers'),
-  Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.file);
+    console.log(req.body);
+    console.log(req.file);
     void (async () => {
       try {
-        const patatate = `${req.protocol}://${req.get('host')}/imagesOffers/${
+        const picture1 = `${req.protocol}://${req.get('host')}/imagesOffers/${
           req.file?.filename
         }`;
+        console.log(picture1);
+        res.status(201).json(picture1);
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
 
-        const offer = { ...req.body, picture1: patatate } as IOffer;
+offersRouter.post(
+  '/',
+  Offer.validateOffer,
+  (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
+    console.log(req.file);
+    void (async () => {
+      try {
+        // const picture1 = `${req.protocol}://${req.get('host')}/imagesOffers/${
+        //   req.file?.filename
+        // }`;
+
+        const offer = req.body as IOffer;
         offer.id_offer = await Offer.create(offer);
         res.status(201).json(offer);
       } catch (err) {
