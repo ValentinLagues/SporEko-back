@@ -64,12 +64,10 @@ deliverer_pricesRouter.put(
     void (async () => {
       try {
         const { idDeliverer_price } = req.params;
-        const { name, id_category } = req.body as IDeliverer_price;
         const deliverer_priceUpdated =
           await Deliverer_price.updateDeliverer_price(
             Number(idDeliverer_price),
-            name,
-            id_category
+            req.body as IDeliverer_price
           );
         if (deliverer_priceUpdated) {
           res.status(200).send('Deliverer_price updated');
