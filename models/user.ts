@@ -20,18 +20,18 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     id_user: Joi.number(),
     lastname: Joi.string().max(255).presence(presence),
     firstname: Joi.string().max(255).presence(presence),
-    adress: Joi.string().max(255),
+    address: Joi.string().max(255),
     zipcode: Joi.number().integer().max(99999),
     city: Joi.string().max(255),
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
     picture: Joi.string().max(255),
     id_country: Joi.number().integer().min(1).presence(presence),
-    isadmin: Joi.number().integer().min(0).max(1),
-    isarchived: Joi.number().integer().min(0).max(1),
-    isprofessional: Joi.number().integer().min(0).max(1).presence(presence),
+    is_admin: Joi.number().integer().min(0).max(1),
+    is_archived: Joi.number().integer().min(0).max(1),
+    is_professional: Joi.number().integer().min(0).max(1).presence(presence),
     id_gender: Joi.number().integer().min(1).presence(presence),
-    adress_complement: Joi.string().max(255),
+    address_complement: Joi.string().max(255),
     id_athletic: Joi.number().integer().min(1),
     birthday: Joi.string().max(50),
     phone: Joi.string().max(14),
@@ -174,9 +174,8 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, address, zipcode, city, email, is_professional, hash_password, picture, is_admin, is_archived, id_gender,id_country, address_complement, id_athletic, birthday, phone, pseudo,authentified_by_facebook) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, address, zipcode, city, email, is_professional, hash_password, picture, is_admin, is_archived, id_gender,id_country, address_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
-        newUser.pseudo,
         newUser.lastname,
         newUser.firstname,
         newUser.address,
@@ -194,6 +193,7 @@ const create = async (newUser: IUser): Promise<number> => {
         newUser.id_athletic,
         newUser.birthday,
         newUser.phone,
+        newUser.pseudo,
         newUser.authentified_by_facebook,
       ]
     )
@@ -218,9 +218,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.firstname);
     oneValue = true;
   }
-  if (attibutesToUpdate.adress) {
-    sql += oneValue ? ', address = ? ' : ' adress = ? ';
-    sqlValues.push(attibutesToUpdate.adress);
+  if (attibutesToUpdate.address) {
+    sql += oneValue ? ', address = ? ' : ' address = ? ';
+    sqlValues.push(attibutesToUpdate.address);
     oneValue = true;
   }
   if (attibutesToUpdate.zipcode) {
@@ -249,19 +249,19 @@ const update = async (
     sqlValues.push(attibutesToUpdate.picture);
     oneValue = true;
   }
-  if (attibutesToUpdate.isadmin) {
-    sql += oneValue ? ', is_admin = ? ' : ' isadmin = ? ';
-    sqlValues.push(attibutesToUpdate.isadmin);
+  if (attibutesToUpdate.is_admin) {
+    sql += oneValue ? ', is_admin = ? ' : ' is_admin = ? ';
+    sqlValues.push(attibutesToUpdate.is_admin);
     oneValue = true;
   }
-  if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
-    sqlValues.push(attibutesToUpdate.isarchived);
+  if (attibutesToUpdate.is_archived) {
+    sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
+    sqlValues.push(attibutesToUpdate.is_archived);
     oneValue = true;
   }
-  if (attibutesToUpdate.isprofessional) {
-    sql += oneValue ? ', is_professional = ? ' : ' isprofessional = ? ';
-    sqlValues.push(attibutesToUpdate.isprofessional);
+  if (attibutesToUpdate.is_professional) {
+    sql += oneValue ? ', is_professional = ? ' : ' is_professional = ? ';
+    sqlValues.push(attibutesToUpdate.is_professional);
     oneValue = true;
   }
   if (attibutesToUpdate.id_gender) {
@@ -275,8 +275,8 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.address_complement) {
-    sql += oneValue ? ', adress_complement = ? ' : ' adress_complement = ? ';
-    sqlValues.push(attibutesToUpdate.adress_complement);
+    sql += oneValue ? ', address_complement = ? ' : ' address_complement = ? ';
+    sqlValues.push(attibutesToUpdate.address_complement);
     oneValue = true;
   }
   if (attibutesToUpdate.id_athletic) {

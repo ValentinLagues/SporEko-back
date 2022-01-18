@@ -54,18 +54,13 @@ usersRouter.post(
   '/',
   User.emailIsFree,
   User.pseudoIsFree,
-  User.upload.single('imageUser'),
   User.validateUser,
 
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        console.log(req.file);
-        const picture = `${req.protocol}://${req.get('host')}/imageUser/${
-          req.file?.filename
-        }`;
         const user = req.body as IUser;
-        user.id_user = await User.create({ ...user, picture: picture });
+        user.id_user = await User.create(user);
         res.status(201).json(user);
       } catch (err) {
         next(err);
