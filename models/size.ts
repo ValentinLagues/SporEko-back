@@ -83,7 +83,7 @@ const createSize = (newSize: ISize): Promise<number> => {
 const updateSize = (
   idSize: number,
   name: string,
-  is_children: number
+  is_child: number
 ): Promise<boolean> => {
   let sql = 'UPDATE sizes SET ';
   const sqlValues: Array<string | number> = [];
@@ -93,9 +93,9 @@ const updateSize = (
     sqlValues.push(name);
     oneValue = true;
   }
-  if (is_children === 0 || is_children === 1) {
-    sql += oneValue ? ', is_children = ? ' : ' is_children = ? ';
-    sqlValues.push(is_children);
+  if (is_child === 0 || is_child === 1) {
+    sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
+    sqlValues.push(is_child);
     oneValue = true;
   }
   sql += ' WHERE id_size = ?';

@@ -116,7 +116,7 @@ const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
   ) {
     cb(null, true);
   } else {
-    cb(new Error("Le fichier n'est pas au bon format!"), false);
+    cb(new Error('error'), false);
   }
 };
 
@@ -128,7 +128,7 @@ const upload = multer({
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
-const getAll = async (
+const getAll = (
   sortBy = 'id_user',
   order = 'ASC'
   // firstItem: string,
@@ -147,21 +147,21 @@ const getAll = async (
     .then(([results]) => results);
 };
 
-const getById = async (idUser: number): Promise<IUser> => {
+const getById = (idUser: number): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE id_user = ?', [idUser])
     .then(([results]) => results[0]);
 };
 
-const getByEmail = async (email: string): Promise<IUser> => {
+const getByEmail = (email: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE email = ?', [email])
     .then(([results]) => results[0]);
 };
 
-const getByPseudo = async (pseudo: string): Promise<IUser> => {
+const getByPseudo = (pseudo: string): Promise<IUser> => {
   return connection
     .promise()
     .query<IUser[]>('SELECT * FROM users WHERE pseudo = ?', [pseudo])
@@ -173,26 +173,26 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, isprofessional, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, address, zipcode, city, email, is_professional, hash_password, picture, is_admin, is_archived, id_gender,id_country, address_complement, id_athletic, birthday, phone, pseudo,authentified_by_facebook) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
+        newUser.pseudo,
         newUser.lastname,
         newUser.firstname,
-        newUser.adress,
+        newUser.address,
         newUser.zipcode,
         newUser.city,
         newUser.email,
-        newUser.isprofessional,
+        newUser.is_professional,
         hashedPassword,
         newUser.picture,
-        newUser.isadmin,
-        newUser.isarchived,
+        newUser.is_admin,
+        newUser.is_archived,
         newUser.id_gender,
         newUser.id_country,
-        newUser.adress_complement,
+        newUser.address_complement,
         newUser.id_athletic,
         newUser.birthday,
         newUser.phone,
-        newUser.pseudo,
         newUser.authentified_by_facebook,
       ]
     )
@@ -218,7 +218,7 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.adress) {
-    sql += oneValue ? ', adress = ? ' : ' adress = ? ';
+    sql += oneValue ? ', address = ? ' : ' adress = ? ';
     sqlValues.push(attibutesToUpdate.adress);
     oneValue = true;
   }
@@ -249,17 +249,17 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isadmin) {
-    sql += oneValue ? ', isadmin = ? ' : ' isadmin = ? ';
+    sql += oneValue ? ', is_admin = ? ' : ' isadmin = ? ';
     sqlValues.push(attibutesToUpdate.isadmin);
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', isarchived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
   if (attibutesToUpdate.isprofessional) {
-    sql += oneValue ? ', isprofessional = ? ' : ' isprofessional = ? ';
+    sql += oneValue ? ', is_professional = ? ' : ' isprofessional = ? ';
     sqlValues.push(attibutesToUpdate.isprofessional);
     oneValue = true;
   }
@@ -273,7 +273,7 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_country);
     oneValue = true;
   }
-  if (attibutesToUpdate.adress_complement) {
+  if (attibutesToUpdate.address_complement) {
     sql += oneValue ? ', adress_complement = ? ' : ' adress_complement = ? ';
     sqlValues.push(attibutesToUpdate.adress_complement);
     oneValue = true;
@@ -314,10 +314,7 @@ const update = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const updateImage = async (
-  idUser: number,
-  picture: string
-): Promise<boolean> => {
+const updateImage = (idUser: number, picture: string): Promise<boolean> => {
   const sql = 'UPDATE users SET picture = ? WHERE id_user = ? ';
 
   return connection
@@ -326,7 +323,7 @@ const updateImage = async (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idUser: number): Promise<boolean> => {
+const destroy = (idUser: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM users WHERE id_user = ?', [idUser])
