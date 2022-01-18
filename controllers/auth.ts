@@ -22,7 +22,7 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               user.pseudo,
               user.picture,
               Number(user.id_user),
-              user.isadmin
+              Number(user.is_admin)
             );
             res.cookie('user_token', token, {
               secure: false,
@@ -31,7 +31,7 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               id: user.id_user,
               pseudo: user.pseudo,
               picture: user.picture,
-              admin: user.isadmin,
+              admin: user.is_admin,
             });
           } else throw new ErrorHandler(401, 'Email or password incorrect');
         }
