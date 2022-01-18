@@ -48,7 +48,6 @@ sizesRouter.get(
 
 sizesRouter.post(
   '/',
-  Sizes.nameIsFree,
   Sizes.validateSize,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -64,16 +63,13 @@ sizesRouter.post(
 sizesRouter.put(
   '/:idSize',
   Sizes.validateSize,
-  Sizes.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const { idSize } = req.params;
-        const { name, is_children } = req.body as ISize;
         const sizeUpdated = await Sizes.updateSize(
           Number(idSize),
-          name,
-          Number(is_children)
+          req.body as ISize
         );
         if (sizeUpdated) {
           res.status(200).send('Size updated');

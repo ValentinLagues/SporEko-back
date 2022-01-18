@@ -290,8 +290,8 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.ischild) {
-    sql += oneValue ? ', ischild = ? ' : ' ischild = ? ';
+  if (attibutesToUpdate.is_child) {
+    sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
     sqlValues.push(attibutesToUpdate.ischild);
     oneValue = true;
   }
@@ -361,12 +361,12 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', isarchived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
   if (attibutesToUpdate.isdraft) {
-    sql += oneValue ? ', isdraft = ? ' : ' isdraft = ? ';
+    sql += oneValue ? ', is_draft = ? ' : ' isdraft = ? ';
     sqlValues.push(attibutesToUpdate.isdraft);
     oneValue = true;
   }
