@@ -12,7 +12,7 @@ interface IFilter {
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  ischild: number | undefined;
+  is_child: number | undefined;
   id_category: number | undefined;
   id_item: number | undefined;
   id_brand: number | undefined;
@@ -38,7 +38,7 @@ offersRouter.get(
       id_user_seller,
       id_sport,
       id_gender,
-      ischild,
+      is_child,
       id_category,
       id_item,
       id_brand,
@@ -63,7 +63,7 @@ offersRouter.get(
       Number(id_user_seller),
       Number(id_sport),
       Number(id_gender),
-      Number(ischild),
+      Number(is_child),
       Number(id_category),
       Number(id_item),
       Number(id_brand),
@@ -99,11 +99,17 @@ offersRouter.get(
 
 offersRouter.post(
   '/',
+  Offer.upload.single('imagesOffers'),
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.file);
     void (async () => {
       try {
-        const offer = req.body as IOffer;
+        const patatate = `${req.protocol}://${req.get('host')}/imagesOffers/${
+          req.file?.filename
+        }`;
+
+        const offer = { ...req.body, picture1: patatate } as IOffer;
         offer.id_offer = await Offer.create(offer);
         res.status(201).json(offer);
       } catch (err) {

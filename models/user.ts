@@ -174,26 +174,26 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, isprofessional, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, address, zipcode, city, email, is_professional, hash_password, picture, is_admin, is_archived, id_gender,id_country, address_complement, id_athletic, birthday, phone, pseudo,authentified_by_facebook) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
+        newUser.pseudo,
         newUser.lastname,
         newUser.firstname,
-        newUser.adress,
+        newUser.address,
         newUser.zipcode,
         newUser.city,
         newUser.email,
-        newUser.isprofessional,
+        newUser.is_professional,
         hashedPassword,
         newUser.picture,
-        newUser.isadmin,
-        newUser.isarchived,
+        newUser.is_admin,
+        newUser.is_archived,
         newUser.id_gender,
         newUser.id_country,
-        newUser.adress_complement,
+        newUser.address_complement,
         newUser.id_athletic,
         newUser.birthday,
         newUser.phone,
-        newUser.pseudo,
         newUser.authentified_by_facebook,
       ]
     )
@@ -219,7 +219,7 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.adress) {
-    sql += oneValue ? ', adress = ? ' : ' adress = ? ';
+    sql += oneValue ? ', address = ? ' : ' adress = ? ';
     sqlValues.push(attibutesToUpdate.adress);
     oneValue = true;
   }
@@ -250,17 +250,17 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isadmin) {
-    sql += oneValue ? ', isadmin = ? ' : ' isadmin = ? ';
+    sql += oneValue ? ', is_admin = ? ' : ' isadmin = ? ';
     sqlValues.push(attibutesToUpdate.isadmin);
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', isarchived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
   if (attibutesToUpdate.isprofessional) {
-    sql += oneValue ? ', isprofessional = ? ' : ' isprofessional = ? ';
+    sql += oneValue ? ', is_professional = ? ' : ' isprofessional = ? ';
     sqlValues.push(attibutesToUpdate.isprofessional);
     oneValue = true;
   }
@@ -274,7 +274,7 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_country);
     oneValue = true;
   }
-  if (attibutesToUpdate.adress_complement) {
+  if (attibutesToUpdate.address_complement) {
     sql += oneValue ? ', adress_complement = ? ' : ' adress_complement = ? ';
     sqlValues.push(attibutesToUpdate.adress_complement);
     oneValue = true;
@@ -324,7 +324,7 @@ const updateImage = (idUser: number, picture: string): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idUser: number): Promise<boolean> => {
+const destroy = (idUser: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM users WHERE id_user = ?', [idUser])
