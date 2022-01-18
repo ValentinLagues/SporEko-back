@@ -13,7 +13,6 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
-    console.log(req.file);
     req.file;
   }
   const errors = Joi.object({
