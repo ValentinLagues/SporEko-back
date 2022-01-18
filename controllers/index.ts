@@ -17,6 +17,7 @@ import itemsRouter from './items';
 import authRouter from './auth';
 import countriesRouter from './countries';
 import size_typesRouter from './size_types';
+import favoritesRouter from './favorites';
 
 const setupRoutes = (app: express.Application) => {
   app.use('/users', usersRouter);
@@ -36,6 +37,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/textiles', textilesRouter);
   app.use('/categories', categoriesRouter);
   app.use('/items', itemsRouter);
+  app.use('/favorites', favoritesRouter);
   app.use('/login', authRouter);
 };
 
