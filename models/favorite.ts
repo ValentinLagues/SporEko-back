@@ -8,7 +8,6 @@ import IFavorite from '../interfaces/IFavorite';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateFavorite = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';

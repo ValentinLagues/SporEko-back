@@ -70,6 +70,29 @@ const getSizeById = (id: number): Promise<ISize> => {
     .then(([result]) => result[0]);
 };
 
+const getSizesBySizeType = (
+  idSize_type: number,
+  id_gender: number = 3,
+  is_child: number
+) => {
+  let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
+  let sqlValues: Array<string | number> = [idSize_type];
+
+  if (id_gender) {
+    sql += ` AND id_gender = ?`;
+    sqlValues.push(id_gender);
+  }
+  if (is_child || is_child === 0) {
+    sql += ' AND is_child = ? ';
+    sqlValues.push(is_child);
+  }
+
+  return connection
+    .promise()
+    .query<ISize[]>(sql, sqlValues)
+    .then(([results]) => results);
+};
+
 const createSize = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
@@ -226,6 +249,7 @@ const deleteSize = (id: number): Promise<boolean> => {
 export {
   getAllSizes,
   getSizeById,
+  getSizesBySizeType,
   createSize,
   updateSize,
   deleteSize,

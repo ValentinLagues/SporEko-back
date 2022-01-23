@@ -12,7 +12,6 @@ const validateOffer_deliverer = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req.body);
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
