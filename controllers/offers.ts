@@ -12,7 +12,7 @@ interface IFilter {
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  is_child: number | undefined;
+  ischild: number | undefined;
   id_category: number | undefined;
   id_item: number | undefined;
   id_brand: number | undefined;
@@ -38,7 +38,7 @@ offersRouter.get(
       id_user_seller,
       id_sport,
       id_gender,
-      is_child,
+      ischild,
       id_category,
       id_item,
       id_brand,
@@ -63,7 +63,7 @@ offersRouter.get(
       Number(id_user_seller),
       Number(id_sport),
       Number(id_gender),
-      Number(is_child),
+      Number(ischild),
       Number(id_category),
       Number(id_item),
       Number(id_brand),
@@ -98,17 +98,34 @@ offersRouter.get(
 );
 
 offersRouter.post(
-  '/',
-  Offer.upload.single('imagesOffers'),
+  '/images',
+  Offer.upload.array('imagesOffers', 20),
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const patatate = `${req.protocol}://${req.get('host')}/imagesOffers/${
-          req.file?.filename
-        }`;
+        const reqFile: any = req.files;
+        const pictures: Array<string> = [];
+        reqFile.map((el: any) => {
+          const url = `${req.protocol}://${req.get('host')}/${el.path}`;
+          pictures.push(url);
+        });
+        const offer = await { ...pictures };
+        res.status(201).json(offer);
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
 
-        const offer = { ...req.body, picture1: patatate } as IOffer;
+offersRouter.post(
+  '/',
+  Offer.validateOffer,
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const offer = req.body as IOffer;
         offer.id_offer = await Offer.create(offer);
         res.status(201).json(offer);
       } catch (err) {
