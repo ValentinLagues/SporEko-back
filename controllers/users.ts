@@ -55,7 +55,6 @@ usersRouter.post(
   User.emailIsFree,
   User.pseudoIsFree,
   User.validateUser,
-
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
@@ -98,7 +97,7 @@ usersRouter.put(
   User.validateUser,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idUser } = req.params;
+      const idUser = req.params.id;
       const userUpdated = await User.update(Number(idUser), req.body as IUser);
       if (userUpdated) {
         res.status(200).send(req.body);

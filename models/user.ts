@@ -1,5 +1,5 @@
 import connection from '../db-config.js';
-import { Field, ResultSetHeader } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
@@ -209,7 +209,7 @@ const update = async (
   let oneValue = false;
 
   if (attibutesToUpdate.lastname) {
-    sql += 'lastname = ? ';
+    sql += oneValue ? 'lastname = ? ' : ' lastname = ? ';
     sqlValues.push(attibutesToUpdate.lastname);
     oneValue = true;
   }
