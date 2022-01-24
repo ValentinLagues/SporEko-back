@@ -13,8 +13,11 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
   if (req.method === '') {
     presence = 'required';
   }
+<<<<<<< HEAD
   console.log(req.file);
   console.log(req.body);
+=======
+>>>>>>> b254e4b7334a4087ccb58fb6ce06b1c35da41ccd
   const errors = Joi.object({
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
@@ -33,7 +36,11 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     id_color1: Joi.number().integer().allow(null),
     id_color2: Joi.number().integer().allow(null),
     id_condition: Joi.number().integer().presence(presence),
+<<<<<<< HEAD
     price: Joi.number().precision(2).presence(presence),
+=======
+    price: Joi.number().precision(2).strict().presence(presence),
+>>>>>>> b254e4b7334a4087ccb58fb6ce06b1c35da41ccd
     weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
@@ -225,6 +232,8 @@ const getAll = async (
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
+
+  console.log(sql);
 
   return connection
     .promise()

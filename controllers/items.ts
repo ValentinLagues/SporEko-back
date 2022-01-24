@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import IItem from '../interfaces/IItem';
+import * as Size from '../models/size';
 import * as Item from '../models/item';
 
 const itemsRouter = Router();
@@ -39,6 +40,26 @@ itemsRouter.get(
   }
 );
 
+itemsRouter.get(
+  '/:idItem/sizes',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idItem } = req.params;
+    const { id_gender, is_child } = req.query;
+    Item.getItemById(Number(idItem))
+      .then((item) =>
+        Size.getSizesBySizeType(
+          item.id_size_type,
+          Number(id_gender),
+          Number(is_child)
+        )
+      )
+      .then((results) => {
+        res.status(200).json(results);
+      })
+      .catch((err) => next(err));
+  }
+);
+
 itemsRouter.post(
   '/',
   Item.validateItem,
@@ -61,11 +82,12 @@ itemsRouter.put(
     void (async () => {
       try {
         const { idItem } = req.params;
-        const { name, id_category } = req.body as IItem;
+        const { name, id_category, id_size_type } = req.body as IItem;
         const itemUpdated = await Item.updateItem(
           Number(idItem),
           name,
-          id_category
+          id_category,
+          id_size_type
         );
         if (itemUpdated) {
           res.status(200).send('Item updated');
