@@ -36,7 +36,7 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser',
-  Auth.userConnected,
+  // Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     User.getById(Number(idUser))
