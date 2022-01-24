@@ -53,7 +53,6 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser/favorites',
-  Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     Favorite.getFavoritesByUser(Number(idUser))
@@ -67,7 +66,6 @@ usersRouter.post(
   User.emailIsFree,
   User.pseudoIsFree,
   User.validateUser,
-
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
@@ -111,6 +109,7 @@ usersRouter.put(
   (req: Request, res: Response) => {
     void (async () => {
       const { idUser } = req.params;
+
       const userUpdated = await User.update(Number(idUser), req.body as IUser);
       if (userUpdated) {
         res.status(200).send(req.body);
