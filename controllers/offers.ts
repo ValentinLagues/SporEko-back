@@ -102,7 +102,6 @@ offersRouter.post(
   Offer.upload.single('imagesOffers'),
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.file);
     void (async () => {
       try {
         const patatate = `${req.protocol}://${req.get('host')}/imagesOffers/${

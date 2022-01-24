@@ -13,7 +13,6 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
   if (req.method === '') {
     presence = 'required';
   }
-  console.log(req.file);
   const errors = Joi.object({
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
@@ -224,6 +223,8 @@ const getAll = async (
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
+
+  console.log(sql);
 
   return connection
     .promise()
