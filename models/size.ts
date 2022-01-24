@@ -3,7 +3,7 @@ import { ErrorHandler } from '../helpers/errors';
 import { ResultSetHeader } from 'mysql2';
 import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
-import Joi, { number } from 'joi';
+import Joi from 'joi';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -72,11 +72,11 @@ const getSizeById = (id: number): Promise<ISize> => {
 
 const getSizesBySizeType = (
   idSize_type: number,
-  id_gender: number = 3,
+  id_gender = 3,
   is_child: number
 ) => {
   let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
-  let sqlValues: Array<string | number> = [idSize_type];
+  const sqlValues: Array<string | number> = [idSize_type];
 
   if (id_gender) {
     sql += ` AND id_gender = ?`;
