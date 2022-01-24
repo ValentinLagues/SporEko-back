@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as User from '../models/user';
+import * as Favorite from '../models/favorite';
 import IUser from '../interfaces/IUser';
 import * as Auth from '../helpers/auth';
 import { ErrorHandler } from '../helpers/errors';
@@ -46,6 +47,17 @@ usersRouter.get(
         }
         res.status(200).json(user);
       })
+      .catch((err) => next(err));
+  }
+);
+
+usersRouter.get(
+  '/:idUser/favorites',
+  Auth.userConnected,
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idUser } = req.params;
+    Favorite.getFavoritesByUser(Number(idUser))
+      .then((favorites) => res.status(200).json(favorites))
       .catch((err) => next(err));
   }
 );
