@@ -53,7 +53,7 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser/favorites',
-  Auth.userConnected,
+  // Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     Favorite.getFavoritesByUser(Number(idUser))
