@@ -53,6 +53,13 @@ const getById = (idFavorite: number): Promise<IFavorite> => {
     .then(([results]) => results[0]);
 };
 
+const getFavoritesByUser = (idUser: number): Promise<IFavorite[]> => {
+  return connection
+    .promise()
+    .query<IFavorite[]>('SELECT * FROM favorites WHERE id_user = ?', [idUser])
+    .then(([results]) => results);
+};
+
 const create = (newFavorite: IFavorite): Promise<number> => {
   return connection
     .promise()
@@ -99,4 +106,12 @@ const destroy = (idFavorite: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export { getAll, getById, create, update, destroy, validateFavorite };
+export {
+  getAll,
+  getById,
+  create,
+  update,
+  destroy,
+  validateFavorite,
+  getFavoritesByUser,
+};
