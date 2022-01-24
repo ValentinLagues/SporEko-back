@@ -123,7 +123,7 @@ const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: 1024 * 1024 * 167 },
   fileFilter: fileFilter,
 });
 
@@ -209,7 +209,7 @@ const update = async (
   let oneValue = false;
 
   if (attibutesToUpdate.lastname) {
-    sql += oneValue ? 'lastname = ? ' : ' lastname = ? ';
+    sql += ' lastname = ? ';
     sqlValues.push(attibutesToUpdate.lastname);
     oneValue = true;
   }
@@ -306,7 +306,7 @@ const update = async (
     sqlValues.push(attibutesToUpdate.authentified_by_facebook);
     oneValue = true;
   }
-  sql += ' WHERE id_user = ?';
+  sql += ' WHERE id_user = ? ';
   sqlValues.push(idUser);
 
   return connection
