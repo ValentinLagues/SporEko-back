@@ -72,7 +72,7 @@ const getSizeById = (id: number): Promise<ISize> => {
 
 const getSizesBySizeType = (
   idSize_type: number,
-  id_gender = 3,
+  id_gender: number,
   is_child: number
 ) => {
   let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
@@ -82,14 +82,48 @@ const getSizesBySizeType = (
     sql += ` AND id_gender = ?`;
     sqlValues.push(id_gender);
   }
-  if (is_child || is_child === 0) {
+  if (is_child) {
     sql += ' AND is_child = ? ';
     sqlValues.push(is_child);
   }
 
+  console.log(sql);
+
   return connection
     .promise()
     .query<ISize[]>(sql, sqlValues)
+    .then(([results]) => results);
+};
+
+const getSizesByCategory = (
+  idCategory: number,
+  id_gender: number,
+  is_child: number
+) => {
+  let sql = `SELECT * FROM sizes`;
+
+  if (idCategory === 1 && !id_gender && !is_child) {
+    sql += ` WHERE id_size_type = 2 OR id_size_type = 3 OR id_size_type = 6`;
+  }
+  if (idCategory === 1 && is_child) {
+    sql += ` WHERE id_size_type = 6`;
+  } else if (idCategory === 1 && id_gender === 1) {
+    console.log('tov');
+    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 1`;
+  } else if (idCategory === 1 && id_gender === 2) {
+    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 2`;
+  }
+  if (idCategory === 2 && !is_child) {
+    sql += ` WHERE id_size_type = 1`;
+  } else if (idCategory === 2 && is_child) {
+    sql += ` WHERE id_size_type = 1 AND is_child = 1`;
+  }
+
+  // console.log(sql);
+
+  return connection
+    .promise()
+    .query<ISize[]>(sql)
     .then(([results]) => results);
 };
 
@@ -250,6 +284,7 @@ export {
   getAllSizes,
   getSizeById,
   getSizesBySizeType,
+  getSizesByCategory,
   createSize,
   updateSize,
   deleteSize,
