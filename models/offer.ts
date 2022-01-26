@@ -10,7 +10,7 @@ import multer from 'multer';
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
-  if (req.method === '') {
+  if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
@@ -237,6 +237,25 @@ const getById = async (idOffer: number): Promise<IOffer> => {
     .promise()
     .query<IOffer[]>('SELECT * FROM offers WHERE id_offer = ?', [idOffer])
     .then(([results]) => results[0]);
+};
+
+const getByIdSeller = async (idOffer: number): Promise<IOffer> => {
+  return connection
+    .promise()
+    .query<IOffer[string | number]>(
+      'SELECT * FROM offers WHERE id_user_seller = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
+const getByIdBuyer = async (idOffer: number): Promise<IOffer> => {
+  return connection
+    .promise()
+    .query<IOffer[string | number]>(
+      'SELECT * FROM offers WHERE id_user_buyer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
 };
 
 const create = async (newOffer: IOffer): Promise<number> => {
@@ -517,6 +536,8 @@ const destroy = async (idOffer: number): Promise<boolean> => {
 export {
   getAll,
   getById,
+  getByIdSeller,
+  getByIdBuyer,
   recordExists,
   create,
   update,
