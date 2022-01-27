@@ -9,6 +9,7 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
+  // console.log(req.body)
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -224,7 +225,7 @@ const getAll = async (
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
 
-  console.log(sql);
+  // console.log(sql);
 
   return connection
     .promise()
