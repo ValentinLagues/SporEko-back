@@ -10,6 +10,7 @@ interface IFilter {
   sort: string | undefined;
   // firstItem: number;
   // limit: number;
+  title: string | undefined;
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
@@ -36,6 +37,7 @@ offersRouter.get(
       sort,
       // firstItem,
       // limit,
+      title,
       id_user_seller,
       id_sport,
       id_gender,
@@ -61,6 +63,7 @@ offersRouter.get(
       order,
       // firstItem,
       // limit,
+      String(title),
       Number(id_user_seller),
       Number(id_sport),
       Number(id_gender),
@@ -77,6 +80,7 @@ offersRouter.get(
       Number(maxPrice)
     )
       .then((offers: Array<IOffer>) => {
+        console.log(offers);
         res.status(200).json(offers);
       })
       .catch((err) => next(err));
@@ -123,6 +127,7 @@ offersRouter.post(
   '/',
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.body)
     void (async () => {
       try {
         const offer = req.body as IOffer;
