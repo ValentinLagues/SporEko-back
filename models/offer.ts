@@ -112,6 +112,7 @@ const getAll = async (
   order: string,
   // firstItem: string,
   // limit: string,
+  title: string,
   id_user_seller: number,
   id_sport: number,
   id_gender: number,
@@ -125,7 +126,7 @@ const getAll = async (
   id_color2: number,
   id_condition: number,
   minPrice: number,
-  maxPrice: number
+  maxPrice: number,
 ): Promise<IOffer[]> => {
   if (sortBy === 'id') {
     sortBy = 'id_offer';
@@ -204,6 +205,13 @@ const getAll = async (
       : ` WHERE id_condition = ${id_condition}`;
     oneValue = true;
   }
+  console.log(title);
+  if (title) {
+    sql += oneValue
+      ? ` AND title LIKE '%${title}%'`
+      : ` WHERE title LIKE '%${title}%'`;
+    oneValue = true;
+  }
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
       sql += oneValue
@@ -229,8 +237,7 @@ const getAll = async (
   return connection
     .promise()
     .query<IOffer[]>(sql)
-    .then(([results]) => results);
-};
+    .then(([results]) => {console.log(results); return results})}
 
 const getById = async (idOffer: number): Promise<IOffer> => {
   return connection
