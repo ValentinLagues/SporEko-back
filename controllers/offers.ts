@@ -126,7 +126,9 @@ offersRouter.post(
     void (async () => {
       try {
         const offer = req.body as IOffer;
+        console.log('check');
         offer.id_offer = await Offer.create(offer);
+        console.log(offer.id_offer);
         res.status(201).json(offer);
       } catch (err) {
         next(err);

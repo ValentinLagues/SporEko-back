@@ -13,6 +13,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
   if (req.method === '') {
     presence = 'required';
   }
+  console.log(req.body);
   const errors = Joi.object({
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
@@ -188,8 +189,8 @@ const getAll = async (
   }
   if (id_color1) {
     sql += oneValue
-      ? ` AND id_color1 = ${id_color1}`
-      : ` WHERE id_color1 = ${id_color1}`;
+      ? ` AND (id_color1 = ${id_color1} OR id_color2 = ${id_color1})`
+      : ` WHERE (id_color1 = ${id_color1} OR id_color2 = ${id_color1})`;
     oneValue = true;
   }
   if (id_color2) {
@@ -224,8 +225,6 @@ const getAll = async (
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
 
-  console.log(sql);
-
   return connection
     .promise()
     .query<IOffer[]>(sql)
@@ -240,6 +239,7 @@ const getById = async (idOffer: number): Promise<IOffer> => {
 };
 
 const create = async (newOffer: IOffer): Promise<number> => {
+  console.log('create');
   return connection
     .promise()
     .query<ResultSetHeader>(
