@@ -155,6 +155,7 @@ offersRouter.post(
   '/',
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.body)
     void (async () => {
       try {
         const offer = req.body as IOffer;
