@@ -16,8 +16,12 @@ const validateDeliverer_price = (
     required = 'required';
   }
   const errors = Joi.object({
-    name: Joi.string().max(50).presence(required),
-    id_category: Joi.number().integer().presence(required),
+    id_deliverer_price: Joi.number().integer(),
+    name: Joi.string().max(150).presence(required),
+    min_weight: Joi.number().integer().presence(required),
+    max_weight: Joi.number().integer().presence(required),
+    price: Joi.number().positive().precision(2).strict().presence(required),
+    id_deliverer: Joi.number().integer().presence(required),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -84,29 +88,49 @@ const createDeliverer_price = (
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO deliverer_prices (name, id_category) VALUES (?, ?)',
-      [newDeliverer_price.name, newDeliverer_price.id_category]
+      'INSERT INTO deliverer_prices (name, min_weight, max_weight, price, id_deliverer,) VALUES (?, ?, ?, ?, ?)',
+      [
+        newDeliverer_price.name,
+        newDeliverer_price.min_weight,
+        newDeliverer_price.max_weight,
+        newDeliverer_price.price,
+        newDeliverer_price.id_deliverer,
+      ]
     )
     .then(([results]) => results.insertId);
 };
 
 const updateDeliverer_price = (
   id: number,
-  name: string,
-  id_category: number
+  attibutesToUpdate: IDeliverer_price
 ): Promise<boolean> => {
   let sql = 'UPDATE deliverer_prices SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-  if (name) {
+  if (attibutesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(name);
+    sqlValues.push(attibutesToUpdate.name);
     oneValue = true;
   }
-  if (id_category) {
-    sql += oneValue ? ', id_category = ? ' : ' id_category = ? ';
-    sqlValues.push(id_category);
+  if (attibutesToUpdate.min_weight) {
+    sql += oneValue ? ', min_weight = ? ' : ' min_weight = ? ';
+    sqlValues.push(attibutesToUpdate.min_weight);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.max_weight) {
+    sql += oneValue ? ', max_weight = ? ' : ' max_weight = ? ';
+    sqlValues.push(attibutesToUpdate.max_weight);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.price) {
+    sql += oneValue ? ', price = ? ' : ' price = ? ';
+    sqlValues.push(attibutesToUpdate.price);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.id_deliverer) {
+    sql += oneValue ? ', id_deliverer = ? ' : ' id_deliverer = ? ';
+    sqlValues.push(attibutesToUpdate.id_deliverer);
     oneValue = true;
   }
   sql += ' WHERE id_deliverer_price = ?';

@@ -14,6 +14,7 @@ const validateItem = (req: Request, res: Response, next: NextFunction) => {
   const errors = Joi.object({
     name: Joi.string().max(50).presence(required),
     id_category: Joi.number().integer().presence(required),
+    id_size_type: Joi.number().integer().presence(required),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -78,7 +79,7 @@ const createItem = (newItem: IItem): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO items (name, id_category) VALUES (?, ?)',
+      'INSERT INTO items (name, id_category, id_size_type) VALUES (?, ?, ?)',
       [newItem.name, newItem.id_category]
     )
     .then(([results]) => results.insertId);
@@ -87,7 +88,8 @@ const createItem = (newItem: IItem): Promise<number> => {
 const updateItem = (
   id: number,
   name: string,
-  id_category: number
+  id_category: number,
+  id_size_type: number
 ): Promise<boolean> => {
   let sql = 'UPDATE items SET ';
   const sqlValues: Array<string | number> = [];
@@ -101,6 +103,11 @@ const updateItem = (
   if (id_category) {
     sql += oneValue ? ', id_category = ? ' : ' id_category = ? ';
     sqlValues.push(id_category);
+    oneValue = true;
+  }
+  if (id_size_type) {
+    sql += oneValue ? ', id_size_type = ? ' : ' id_size_type = ? ';
+    sqlValues.push(id_size_type);
     oneValue = true;
   }
   sql += ' WHERE id_item = ?';

@@ -9,7 +9,7 @@ export default interface IOffer extends RowDataPacket {
   description: string;
   id_sport: number;
   id_gender: number;
-  ischild: number;
+  is_child: number;
   id_category: number;
   id_item: number;
   id_brand: number;
@@ -25,8 +25,8 @@ export default interface IOffer extends RowDataPacket {
   hand_delivery: number;
   colissimo_delivery: number;
   mondial_relay_delivery: number;
-  isarchived: number;
-  isdraft: number;
+  is_archived: number;
+  is_draft: number;
   picture2: string;
   picture3: string;
   picture4: string;

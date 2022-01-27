@@ -1,5 +1,5 @@
 import connection from '../db-config.js';
-import { Field, ResultSetHeader } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
@@ -13,7 +13,6 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
-    console.log(req.file);
     req.file;
   }
   const errors = Joi.object({
@@ -21,18 +20,18 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     id_user: Joi.number(),
     lastname: Joi.string().max(255).presence(presence),
     firstname: Joi.string().max(255).presence(presence),
-    adress: Joi.string().max(255),
+    address: Joi.string().max(255),
     zipcode: Joi.number().integer().max(99999),
     city: Joi.string().max(255),
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
     picture: Joi.string().max(255),
     id_country: Joi.number().integer().min(1).presence(presence),
-    isadmin: Joi.number().integer().min(0).max(1),
-    isarchived: Joi.number().integer().min(0).max(1),
-    isprofessional: Joi.number().integer().min(0).max(1).presence(presence),
+    is_admin: Joi.number().integer().min(0).max(1),
+    is_archived: Joi.number().integer().min(0).max(1),
+    is_professional: Joi.number().integer().min(0).max(1).presence(presence),
     id_gender: Joi.number().integer().min(1).presence(presence),
-    adress_complement: Joi.string().max(255),
+    address_complement: Joi.string().max(255),
     id_athletic: Joi.number().integer().min(1),
     birthday: Joi.string().max(50),
     phone: Joi.string().max(14),
@@ -124,7 +123,7 @@ const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: 1024 * 1024 * 167 },
   fileFilter: fileFilter,
 });
 
@@ -175,22 +174,22 @@ const create = async (newUser: IUser): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO users (lastname, firstname, adress, zipcode, city, email, isprofessional, hash_password, picture, isadmin, isarchived, id_gender,id_country, adress_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO users (lastname, firstname, address, zipcode, city, email, is_professional, hash_password, picture, is_admin, is_archived, id_gender,id_country, address_complement, id_athletic, birthday, phone, pseudo, authentified_by_facebook) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newUser.lastname,
         newUser.firstname,
-        newUser.adress,
+        newUser.address,
         newUser.zipcode,
         newUser.city,
         newUser.email,
-        newUser.isprofessional,
+        newUser.is_professional,
         hashedPassword,
         newUser.picture,
-        newUser.isadmin,
-        newUser.isarchived,
+        newUser.is_admin,
+        newUser.is_archived,
         newUser.id_gender,
         newUser.id_country,
-        newUser.adress_complement,
+        newUser.address_complement,
         newUser.id_athletic,
         newUser.birthday,
         newUser.phone,
@@ -210,7 +209,7 @@ const update = async (
   let oneValue = false;
 
   if (attibutesToUpdate.lastname) {
-    sql += 'lastname = ? ';
+    sql += ' lastname = ? ';
     sqlValues.push(attibutesToUpdate.lastname);
     oneValue = true;
   }
@@ -219,9 +218,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.firstname);
     oneValue = true;
   }
-  if (attibutesToUpdate.adress) {
-    sql += oneValue ? ', adress = ? ' : ' adress = ? ';
-    sqlValues.push(attibutesToUpdate.adress);
+  if (attibutesToUpdate.address) {
+    sql += oneValue ? ', address = ? ' : ' address = ? ';
+    sqlValues.push(attibutesToUpdate.address);
     oneValue = true;
   }
   if (attibutesToUpdate.zipcode) {
@@ -250,19 +249,19 @@ const update = async (
     sqlValues.push(attibutesToUpdate.picture);
     oneValue = true;
   }
-  if (attibutesToUpdate.isadmin) {
-    sql += oneValue ? ', isadmin = ? ' : ' isadmin = ? ';
-    sqlValues.push(attibutesToUpdate.isadmin);
+  if (attibutesToUpdate.is_admin) {
+    sql += oneValue ? ', is_admin = ? ' : ' is_admin = ? ';
+    sqlValues.push(attibutesToUpdate.is_admin);
     oneValue = true;
   }
-  if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', isarchived = ? ' : ' isarchived = ? ';
-    sqlValues.push(attibutesToUpdate.isarchived);
+  if (attibutesToUpdate.is_archived) {
+    sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
+    sqlValues.push(attibutesToUpdate.is_archived);
     oneValue = true;
   }
-  if (attibutesToUpdate.isprofessional) {
-    sql += oneValue ? ', isprofessional = ? ' : ' isprofessional = ? ';
-    sqlValues.push(attibutesToUpdate.isprofessional);
+  if (attibutesToUpdate.is_professional) {
+    sql += oneValue ? ', is_professional = ? ' : ' is_professional = ? ';
+    sqlValues.push(attibutesToUpdate.is_professional);
     oneValue = true;
   }
   if (attibutesToUpdate.id_gender) {
@@ -275,9 +274,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.id_country);
     oneValue = true;
   }
-  if (attibutesToUpdate.adress_complement) {
-    sql += oneValue ? ', adress_complement = ? ' : ' adress_complement = ? ';
-    sqlValues.push(attibutesToUpdate.adress_complement);
+  if (attibutesToUpdate.address_complement) {
+    sql += oneValue ? ', address_complement = ? ' : ' address_complement = ? ';
+    sqlValues.push(attibutesToUpdate.address_complement);
     oneValue = true;
   }
   if (attibutesToUpdate.id_athletic) {
@@ -307,7 +306,7 @@ const update = async (
     sqlValues.push(attibutesToUpdate.authentified_by_facebook);
     oneValue = true;
   }
-  sql += ' WHERE id_user = ?';
+  sql += ' WHERE id_user = ? ';
   sqlValues.push(idUser);
 
   return connection
@@ -325,7 +324,7 @@ const updateImage = (idUser: number, picture: string): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = async (idUser: number): Promise<boolean> => {
+const destroy = (idUser: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM users WHERE id_user = ?', [idUser])

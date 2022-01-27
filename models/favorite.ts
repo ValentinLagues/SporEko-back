@@ -3,22 +3,18 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import IOffer_deliverer from '../interfaces/IOffer_deliverer';
+import IFavorite from '../interfaces/IFavorite';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateOffer_deliverer = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const validateFavorite = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
     id_offer: Joi.number().integer().presence(presence),
-    id_deliverer: Joi.number().integer().presence(presence),
+    id_user: Joi.number().integer().presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -30,49 +26,55 @@ const validateOffer_deliverer = (
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_offer_deliverer',
+  sortBy = 'id_favorite',
   order = 'ASC'
   // firstItem: string,
   // limit: string
-): Promise<IOffer_deliverer[]> => {
-  const sql = `SELECT * FROM offer_deliverers ORDER BY ${sortBy} ${order}`;
+): Promise<IFavorite[]> => {
+  const sql = `SELECT * FROM favorites ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
-    sortBy = 'id_offer_deliverer';
+    sortBy = 'id_favorite';
   }
   // if (limit) {
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
   return connection
     .promise()
-    .query<IOffer_deliverer[]>(sql)
+    .query<IFavorite[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idOffer_deliverer: number): Promise<IOffer_deliverer> => {
+const getById = (idFavorite: number): Promise<IFavorite> => {
   return connection
     .promise()
-    .query<IOffer_deliverer[]>(
-      'SELECT * FROM offer_deliverers WHERE id_offer_deliverer = ?',
-      [idOffer_deliverer]
-    )
+    .query<IFavorite[]>('SELECT * FROM favorites WHERE id_favorite = ?', [
+      idFavorite,
+    ])
     .then(([results]) => results[0]);
 };
 
-const create = (newOffer_deliverer: IOffer_deliverer): Promise<number> => {
+const getFavoritesByUser = (idUser: number): Promise<IFavorite[]> => {
+  return connection
+    .promise()
+    .query<IFavorite[]>('SELECT * FROM favorites WHERE id_user = ?', [idUser])
+    .then(([results]) => results);
+};
+
+const create = (newFavorite: IFavorite): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offer_deliverers (id_offer, id_deliverer) VALUES (?, ?)',
-      [newOffer_deliverer.id_offer, newOffer_deliverer.id_deliverer]
+      'INSERT INTO favorites (id_offer, id_user) VALUES (?, ?)',
+      [newFavorite.id_offer, newFavorite.id_user]
     )
     .then(([results]) => results.insertId);
 };
 
 const update = (
-  idOffer_deliverer: number,
-  attibutesToUpdate: IOffer_deliverer
+  idFavorite: number,
+  attibutesToUpdate: IFavorite
 ): Promise<boolean> => {
-  let sql = 'UPDATE offer_deliverers SET ';
+  let sql = 'UPDATE favorites SET ';
   const sqlValues: Array<string | number> = [];
 
   let oneValue = false;
@@ -81,13 +83,13 @@ const update = (
     sqlValues.push(attibutesToUpdate.id_offer);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_deliverer) {
-    sql += oneValue ? ', id_deliverer = ? ' : ' id_deliverer = ? ';
-    sqlValues.push(attibutesToUpdate.id_deliverer);
+  if (attibutesToUpdate.id_user) {
+    sql += oneValue ? ', id_user = ? ' : ' id_user = ? ';
+    sqlValues.push(attibutesToUpdate.id_user);
     oneValue = true;
   }
-  sql += ' WHERE id_offer_deliverer = ?';
-  sqlValues.push(idOffer_deliverer);
+  sql += ' WHERE id_favorite = ?';
+  sqlValues.push(idFavorite);
 
   return connection
     .promise()
@@ -95,14 +97,21 @@ const update = (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = (idOffer_deliverer: number): Promise<boolean> => {
+const destroy = (idFavorite: number): Promise<boolean> => {
   return connection
     .promise()
-    .query<ResultSetHeader>(
-      'DELETE FROM offer_deliverers WHERE id_offer_deliverer = ?',
-      [idOffer_deliverer]
-    )
+    .query<ResultSetHeader>('DELETE FROM favorites WHERE id_favorite = ?', [
+      idFavorite,
+    ])
     .then(([results]) => results.affectedRows === 1);
 };
 
-export { getAll, getById, create, update, destroy, validateOffer_deliverer };
+export {
+  getAll,
+  getById,
+  create,
+  update,
+  destroy,
+  validateFavorite,
+  getFavoritesByUser,
+};

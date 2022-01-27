@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as User from '../models/user';
+import * as Offer from '../models/offer';
+import * as Favorite from '../models/favorite';
 import IUser from '../interfaces/IUser';
 import * as Auth from '../helpers/auth';
 import { ErrorHandler } from '../helpers/errors';
@@ -50,22 +52,42 @@ usersRouter.get(
   }
 );
 
+usersRouter.get(
+  '/:idUser/favorites',
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idUser } = req.params;
+    Favorite.getFavoritesByUser(Number(idUser))
+      .then((favorites) => res.status(200).json(favorites))
+      .catch((err) => next(err));
+  }
+);
+
+usersRouter.get(
+  '/:idUser/offers',
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idUser } = req.params;
+    Offer.getOfferByIdUser(Number(idUser))
+      .then((user) => {
+        if (user === undefined) {
+          res.status(404).send('User not found');
+        }
+        res.status(200).json(user);
+      })
+      .catch((err) => next(err));
+  }
+);
+
 usersRouter.post(
   '/',
   User.emailIsFree,
   User.pseudoIsFree,
-  User.upload.single('imageUser'),
   User.validateUser,
-
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        console.log(req.file);
-        const picture = `${req.protocol}://${req.get('host')}/imageUser/${
-          req.file?.filename
-        }`;
         const user = req.body as IUser;
-        user.id_user = await User.create({ ...user, picture: picture });
+        user.id_user = await User.create(user);
         res.status(201).json(user);
       } catch (err) {
         next(err);
@@ -75,7 +97,7 @@ usersRouter.post(
 );
 
 usersRouter.put(
-  '/image/:id',
+  '/:id/image',
   Auth.userConnected,
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
@@ -104,6 +126,7 @@ usersRouter.put(
   (req: Request, res: Response) => {
     void (async () => {
       const { idUser } = req.params;
+
       const userUpdated = await User.update(Number(idUser), req.body as IUser);
       if (userUpdated) {
         res.status(200).send(req.body);

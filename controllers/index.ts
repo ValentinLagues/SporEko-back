@@ -16,6 +16,8 @@ import categoriesRouter from './categories';
 import itemsRouter from './items';
 import authRouter from './auth';
 import countriesRouter from './countries';
+import size_typesRouter from './size_types';
+import favoritesRouter from './favorites';
 
 const setupRoutes = (app: express.Application) => {
   app.use('/users', usersRouter);
@@ -24,6 +26,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/countries', countriesRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
+  app.use('/size_types', size_typesRouter);
   app.use('/conditions', conditionsRouter);
   app.use('/deliverers', deliverersRouter);
   app.use('/deliverer_prices', deliverer_pricesRouter);
@@ -34,6 +37,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/textiles', textilesRouter);
   app.use('/categories', categoriesRouter);
   app.use('/items', itemsRouter);
+  app.use('/favorites', favoritesRouter);
   app.use('/login', authRouter);
 };
 

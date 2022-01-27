@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
+import { AnyRecord } from 'dns';
 
 const offersRouter = Router();
 
@@ -94,6 +95,27 @@ offersRouter.get(
         res.status(200).json(offer);
       })
       .catch((err) => next(err));
+  }
+);
+
+offersRouter.post(
+  '/images',
+  Offer.upload.array('imagesOffers', 20),
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const reqFile: any = req.files;
+        const pictures: Array<string> = [];
+        reqFile.map((el: any) => {
+          const url = `${req.protocol}://${req.get('host')}/${el.path}`;
+          pictures.push(url);
+        });
+        const offer = await { ...pictures };
+        res.status(201).json(offer);
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
