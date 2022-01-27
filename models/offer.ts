@@ -206,7 +206,6 @@ const getAll = async (
       : ` WHERE id_condition = ${id_condition}`;
     oneValue = true;
   }
-  console.log(title);
   if (title) {
     sql += oneValue
       ? ` AND title LIKE '%${title}%'`
