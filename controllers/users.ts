@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as User from '../models/user';
+import * as Offer from '../models/offer';
 import * as Favorite from '../models/favorite';
 import IUser from '../interfaces/IUser';
 import * as Auth from '../helpers/auth';
@@ -62,6 +63,22 @@ usersRouter.get(
   }
 );
 
+usersRouter.get(
+  '/:idUser/offers',
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idUser } = req.params;
+    Offer.getOfferByIdUser(Number(idUser))
+      .then((user) => {
+        if (user === undefined) {
+          res.status(404).send('User not found');
+        }
+        res.status(200).json(user);
+      })
+      .catch((err) => next(err));
+  }
+);
+
 usersRouter.post(
   '/',
   User.emailIsFree,
@@ -96,7 +113,7 @@ usersRouter.post(
 );
 
 usersRouter.put(
-  '/image/:id',
+  '/:id/image',
   Auth.userConnected,
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
