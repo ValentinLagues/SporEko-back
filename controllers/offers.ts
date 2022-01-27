@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
+import { AnyRecord } from 'dns';
 
 const offersRouter = Router();
 
