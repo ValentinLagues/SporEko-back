@@ -232,8 +232,6 @@ const getAll = async (
   //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   // }
 
-  // console.log(sql);
-
   return connection
     .promise()
     .query<IOffer[]>(sql)
@@ -246,21 +244,12 @@ const getById = async (idOffer: number): Promise<IOffer> => {
     .then(([results]) => results[0]);
 };
 
-const getByIdSeller = async (idOffer: number): Promise<IOffer> => {
+const getOfferByIdUser = async (idOffer: number): Promise<IOffer> => {
   return connection
     .promise()
     .query<IOffer[string | number]>(
-      'SELECT * FROM offers WHERE id_user_seller = ?',
-      [idOffer]
-    )
-    .then(([results]) => results);
-};
-const getByIdBuyer = async (idOffer: number): Promise<IOffer> => {
-  return connection
-    .promise()
-    .query<IOffer[string | number]>(
-      'SELECT * FROM offers WHERE id_user_buyer = ?',
-      [idOffer]
+      'SELECT * FROM offers WHERE id_user_seller = ? or id_user_buyer = ?',
+      [idOffer, idOffer]
     )
     .then(([results]) => results);
 };
@@ -543,8 +532,7 @@ const destroy = async (idOffer: number): Promise<boolean> => {
 export {
   getAll,
   getById,
-  getByIdSeller,
-  getByIdBuyer,
+  getOfferByIdUser,
   recordExists,
   create,
   update,
@@ -552,3 +540,6 @@ export {
   validateOffer,
   upload,
 };
+export function getByIdOffer(arg0: number) {
+  throw new Error('Function not implemented.');
+}

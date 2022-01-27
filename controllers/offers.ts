@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
+import { AnyRecord } from 'dns';
 
 const offersRouter = Router();
 
@@ -91,35 +92,6 @@ offersRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { idOffer } = req.params;
     Offer.getById(Number(idOffer))
-      .then((offer: IOffer) => {
-        if (offer === undefined) {
-          res.status(404).send('Offer not found');
-        }
-        res.status(200).json(offer);
-      })
-      .catch((err) => next(err));
-  }
-);
-// Search offers by User
-offersRouter.get(
-  '/:idUser/seller/',
-  (req: Request, res: Response, next: NextFunction) => {
-    const { idUser } = req.params;
-    Offer.getByIdSeller(Number(idUser))
-      .then((offer: IOffer) => {
-        if (offer === undefined) {
-          res.status(404).send('Offer not found');
-        }
-        res.status(200).json(offer);
-      })
-      .catch((err) => next(err));
-  }
-);
-offersRouter.get(
-  '/:idUser/buyer/',
-  (req: Request, res: Response, next: NextFunction) => {
-    const { idUser } = req.params;
-    Offer.getByIdBuyer(Number(idUser))
       .then((offer: IOffer) => {
         if (offer === undefined) {
           res.status(404).send('Offer not found');
