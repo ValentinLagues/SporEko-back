@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
+import { string } from 'joi';
 
 const offersRouter = Router();
 
@@ -62,8 +63,9 @@ offersRouter.get(
       order,
       // firstItem,
       // limit,
-      String(title),
+
       Number(id_user_seller),
+      title as string,
       Number(id_sport),
       Number(id_gender),
       Number(ischild),
