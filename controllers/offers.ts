@@ -2,7 +2,6 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
-import { AnyRecord } from 'dns';
 
 const offersRouter = Router();
 
@@ -138,7 +137,7 @@ offersRouter.post(
 offersRouter.put(
   '/:idOffer',
   Offer.recordExists,
-  Offer.validateOffer,
+  // Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
       const { idOffer } = req.params;
