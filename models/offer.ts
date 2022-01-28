@@ -113,8 +113,8 @@ const getAll = async (
   order: string,
   // firstItem: string,
   // limit: string,
-  title: string,
   id_user_seller: number,
+  title: string,
   id_sport: number,
   id_gender: number,
   is_child: number,
@@ -138,6 +138,12 @@ const getAll = async (
 
   if (id_user_seller) {
     sql += ` WHERE id_user_seller = ${id_user_seller}`;
+    oneValue = true;
+  }
+  if (title) {
+    sql += oneValue
+      ? ` AND title LIKE '%${title}%'`
+      : ` WHERE title LIKE '%${title}%'`;
     oneValue = true;
   }
   if (id_sport) {
@@ -206,12 +212,7 @@ const getAll = async (
       : ` WHERE id_condition = ${id_condition}`;
     oneValue = true;
   }
-  if (title) {
-    sql += oneValue
-      ? ` AND title LIKE '%${title}%'`
-      : ` WHERE title LIKE '%${title}%'`;
-    oneValue = true;
-  }
+
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
       sql += oneValue
