@@ -50,7 +50,7 @@ favoritesRouter.post(
     void (async () => {
       try {
         const favorite = req.body as IFavorite;
-        favorite.id_favorite = await Favorite.create(favorite);
+        favorite.id_favorite = await Favorite.createFavorite(favorite);
         res.status(201).json(favorite);
       } catch (err) {
         next(err);
@@ -87,7 +87,7 @@ favoritesRouter.delete(
     void (async () => {
       try {
         const { idFavorite } = req.params;
-        const favoriteDeleted = await Favorite.destroy(Number(idFavorite));
+        const favoriteDeleted = await Favorite.destroyFavorite(Number(idFavorite));
         if (favoriteDeleted) {
           res.status(200).send('Favorite deleted');
         } else {

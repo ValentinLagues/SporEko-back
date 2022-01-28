@@ -5,6 +5,7 @@ import * as Favorite from '../models/favorite';
 import IUser from '../interfaces/IUser';
 import * as Auth from '../helpers/auth';
 import { ErrorHandler } from '../helpers/errors';
+import IFavorite from '../interfaces/IFavorite';
 
 const usersRouter = Router();
 
@@ -38,7 +39,7 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser',
-  Auth.userConnected,
+  // Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     User.getById(Number(idUser))
@@ -96,6 +97,21 @@ usersRouter.post(
   }
 );
 
+usersRouter.post(
+  '/:id/favorites',
+  (req: Request, res: Response, next: NextFunction) => {
+      void (async () => {
+        try {
+          const favorite = req.body as IFavorite;
+          favorite.id_favorite = await Favorite.createFavorite(favorite);
+          res.status(201).json(favorite);
+        } catch (err) {
+          next(err);
+        }
+      })();
+    }
+);
+
 usersRouter.put(
   '/:id/image',
   Auth.userConnected,
@@ -132,6 +148,25 @@ usersRouter.put(
         res.status(200).send(req.body);
       } else {
         throw new ErrorHandler(500, `User can't be updated`);
+      }
+    })();
+  }
+);
+
+usersRouter.delete(
+'/:id/favorites/:idFavorite',
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const { idFavorite } = req.params;
+        const favoriteDeleted = await Favorite.destroyFavorite(Number(idFavorite));
+        if (favoriteDeleted) {
+          res.status(200).send('Favorite deleted');
+        } else {
+          throw new ErrorHandler(404, `Favorite not found`);
+        }
+      } catch (err) {
+        next(err);
       }
     })();
   }

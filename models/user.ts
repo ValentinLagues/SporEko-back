@@ -5,6 +5,7 @@ import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IUser from '../interfaces/IUser';
+import IFavorite from '../interfaces/IFavorite.js';
 import multer from 'multer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
@@ -199,6 +200,7 @@ const create = async (newUser: IUser): Promise<number> => {
     )
     .then(([results]) => results.insertId);
 };
+
 
 const update = async (
   idUser: number,
