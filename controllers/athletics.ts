@@ -53,14 +53,14 @@ athleticsRouter.post(
 );
 
 athleticsRouter.put(
-  '/:id',
+  '/:idAthletic',
   Athletics.nameIsFree,
   Athletics.validateAthletics,
   (req: Request, res: Response) => {
     void (async () => {
-      const { id } = req.params;
+      const { idAthletic } = req.params;
       const athleticUpdated = await Athletics.update(
-        Number(id),
+        Number(idAthletic),
         req.body as IAthletics
       );
       if (athleticUpdated) {

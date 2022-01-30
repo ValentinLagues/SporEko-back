@@ -40,7 +40,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const color = req.body as IColor;
     const colorWithSameName: IColor = await getByName(color.name);
-    if (colorWithSameName) {
+    if (colorWithSameName && colorWithSameName.id_color !== req.body.id_color) {
       next(new ErrorHandler(409, `Color name already exists`));
     } else {
       next();
@@ -90,7 +90,7 @@ const getByName = async (name: string): Promise<IColor> => {
 const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
   const colorWithSameCode: IColor = await getByCode(color.color_code);
-  if (colorWithSameCode) {
+  if (colorWithSameCode && colorWithSameCode.id_color !== req.body.id_color) {
     next(new ErrorHandler(409, `Color code already exists`));
   } else {
     next();

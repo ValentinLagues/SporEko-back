@@ -13,6 +13,8 @@ const validateCategory = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_category: Joi.number(),
     name: Joi.string().max(50).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -36,18 +38,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_category',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ICategory[]> => {
-  const sql = `SELECT * FROM categories ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_category';
+  let sql = `SELECT *, id_category as id FROM categories`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_category ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ICategory[]>(sql)

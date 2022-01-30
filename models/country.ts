@@ -88,13 +88,28 @@ const update = (
   idCountry: number,
   newAttributes: ICountries
 ): Promise<boolean> => {
-  return connection
-    .promise()
-    .query<ResultSetHeader>('UPDATE countries SET ? WHERE id_country = ?', [
-      newAttributes,
-      idCountry,
-    ])
-    .then(([results]) => results.affectedRows === 1);
+  let sql = 'UPDATE countries SET ';
+  const sqlValues: Array<string | number> = [];
+
+  if (newAttributes.name) {
+    sql += 'name = ? ';
+    sqlValues.push(newAttributes.name);
+  }
+  sql += ' WHERE id_country = ?';
+  sqlValues.push(idCountry);
+
+  return (
+    connection
+      .promise()
+      .query<ResultSetHeader>(sql, sqlValues)
+      // return connection
+      //   .promise()
+      //   .query<ResultSetHeader>('UPDATE countries SET ? WHERE id_country = ?', [
+      //     newAttributes,
+      //     idCountry,
+      //   ])
+      .then(([results]) => results.affectedRows === 1)
+  );
 };
 
 const destroy = (idCountry: number): Promise<boolean> => {

@@ -11,6 +11,8 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
     required = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_gender: Joi.number(),
     adult_name: Joi.string().max(50).presence(required),
     child_name: Joi.string().max(50).presence(required),
   }).validate(req.body, { abortEarly: false }).error;
@@ -23,18 +25,23 @@ const validateGender = (req: Request, res: Response, next: NextFunction) => {
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllGenders = (
-  sortBy = 'id_gender',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IGender[]> => {
-  const sql = `SELECT * FROM genders ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_gender';
+  let sql = `SELECT *, id_gender as id FROM genders`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_gender ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IGender[]>(sql)

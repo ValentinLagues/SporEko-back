@@ -86,14 +86,21 @@ const create = (newAthletic: IAthletics): Promise<number> => {
 
 const update = (
   idAthletic: number,
-  newAttributes: IAthletics
+  attibutesToUpdate: IAthletics
 ): Promise<boolean> => {
+  let sql = 'UPDATE athletics SET ';
+  const sqlValues: Array<string | number> = [];
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+  }
+  sql += ' WHERE id_athletic = ?';
+  sqlValues.push(idAthletic);
+
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE athletics SET ? WHERE id_athletic = ?', [
-      newAttributes,
-      idAthletic,
-    ])
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
 };
 
