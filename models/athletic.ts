@@ -13,6 +13,8 @@ const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_athletic: Joi.number(),
     name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -36,18 +38,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_athletic',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IAthletics[]> => {
-  const sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_athletic';
+  let sql = `SELECT *, id_athletic as id FROM athletics`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_athletic ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IAthletics[]>(sql)

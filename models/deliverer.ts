@@ -13,6 +13,8 @@ const validateDeliverer = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_deliverer: Joi.number(),
     name: Joi.string().max(50).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -37,18 +39,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_deliverer',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IDeliverer[]> => {
-  const sql = `SELECT * FROM deliverers ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_deliverer';
+  let sql = `SELECT *, id_deliverer as id FROM deliverers`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_deliverer ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IDeliverer[]>(sql)

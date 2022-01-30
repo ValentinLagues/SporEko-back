@@ -87,8 +87,6 @@ const getSizesBySizeType = (
     sqlValues.push(is_child);
   }
 
-  console.log(sql);
-
   return connection
     .promise()
     .query<ISize[]>(sql, sqlValues)
@@ -108,7 +106,6 @@ const getSizesByCategory = (
   if (idCategory === 1 && is_child) {
     sql += ` WHERE id_size_type = 6`;
   } else if (idCategory === 1 && id_gender === 1) {
-    console.log('tov');
     sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 1`;
   } else if (idCategory === 1 && id_gender === 2) {
     sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 2`;
@@ -118,8 +115,6 @@ const getSizesByCategory = (
   } else if (idCategory === 2 && is_child) {
     sql += ` WHERE id_size_type = 1 AND is_child = 1`;
   }
-
-  // console.log(sql);
 
   return connection
     .promise()

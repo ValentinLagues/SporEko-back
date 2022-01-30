@@ -13,6 +13,7 @@ const validateColor = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_color: Joi.number(),
     name: Joi.string().max(50).presence(presence),
     color_code: Joi.string().min(7).max(9).presence(presence),
@@ -49,18 +50,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = async (
-  sortBy = 'id_color',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IColor[]> => {
-  const sql = `SELECT * FROM colors ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_color';
+  let sql = `SELECT *, id_color as id FROM colors`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_color ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IColor[]>(sql)

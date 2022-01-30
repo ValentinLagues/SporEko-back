@@ -9,7 +9,6 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
-  // console.log(req.body)
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -127,7 +126,7 @@ const getAll = async (
   id_color2: number,
   id_condition: number,
   minPrice: number,
-  maxPrice: number,
+  maxPrice: number
 ): Promise<IOffer[]> => {
   if (sortBy === 'id') {
     sortBy = 'id_offer';
@@ -236,7 +235,10 @@ const getAll = async (
   return connection
     .promise()
     .query<IOffer[]>(sql)
-    .then(([results]) => {console.log(results); return results})}
+    .then(([results]) => {
+      return results;
+    });
+};
 
 const getById = async (idOffer: number): Promise<IOffer> => {
   return connection
