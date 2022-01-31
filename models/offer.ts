@@ -113,7 +113,6 @@ const getAll = async (
   order: string,
   // firstItem: string,
   // limit: string,
-
   id_user_seller: number,
   title: string,
   id_sport: number,
@@ -141,7 +140,6 @@ const getAll = async (
     sql += ` WHERE id_user_seller = ${id_user_seller}`;
     oneValue = true;
   }
-
   if (title) {
     sql += oneValue
       ? ` AND title LIKE '%${title}%'`
@@ -214,7 +212,6 @@ const getAll = async (
       : ` WHERE id_condition = ${id_condition}`;
     oneValue = true;
   }
-  console.log(title);
 
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
