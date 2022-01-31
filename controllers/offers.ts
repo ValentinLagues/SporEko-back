@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
+import * as Offer_deliverer from '../models/offer_deliverer'
 import { ErrorHandler } from '../helpers/errors';
 import { string } from 'joi';
 
@@ -33,11 +34,12 @@ offersRouter.get(
     let sortBy = 'creation_date';
     let order = 'DESC';
 
+    const title = req.query.title as string;
+
     const {
       sort,
       // firstItem,
       // limit,
-      title,
       id_user_seller,
       id_sport,
       id_gender,
@@ -98,6 +100,22 @@ offersRouter.get(
           res.status(404).send('Offer not found');
         }
         res.status(200).json(offer);
+      })
+      .catch((err) => next(err));
+  }
+);
+offersRouter.get(
+  '/:idOffer/offer_deliverers',
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idOffer } = req.params;
+    Offer_deliverer.getDeliverersByIdOffer(Number(idOffer))
+      .then((deliverers) => {
+        console.log(deliverers)
+        if (deliverers === undefined) {
+          res.status(404).send('Offer not found');
+        }
+        res.status(200).json(deliverers);
       })
       .catch((err) => next(err));
   }
