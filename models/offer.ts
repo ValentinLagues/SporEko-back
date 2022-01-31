@@ -234,8 +234,6 @@ const getAll = async (
   }
   sql = sql.replace(/"/g, '');
 
-  console.log(sql);
-
   return connection
     .promise()
     .query<IOffer[]>(sql)
@@ -346,7 +344,7 @@ const update = async (
   }
   if (attibutesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.ischild);
+    sqlValues.push(attibutesToUpdate.is_child);
     oneValue = true;
   }
   if (attibutesToUpdate.id_category) {
@@ -419,9 +417,9 @@ const update = async (
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
-  if (attibutesToUpdate.isdraft) {
-    sql += oneValue ? ', is_draft = ? ' : ' isdraft = ? ';
-    sqlValues.push(attibutesToUpdate.isdraft);
+  if (attibutesToUpdate.is_draft) {
+    sql += oneValue ? ', is_draft = ? ' : ' is_draft = ? ';
+    sqlValues.push(attibutesToUpdate.is_draft);
     oneValue = true;
   }
   if (attibutesToUpdate.picture2) {

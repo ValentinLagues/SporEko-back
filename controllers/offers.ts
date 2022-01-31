@@ -15,7 +15,7 @@ interface IFilter {
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  ischild: number | undefined;
+  is_child: number | undefined;
   id_category: number | undefined;
   id_item: number | undefined;
   id_brand: number | undefined;
@@ -41,7 +41,7 @@ offersRouter.get(
       id_user_seller,
       id_sport,
       id_gender,
-      ischild,
+      is_child,
       id_category,
       id_item,
       id_brand,
@@ -62,7 +62,7 @@ offersRouter.get(
       title,
       Number(id_sport),
       Number(id_gender),
-      Number(ischild),
+      Number(is_child),
       Number(id_category),
       Number(id_item),
       Number(id_brand),

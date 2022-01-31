@@ -28,7 +28,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const sport = req.body as ISport;
     const sportWithSameName: ISport = await getByName(sport.name);
-    if (sportWithSameName) {
+    if (sportWithSameName && sportWithSameName.id_sport !== req.body.id_sport) {
       next(new ErrorHandler(409, `Sport name already exists`));
     } else {
       next();
