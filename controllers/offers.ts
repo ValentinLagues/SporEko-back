@@ -14,7 +14,7 @@ interface IFilter {
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  ischild: number | undefined;
+  is_child: number | undefined;
   id_category: number | undefined;
   id_item: number | undefined;
   id_brand: number | undefined;
@@ -41,7 +41,7 @@ offersRouter.get(
       id_user_seller,
       id_sport,
       id_gender,
-      ischild,
+      is_child,
       id_category,
       id_item,
       id_brand,
@@ -68,7 +68,7 @@ offersRouter.get(
       title as string,
       Number(id_sport),
       Number(id_gender),
-      Number(ischild),
+      Number(is_child),
       Number(id_category),
       Number(id_item),
       Number(id_brand),
@@ -128,7 +128,6 @@ offersRouter.post(
   '/',
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.body)
     void (async () => {
       try {
         const offer = req.body as IOffer;
@@ -144,7 +143,7 @@ offersRouter.post(
 offersRouter.put(
   '/:idOffer',
   Offer.recordExists,
-  // Offer.validateOffer,
+  Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
       const { idOffer } = req.params;

@@ -9,7 +9,6 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
-  // console.log(req.body)
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -344,7 +343,7 @@ const update = async (
   }
   if (attibutesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.ischild);
+    sqlValues.push(attibutesToUpdate.is_child);
     oneValue = true;
   }
   if (attibutesToUpdate.id_category) {
@@ -413,12 +412,12 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
   if (attibutesToUpdate.isdraft) {
-    sql += oneValue ? ', is_draft = ? ' : ' isdraft = ? ';
+    sql += oneValue ? ', is_draft = ? ' : ' is_draft = ? ';
     sqlValues.push(attibutesToUpdate.isdraft);
     oneValue = true;
   }
