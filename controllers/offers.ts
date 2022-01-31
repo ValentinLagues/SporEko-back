@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import { ErrorHandler } from '../helpers/errors';
-import { AnyRecord } from 'dns';
+import { string } from 'joi';
 
 const offersRouter = Router();
 
@@ -63,8 +63,9 @@ offersRouter.get(
       order,
       // firstItem,
       // limit,
+
       Number(id_user_seller),
-      title,
+      title as string,
       Number(id_sport),
       Number(id_gender),
       Number(ischild),
@@ -143,7 +144,7 @@ offersRouter.post(
 offersRouter.put(
   '/:idOffer',
   Offer.recordExists,
-  Offer.validateOffer,
+  // Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
       const { idOffer } = req.params;

@@ -127,7 +127,7 @@ const getAll = async (
   id_color2: number,
   id_condition: number,
   minPrice: number,
-  maxPrice: number,
+  maxPrice: number
 ): Promise<IOffer[]> => {
   if (sortBy === 'id') {
     sortBy = 'id_offer';
@@ -236,7 +236,11 @@ const getAll = async (
   return connection
     .promise()
     .query<IOffer[]>(sql)
-    .then(([results]) => {console.log(results); return results})}
+    .then(([results]) => {
+      console.log(results);
+      return results;
+    });
+};
 
 const getById = async (idOffer: number): Promise<IOffer> => {
   return connection
