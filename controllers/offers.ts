@@ -3,7 +3,6 @@ import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import * as Offer_deliverer from '../models/offer_deliverer';
 import { ErrorHandler } from '../helpers/errors';
-import { string } from 'joi';
 
 const offersRouter = Router();
 

@@ -545,6 +545,3 @@ export {
   validateOffer,
   upload,
 };
-export function getByIdOffer(arg0: number) {
-  throw new Error('Function not implemented.');
-}
