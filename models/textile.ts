@@ -13,6 +13,8 @@ const validateTextile = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_textile: Joi.number(),
     name: Joi.string().max(80).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -35,18 +37,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = async (
-  sortBy = 'id_textile',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ITextile[]> => {
-  const sql = `SELECT * FROM textiles ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_textile';
+  let sql = `SELECT *, id_textile as id FROM textiles`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_textile ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ITextile[]>(sql)

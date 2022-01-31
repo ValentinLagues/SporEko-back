@@ -13,6 +13,8 @@ const validateCondition = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_condition: Joi.number(),
     name: Joi.string().max(50).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -37,18 +39,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_condition',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ICondition[]> => {
-  const sql = `SELECT * FROM conditions ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_condition';
+  let sql = `SELECT *, id_condition as id FROM conditions`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_condition ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ICondition[]>(sql)

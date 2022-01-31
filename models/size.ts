@@ -13,6 +13,7 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
     required = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_size: Joi.number().integer(),
     id_gender: Joi.number().integer().presence(required),
     is_child: Joi.number().integer().min(0).max(1),
@@ -45,18 +46,23 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAllSizes = (
-  sortBy = 'id_size',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ISize[]> => {
-  const sql = `SELECT * FROM sizes ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_size';
+  let sql = `SELECT *, id_size as id FROM sizes`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_size ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ISize[]>(sql)
@@ -87,8 +93,6 @@ const getSizesBySizeType = (
     sqlValues.push(is_child);
   }
 
-  console.log(sql);
-
   return connection
     .promise()
     .query<ISize[]>(sql, sqlValues)
@@ -108,7 +112,6 @@ const getSizesByCategory = (
   if (idCategory === 1 && is_child) {
     sql += ` WHERE id_size_type = 6`;
   } else if (idCategory === 1 && id_gender === 1) {
-    console.log('tov');
     sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 1`;
   } else if (idCategory === 1 && id_gender === 2) {
     sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 2`;
@@ -118,8 +121,6 @@ const getSizesByCategory = (
   } else if (idCategory === 2 && is_child) {
     sql += ` WHERE id_size_type = 1 AND is_child = 1`;
   }
-
-  // console.log(sql);
 
   return connection
     .promise()

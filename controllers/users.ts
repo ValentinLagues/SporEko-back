@@ -14,24 +14,18 @@ usersRouter.get(
   Auth.userConnected,
   Auth.userIsAdmin,
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy = 'id_user';
-    let order = 'ASC';
+    const sortBy = req.query.sortBy as string;
+    const order = req.query.order as string;
+    const firstItem = req.query.firstItem as string;
+    const limit = req.query.limit as string;
 
-    const {
-      sort,
-      // firstItem,
-      // limit
-    } = req.query;
-
-    if (sort) {
-      const sortToArray = sort.toString().split(' ');
-      sortBy = sortToArray[0];
-      order = sortToArray[1];
-    }
-
-    User.getAll(sortBy, order)
-      .then((user: Array<IUser>) => {
-        res.status(200).json(user);
+    User.getAll(sortBy, order, firstItem, limit)
+      .then((users: Array<IUser>) => {
+        res.setHeader(
+          'Content-Range',
+          `addresses : 0-${users.length}/${users.length + 1}`
+        );
+        res.status(200).json(users);
       })
       .catch((err) => next(err));
   }
@@ -39,7 +33,6 @@ usersRouter.get(
 
 usersRouter.get(
   '/:idUser',
-  // Auth.userConnected,
   (req: Request, res: Response, next: NextFunction) => {
     const { idUser } = req.params;
     User.getById(Number(idUser))
@@ -100,16 +93,16 @@ usersRouter.post(
 usersRouter.post(
   '/:id/favorites',
   (req: Request, res: Response, next: NextFunction) => {
-      void (async () => {
-        try {
-          const favorite = req.body as IFavorite;
-          favorite.id_favorite = await Favorite.createFavorite(favorite);
-          res.status(201).json(favorite);
-        } catch (err) {
-          next(err);
-        }
-      })();
-    }
+    void (async () => {
+      try {
+        const favorite = req.body as IFavorite;
+        favorite.id_favorite = await Favorite.createFavorite(favorite);
+        res.status(201).json(favorite);
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
 );
 
 usersRouter.put(
@@ -154,12 +147,14 @@ usersRouter.put(
 );
 
 usersRouter.delete(
-'/:id/favorites/:idFavorite',
+  '/:id/favorites/:idFavorite',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const { idFavorite } = req.params;
-        const favoriteDeleted = await Favorite.destroyFavorite(Number(idFavorite));
+        const favoriteDeleted = await Favorite.destroyFavorite(
+          Number(idFavorite)
+        );
         if (favoriteDeleted) {
           res.status(200).send('Favorite deleted');
         } else {
