@@ -58,6 +58,16 @@ const getById = (idOffer_deliverer: number): Promise<IOffer_deliverer> => {
     .then(([results]) => results[0]);
 };
 
+const getDeliverersByIdOffer = async (idOffer: number): Promise<IOffer_deliverer> => {
+  return connection
+    .promise()
+    .query<IOffer_deliverer[string | number]>(
+      'SELECT id_deliverer FROM offer_deliverers WHERE id_offer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
+
 const create = (newOffer_deliverer: IOffer_deliverer): Promise<number> => {
   return connection
     .promise()
@@ -105,4 +115,4 @@ const destroy = (idOffer_deliverer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export { getAll, getById, create, update, destroy, validateOffer_deliverer };
+export { getAll, getById, getDeliverersByIdOffer, create, update, destroy, validateOffer_deliverer };

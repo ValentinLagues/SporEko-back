@@ -413,7 +413,7 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }

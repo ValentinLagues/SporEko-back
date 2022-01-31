@@ -4,6 +4,7 @@ import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IDeliverer from '../interfaces/IDeliverer';
+import * as Offers from '../controllers/offers'
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -77,6 +78,16 @@ const getByName = (name: string): Promise<IDeliverer> => {
     .query<IDeliverer[]>('SELECT * FROM deliverers WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
+
+// const getDelivererByIdOffer = async (idOffer: number): Promise<IDeliverer> => {
+//   return connection
+//     .promise()
+//     .query<IDeliverer[string | number]>(
+//       'SELECT id_deliverer FROM deliverers WHERE id_offer = ?',
+//       [idOffer]
+//     )
+//     .then(([results]) => results);
+// };
 
 const create = (newDeliverer: IDeliverer): Promise<number> => {
   return connection
