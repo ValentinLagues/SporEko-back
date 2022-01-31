@@ -14,6 +14,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
     id_user_seller: Joi.number().integer().presence(presence),
@@ -110,8 +111,8 @@ const upload = multer({
 const getAll = async (
   sortBy: string,
   order: string,
-  // firstItem: string,
-  // limit: string,
+  firstItem: string,
+  limit: string,
   id_user_seller: number,
   title: string,
   id_sport: number,
@@ -128,11 +129,7 @@ const getAll = async (
   minPrice: number,
   maxPrice: number
 ): Promise<IOffer[]> => {
-  if (sortBy === 'id') {
-    sortBy = 'id_offer';
-  }
-
-  let sql = `SELECT * FROM offers`;
+  let sql = `SELECT *, id_offer as id FROM offers`;
   let oneValue = false;
 
   if (id_user_seller) {
@@ -226,11 +223,18 @@ const getAll = async (
     }
   }
 
-  sql += ` ORDER BY ${sortBy} ${order}`;
+  if (!sortBy) {
+    sql += ` ORDER BY id_offer ASC`;
+  }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
 
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  console.log(sql);
 
   return connection
     .promise()
