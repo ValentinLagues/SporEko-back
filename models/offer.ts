@@ -1,4 +1,4 @@
-import connection from '../db-config.js';
+  import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
