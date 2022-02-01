@@ -1,6 +1,6 @@
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
-import Joi from 'joi';
+import Joi, { number } from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
@@ -62,7 +62,10 @@ const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSameEmail: IUser = await getByEmail(user.email);
-    if (userWithSameEmail && userWithSameEmail.id_user !== req.body.id_user) {
+    if (
+      userWithSameEmail &&
+      userWithSameEmail.id_user !== (req.body.id_user as number)
+    ) {
       next(new ErrorHandler(409, `Email already exists`));
     } else {
       next();
@@ -73,7 +76,10 @@ const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
-    if (userWithSamePseudo && userWithSamePseudo.id_user !== req.body.id_user) {
+    if (
+      userWithSamePseudo &&
+      userWithSamePseudo.id_user !== (req.body.id_user as number)
+    ) {
       next(new ErrorHandler(409, `Pseudo already exists`));
     } else {
       next();

@@ -15,7 +15,7 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
   const errors = Joi.object({
     id: Joi.number(),
     id_size: Joi.number().integer(),
-    id_gender: Joi.number().integer().presence(required),
+    id_gender: Joi.number().integer().allow(null),
     is_child: Joi.number().integer().min(0).max(1),
     id_size_type: Joi.number().integer().presence(required),
     size_int: Joi.string().max(8),
