@@ -38,7 +38,6 @@ gendersRouter.get(
 gendersRouter.post(
   '/',
   Genders.validateGender,
-  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     const gender = req.body as IGender;
     Genders.createGender(gender)
@@ -52,7 +51,6 @@ gendersRouter.post(
 gendersRouter.put(
   '/:idGender',
   Genders.validateGender,
-  // Genders.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {

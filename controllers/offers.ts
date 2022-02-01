@@ -106,7 +106,6 @@ offersRouter.get(
     const { idOffer } = req.params;
     Offer_deliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
-        console.log(deliverers);
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');
         }

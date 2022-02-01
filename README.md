@@ -1,7 +1,7 @@
-# git clone, git checkout dev on dev time / main, npm install
+# git clone, npm install
 
-# create a .env file
+# create a .env file (see .env.sample)
 
 # update your bdd
 
-# npm run start (nodemon)
+# npm run ts + npm start (nodemon)

@@ -22,7 +22,7 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     title: Joi.string().max(255).presence(presence),
     description: Joi.string().max(5000).presence(presence),
     id_sport: Joi.number().integer().presence(presence),
-    id_gender: Joi.number().integer().presence(presence),
+    id_gender: Joi.number().integer().allow(null),
     is_child: Joi.number().integer().min(0).max(1).presence(presence),
     id_category: Joi.number().integer().presence(presence),
     id_item: Joi.number().integer().presence(presence),
