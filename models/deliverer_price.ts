@@ -82,6 +82,16 @@ const getDeliverer_priceByName = (name: string) => {
     .then(([results]) => results[0]);
 };
 
+const getDeliverer_priceByPrice = (name: string) => {
+  return connection
+    .promise()
+    .query<IDeliverer_price[]>(
+      'SELECT price FROM deliverer_prices AS dp INNER JOIN offers AS o WHERE dp.id_deliverer = ? AND o.weight BETWEEN dp.min_weight AND dp.max_weight',
+      [name]
+    )
+    .then(([results]) => results[0]);
+};
+
 const createDeliverer_price = (
   newDeliverer_price: IDeliverer_price
 ): Promise<number> => {
@@ -156,6 +166,7 @@ export {
   getAllDeliverer_price,
   nameIsFree,
   getDeliverer_priceById,
+  getDeliverer_priceByPrice,
   createDeliverer_price,
   updateDeliverer_price,
   deleteDeliverer_price,

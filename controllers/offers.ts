@@ -83,7 +83,6 @@ offersRouter.get(
       Number(maxPrice)
     )
       .then((offers: Array<IOffer>) => {
-        console.log(offers);
         res.status(200).json(offers);
       })
       .catch((err) => next(err));
@@ -111,7 +110,7 @@ offersRouter.get(
     const { idOffer } = req.params;
     Offer_deliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
-        console.log(deliverers)
+        
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');
         }
@@ -146,7 +145,7 @@ offersRouter.post(
   '/',
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.body)
+    
     void (async () => {
       try {
         const offer = req.body as IOffer;

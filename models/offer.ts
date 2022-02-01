@@ -9,7 +9,7 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
-  // console.log(req.body)
+  
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -237,7 +237,7 @@ const getAll = async (
     .promise()
     .query<IOffer[]>(sql)
     .then(([results]) => {
-      console.log(results);
+     
       return results;
     });
 };
