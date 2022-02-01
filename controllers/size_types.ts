@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as Size_type from '../models/size_type';
-// import * as Size from '../models/size';
 import ISize_type from '../interfaces/ISize_type';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -37,16 +36,6 @@ size_typesRouter.get(
       .catch((err) => next(err));
   }
 );
-
-// size_typesRouter.get(
-//   '/:idSize_type/sizes',
-//   (req: Request, res: Response, next: NextFunction) => {
-//     const { idSize_type } = req.params;
-//     Size.getSizesBySizeType(Number(idSize_type))
-//       .then((results) => res.status(200).json(results))
-//       .catch((err) => next(err));
-//   }
-// );
 
 size_typesRouter.post(
   '/',

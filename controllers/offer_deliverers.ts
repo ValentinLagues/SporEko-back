@@ -8,20 +8,8 @@ const offer_deliverersRouter = Router();
 offer_deliverersRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy = 'id_offer_deliverer';
-    let order = 'ASC';
-
-    const {
-      sort,
-      // firstItem,
-      // limit
-    } = req.query;
-
-    if (sort) {
-      const sortToArray = sort.toString().split(' ');
-      sortBy = sortToArray[0];
-      order = sortToArray[1];
-    }
+    const sortBy = 'id_offer_deliverer';
+    const order = 'ASC';
 
     Offer_deliverer.getAll(sortBy, order)
       .then((offer_deliverers: Array<IOffer_deliverer>) => {

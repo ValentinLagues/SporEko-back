@@ -28,16 +28,11 @@ const validateFavorite = (req: Request, res: Response, next: NextFunction) => {
 const getAll = (
   sortBy = 'id_favorite',
   order = 'ASC'
-  // firstItem: string,
-  // limit: string
 ): Promise<IFavorite[]> => {
   const sql = `SELECT * FROM favorites ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_favorite';
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
   return connection
     .promise()
     .query<IFavorite[]>(sql)
