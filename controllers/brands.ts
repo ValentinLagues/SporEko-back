@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const brandsRouter = Router();
 
 brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_brand';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Brand.getAll(sortBy, order)
+  Brand.getAll(sortBy, order, firstItem, limit)
     .then((brands: Array<IBrand>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${brands.length}/${brands.length + 1}`
+      );
       res.status(200).json(brands);
     })
     .catch((err) => next(err));

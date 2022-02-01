@@ -13,6 +13,8 @@ const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_athletic: Joi.number(),
     name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -25,7 +27,10 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const Athletic = req.body as IAthletics;
     const AthleticWithSameName: IAthletics = await getByName(Athletic.name);
-    if (AthleticWithSameName) {
+    if (
+      AthleticWithSameName &&
+      AthleticWithSameName.id_athletic !== req.body.id_athletic
+    ) {
       next(new ErrorHandler(409, `Athletic name already exists`));
     } else {
       next();
@@ -36,18 +41,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_athletic',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IAthletics[]> => {
-  const sql = `SELECT * FROM athletics ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_athletic';
+  let sql = `SELECT *, id_athletic as id FROM athletics`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_athletic ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IAthletics[]>(sql)
@@ -79,14 +89,21 @@ const create = (newAthletic: IAthletics): Promise<number> => {
 
 const update = (
   idAthletic: number,
-  newAttributes: IAthletics
+  attibutesToUpdate: IAthletics
 ): Promise<boolean> => {
+  let sql = 'UPDATE athletics SET ';
+  const sqlValues: Array<string | number> = [];
+
+  if (attibutesToUpdate.name) {
+    sql += 'name = ? ';
+    sqlValues.push(attibutesToUpdate.name);
+  }
+  sql += ' WHERE id_athletic = ?';
+  sqlValues.push(idAthletic);
+
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE athletics SET ? WHERE id_athletic = ?', [
-      newAttributes,
-      idAthletic,
-    ])
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
 };
 

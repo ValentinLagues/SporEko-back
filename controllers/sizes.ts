@@ -5,29 +5,20 @@ import * as Sizes from '../models/size';
 const sizesRouter = Router();
 
 sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_size';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  void (async () => {
-    try {
-      const results = await Sizes.getAllSizes(sortBy, order);
-      res.status(200).json(results);
-    } catch (err) {
-      next(err);
-    }
-  })();
+  Sizes.getAllSizes(sortBy, order, firstItem, limit)
+    .then((sizes: Array<ISize>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${sizes.length}/${sizes.length + 1}`
+      );
+      res.status(200).json(sizes);
+    })
+    .catch((err) => next(err));
 });
 
 sizesRouter.get(

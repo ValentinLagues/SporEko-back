@@ -1,11 +1,10 @@
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
-import Joi from 'joi';
+import Joi, { number } from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import IUser from '../interfaces/IUser';
-import IFavorite from '../interfaces/IFavorite.js';
 import multer from 'multer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
@@ -63,7 +62,10 @@ const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSameEmail: IUser = await getByEmail(user.email);
-    if (userWithSameEmail) {
+    if (
+      userWithSameEmail &&
+      userWithSameEmail.id_user !== (req.body.id_user as number)
+    ) {
       next(new ErrorHandler(409, `Email already exists`));
     } else {
       next();
@@ -74,7 +76,10 @@ const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
-    if (userWithSamePseudo) {
+    if (
+      userWithSamePseudo &&
+      userWithSamePseudo.id_user !== (req.body.id_user as number)
+    ) {
       next(new ErrorHandler(409, `Pseudo already exists`));
     } else {
       next();
@@ -131,18 +136,23 @@ const upload = multer({
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_user',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IUser[]> => {
-  const sql = `SELECT * FROM users ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_user';
+  let sql = `SELECT *, id_user as id FROM users`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_user ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IUser[]>(sql)
@@ -200,7 +210,6 @@ const create = async (newUser: IUser): Promise<number> => {
     )
     .then(([results]) => results.insertId);
 };
-
 
 const update = async (
   idUser: number,

@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const countriesRouter = Router();
 
 countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_country';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Countries.getAll(sortBy, order)
+  Countries.getAll(sortBy, order, firstItem, limit)
     .then((countries: Array<ICountries>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${countries.length}/${countries.length + 1}`
+      );
       res.status(200).json(countries);
     })
     .catch((err) => next(err));

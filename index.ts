@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 const corsOptions: cors.CorsOptions = {
-  origin: process.env.CORS_ORIGINS,
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
   maxAge: 3600,
 };
@@ -22,8 +22,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 setupRoutes(app);
-
-// A mettre à la fin pour gèrer les erreurs qui sortiront des routes
 
 app.use(handleError);
 

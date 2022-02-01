@@ -6,20 +6,8 @@ import { ErrorHandler } from '../helpers/errors';
 const favoritesRouter = Router();
 
 favoritesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_favorite';
-  let order = 'ASC';
-
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
+  const sortBy = 'id_favorite';
+  const order = 'ASC';
 
   Favorite.getAll(sortBy, order)
     .then((favorites: Array<IFavorite>) => {
@@ -87,7 +75,9 @@ favoritesRouter.delete(
     void (async () => {
       try {
         const { idFavorite } = req.params;
-        const favoriteDeleted = await Favorite.destroyFavorite(Number(idFavorite));
+        const favoriteDeleted = await Favorite.destroyFavorite(
+          Number(idFavorite)
+        );
         if (favoriteDeleted) {
           res.status(200).send('Favorite deleted');
         } else {

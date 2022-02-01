@@ -13,6 +13,8 @@ const validatecountries = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_country: Joi.number(),
     name: Joi.string().max(200).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -36,18 +38,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_country',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ICountries[]> => {
-  const sql = `SELECT * FROM countries ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_country';
+  let sql = `SELECT *, id_country as id FROM countries`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_country ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ICountries[]>(sql)
@@ -81,12 +88,19 @@ const update = (
   idCountry: number,
   newAttributes: ICountries
 ): Promise<boolean> => {
+  let sql = 'UPDATE countries SET ';
+  const sqlValues: Array<string | number> = [];
+
+  if (newAttributes.name) {
+    sql += 'name = ? ';
+    sqlValues.push(newAttributes.name);
+  }
+  sql += ' WHERE id_country = ?';
+  sqlValues.push(idCountry);
+
   return connection
     .promise()
-    .query<ResultSetHeader>('UPDATE countries SET ? WHERE id_country = ?', [
-      newAttributes,
-      idCountry,
-    ])
+    .query<ResultSetHeader>(sql, sqlValues)
     .then(([results]) => results.affectedRows === 1);
 };
 
