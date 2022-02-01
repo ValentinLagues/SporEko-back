@@ -13,6 +13,8 @@ const validateSize_type = (req: Request, res: Response, next: NextFunction) => {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_size_type: Joi.number(),
     name: Joi.string().max(80).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -36,18 +38,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
 const getAll = (
-  sortBy = 'id_size_type',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<ISize_type[]> => {
-  const sql = `SELECT * FROM size_types ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_size_type';
+  let sql = `SELECT *, id_size_type as id FROM size_types`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_size_type ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<ISize_type[]>(sql)

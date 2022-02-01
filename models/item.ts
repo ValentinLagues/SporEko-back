@@ -12,6 +12,8 @@ const validateItem = (req: Request, res: Response, next: NextFunction) => {
     required = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
+    id_item: Joi.number(),
     name: Joi.string().max(50).presence(required),
     id_category: Joi.number().integer().presence(required),
     id_size_type: Joi.number().integer().presence(required),
@@ -27,7 +29,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const item = req.body as IItem;
     const itemWithSameName: IItem = await getItemByName(item.name);
-    if (itemWithSameName) {
+    if (itemWithSameName && itemWithSameName.id_item !== req.body.id_item) {
       next(new ErrorHandler(409, `Item name already exists`));
     } else {
       next();
@@ -36,18 +38,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllItem = (
-  sortBy = 'id_item',
-  order = 'ASC'
-  // firstItem: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IItem[]> => {
-  const sql = `SELECT * FROM items ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_item';
+  let sql = `SELECT *, id_item as id FROM items`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_item ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IItem[]>(sql)

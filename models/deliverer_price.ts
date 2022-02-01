@@ -16,6 +16,7 @@ const validateDeliverer_price = (
     required = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_deliverer_price: Joi.number().integer(),
     name: Joi.string().max(150).presence(required),
     min_weight: Joi.number().integer().presence(required),
@@ -35,7 +36,11 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     const deliverer_price = req.body as IDeliverer_price;
     const deliverer_priceWithSameName: IDeliverer_price =
       await getDeliverer_priceByName(deliverer_price.name);
-    if (deliverer_priceWithSameName) {
+    if (
+      deliverer_priceWithSameName &&
+      deliverer_priceWithSameName.id_deliverer_price !==
+        req.body.id_deliverer_price
+    ) {
       next(new ErrorHandler(409, `Deliverer_price name already exists`));
     } else {
       next();
@@ -44,18 +49,23 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
 const getAllDeliverer_price = (
-  sortBy = 'id_deliverer_price',
-  order = 'ASC'
-  // firstDeliverer_price: string,
-  // limit: string
+  sortBy: string,
+  order: string,
+  firstItem: string,
+  limit: string
 ): Promise<IDeliverer_price[]> => {
-  const sql = `SELECT * FROM deliverer_prices ORDER BY ${sortBy} ${order}`;
-  if (sortBy === 'id') {
-    sortBy = 'id_deliverer_price';
+  let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
+
+  if (!sortBy) {
+    sql += ` ORDER BY id_deliverer_price ASC`;
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstDeliverer_price}`;
-  // }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
   return connection
     .promise()
     .query<IDeliverer_price[]>(sql)

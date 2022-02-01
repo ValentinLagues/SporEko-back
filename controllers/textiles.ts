@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const textilesRouter = Router();
 
 textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_textile';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Textile.getAll(sortBy, order)
+  Textile.getAll(sortBy, order, firstItem, limit)
     .then((textiles: Array<ITextile>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${textiles.length}/${textiles.length + 1}`
+      );
       res.status(200).json(textiles);
     })
     .catch((err) => next(err));

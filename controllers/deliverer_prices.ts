@@ -7,23 +7,21 @@ const deliverer_pricesRouter = Router();
 deliverer_pricesRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    let sortBy = 'id_deliverer_price';
-    let order = 'ASC';
+    const sortBy = req.query.sortBy as string;
+    const order = req.query.order as string;
+    const firstItem = req.query.firstItem as string;
+    const limit = req.query.limit as string;
 
-    const {
-      sort,
-      // firstDeliverer_price,
-      // limit
-    } = req.query;
-
-    if (sort) {
-      const sortToArray = sort.toString().split(' ');
-      sortBy = sortToArray[0];
-      order = sortToArray[1];
-    }
-
-    Deliverer_price.getAllDeliverer_price(sortBy, order)
-      .then((results) => res.status(200).json(results))
+    Deliverer_price.getAllDeliverer_price(sortBy, order, firstItem, limit)
+      .then((deliverer_prices: Array<IDeliverer_price>) => {
+        res.setHeader(
+          'Content-Range',
+          `addresses : 0-${deliverer_prices.length}/${
+            deliverer_prices.length + 1
+          }`
+        );
+        res.status(200).json(deliverer_prices);
+      })
       .catch((err) => next(err));
   }
 );

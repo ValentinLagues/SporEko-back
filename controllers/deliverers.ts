@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const deliverersRouter = Router();
 
 deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_deliverer';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Deliverer.getAll(sortBy, order)
+  Deliverer.getAll(sortBy, order, firstItem, limit)
     .then((deliverers: Array<IDeliverer>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${deliverers.length}/${deliverers.length + 1}`
+      );
       res.status(200).json(deliverers);
     })
     .catch((err) => next(err));

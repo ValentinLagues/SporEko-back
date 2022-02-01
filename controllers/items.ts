@@ -6,23 +6,19 @@ import * as Item from '../models/item';
 const itemsRouter = Router();
 
 itemsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_item';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Item.getAllItem(sortBy, order)
-    .then((results) => res.status(200).json(results))
+  Item.getAllItem(sortBy, order, firstItem, limit)
+    .then((items: Array<IItem>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${items.length}/${items.length + 1}`
+      );
+      res.status(200).json(items);
+    })
     .catch((err) => next(err));
 });
 

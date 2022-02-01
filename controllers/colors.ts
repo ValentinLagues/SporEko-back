@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const colorsRouter = Router();
 
 colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_color';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Color.getAll(sortBy, order)
+  Color.getAll(sortBy, order, firstItem, limit)
     .then((colors: Array<IColor>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${colors.length}/${colors.length + 1}`
+      );
       res.status(200).json(colors);
     })
     .catch((err) => next(err));

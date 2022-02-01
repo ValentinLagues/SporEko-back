@@ -1,4 +1,4 @@
-  import connection from '../db-config.js';
+import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
@@ -9,12 +9,16 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
+<<<<<<< HEAD
   
+=======
+>>>>>>> 2ddcf253a8b44e1a03d68f0b118459659790f41c
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
+    id: Joi.number(),
     id_offer: Joi.number().integer(),
     creation_date: Joi.string().max(255),
     id_user_seller: Joi.number().integer().presence(presence),
@@ -111,8 +115,8 @@ const upload = multer({
 const getAll = async (
   sortBy: string,
   order: string,
-  // firstItem: string,
-  // limit: string,
+  firstItem: string,
+  limit: string,
   id_user_seller: number,
   title: string,
   id_sport: number,
@@ -129,11 +133,7 @@ const getAll = async (
   minPrice: number,
   maxPrice: number
 ): Promise<IOffer[]> => {
-  if (sortBy === 'id') {
-    sortBy = 'id_offer';
-  }
-
-  let sql = `SELECT * FROM offers`;
+  let sql = `SELECT *, id_offer as id FROM offers`;
   let oneValue = false;
 
   if (id_user_seller) {
@@ -227,17 +227,25 @@ const getAll = async (
     }
   }
 
-  sql += ` ORDER BY ${sortBy} ${order}`;
-
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
+  if (!sortBy) {
+    sql += ` ORDER BY id_offer ASC`;
+  }
+  if (sortBy) {
+    sql += ` ORDER BY ${sortBy} ${order}`;
+  }
+  if (limit) {
+    sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
+  }
+  sql = sql.replace(/"/g, '');
 
   return connection
     .promise()
     .query<IOffer[]>(sql)
     .then(([results]) => {
+<<<<<<< HEAD
      
+=======
+>>>>>>> 2ddcf253a8b44e1a03d68f0b118459659790f41c
       return results;
     });
 };
@@ -344,7 +352,7 @@ const update = async (
   }
   if (attibutesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.ischild);
+    sqlValues.push(attibutesToUpdate.is_child);
     oneValue = true;
   }
   if (attibutesToUpdate.id_category) {
@@ -413,13 +421,13 @@ const update = async (
     oneValue = true;
   }
   if (attibutesToUpdate.isarchived) {
-    sql += oneValue ? ', is_archived = ? ' : ' isarchived = ? ';
+    sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
     sqlValues.push(attibutesToUpdate.isarchived);
     oneValue = true;
   }
-  if (attibutesToUpdate.isdraft) {
-    sql += oneValue ? ', is_draft = ? ' : ' isdraft = ? ';
-    sqlValues.push(attibutesToUpdate.isdraft);
+  if (attibutesToUpdate.is_draft) {
+    sql += oneValue ? ', is_draft = ? ' : ' is_draft = ? ';
+    sqlValues.push(attibutesToUpdate.is_draft);
     oneValue = true;
   }
   if (attibutesToUpdate.picture2) {
@@ -545,6 +553,3 @@ export {
   validateOffer,
   upload,
 };
-export function getByIdOffer(arg0: number) {
-  throw new Error('Function not implemented.');
-}

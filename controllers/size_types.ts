@@ -7,23 +7,17 @@ import { ErrorHandler } from '../helpers/errors';
 const size_typesRouter = Router();
 
 size_typesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_size_type';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Size_type.getAll(sortBy, order)
+  Size_type.getAll(sortBy, order, firstItem, limit)
     .then((size_types: Array<ISize_type>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${size_types.length}/${size_types.length + 1}`
+      );
       res.status(200).json(size_types);
     })
     .catch((err) => next(err));

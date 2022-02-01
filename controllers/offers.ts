@@ -1,21 +1,21 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import * as Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
-import * as Offer_deliverer from '../models/offer_deliverer'
+import * as Offer_deliverer from '../models/offer_deliverer';
 import { ErrorHandler } from '../helpers/errors';
-import { string } from 'joi';
 
 const offersRouter = Router();
 
 interface IFilter {
-  sort: string | undefined;
-  // firstItem: number;
-  // limit: number;
+  sortBy: string | undefined;
+  order: string | undefined;
+  firstItem: string | undefined;
+  limit: string | undefined;
   title: string | undefined;
   id_user_seller: number | undefined;
   id_sport: number | undefined;
   id_gender: number | undefined;
-  ischild: number | undefined;
+  is_child: number | undefined;
   id_category: number | undefined;
   id_item: number | undefined;
   id_brand: number | undefined;
@@ -31,19 +31,17 @@ interface IFilter {
 offersRouter.get(
   '/',
   (req: Request<IFilter>, res: Response, next: NextFunction) => {
-    let sortBy = 'creation_date';
-    let order = 'DESC';
-
+    const sortBy = req.query.sortBy as string;
+    const order = req.query.order as string;
+    const firstItem = req.query.firstItem as string;
+    const limit = req.query.limit as string;
     const title = req.query.title as string;
 
     const {
-      sort,
-      // firstItem,
-      // limit,
       id_user_seller,
       id_sport,
       id_gender,
-      ischild,
+      is_child,
       id_category,
       id_item,
       id_brand,
@@ -55,22 +53,16 @@ offersRouter.get(
       minPrice,
       maxPrice,
     } = req.query;
-    if (sort) {
-      const sortToArray = sort.toString().split(' ');
-      sortBy = sortToArray[0];
-      order = sortToArray[1];
-    }
     Offer.getAll(
       sortBy,
       order,
-      // firstItem,
-      // limit,
-
+      firstItem,
+      limit,
       Number(id_user_seller),
-      title as string,
+      title,
       Number(id_sport),
       Number(id_gender),
-      Number(ischild),
+      Number(is_child),
       Number(id_category),
       Number(id_item),
       Number(id_brand),
@@ -83,6 +75,10 @@ offersRouter.get(
       Number(maxPrice)
     )
       .then((offers: Array<IOffer>) => {
+        res.setHeader(
+          'Content-Range',
+          `addresses : 0-${offers.length}/${offers.length + 1}`
+        );
         res.status(200).json(offers);
       })
       .catch((err) => next(err));
@@ -110,7 +106,7 @@ offersRouter.get(
     const { idOffer } = req.params;
     Offer_deliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
-        
+        console.log(deliverers);
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');
         }
@@ -145,7 +141,6 @@ offersRouter.post(
   '/',
   Offer.validateOffer,
   (req: Request, res: Response, next: NextFunction) => {
-    
     void (async () => {
       try {
         const offer = req.body as IOffer;
@@ -161,7 +156,7 @@ offersRouter.post(
 offersRouter.put(
   '/:idOffer',
   Offer.recordExists,
-  // Offer.validateOffer,
+  Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
       const { idOffer } = req.params;

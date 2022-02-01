@@ -6,23 +6,17 @@ import { ErrorHandler } from '../helpers/errors';
 const conditionsRouter = Router();
 
 conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
-  let sortBy = 'id_condition';
-  let order = 'ASC';
+  const sortBy = req.query.sortBy as string;
+  const order = req.query.order as string;
+  const firstItem = req.query.firstItem as string;
+  const limit = req.query.limit as string;
 
-  const {
-    sort,
-    // firstItem,
-    // limit
-  } = req.query;
-
-  if (sort) {
-    const sortToArray = sort.toString().split(' ');
-    sortBy = sortToArray[0];
-    order = sortToArray[1];
-  }
-
-  Condition.getAll(sortBy, order)
+  Condition.getAll(sortBy, order, firstItem, limit)
     .then((conditions: Array<ICondition>) => {
+      res.setHeader(
+        'Content-Range',
+        `addresses : 0-${conditions.length}/${conditions.length + 1}`
+      );
       res.status(200).json(conditions);
     })
     .catch((err) => next(err));
