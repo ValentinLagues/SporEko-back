@@ -32,16 +32,11 @@ const validateOffer_deliverer = (
 const getAll = (
   sortBy = 'id_offer_deliverer',
   order = 'ASC'
-  // firstItem: string,
-  // limit: string
 ): Promise<IOffer_deliverer[]> => {
   const sql = `SELECT * FROM offer_deliverers ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_offer_deliverer';
   }
-  // if (limit) {
-  //   sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
-  // }
   return connection
     .promise()
     .query<IOffer_deliverer[]>(sql)
@@ -58,7 +53,9 @@ const getById = (idOffer_deliverer: number): Promise<IOffer_deliverer> => {
     .then(([results]) => results[0]);
 };
 
-const getDeliverersByIdOffer = async (idOffer: number): Promise<IOffer_deliverer> => {
+const getDeliverersByIdOffer = async (
+  idOffer: number
+): Promise<IOffer_deliverer> => {
   return connection
     .promise()
     .query<IOffer_deliverer[string | number]>(
@@ -115,4 +112,12 @@ const destroy = (idOffer_deliverer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export { getAll, getById, getDeliverersByIdOffer, create, update, destroy, validateOffer_deliverer };
+export {
+  getAll,
+  getById,
+  getDeliverersByIdOffer,
+  create,
+  update,
+  destroy,
+  validateOffer_deliverer,
+};
