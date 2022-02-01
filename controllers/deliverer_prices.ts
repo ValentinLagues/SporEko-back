@@ -40,19 +40,19 @@ deliverer_pricesRouter.get(
   }
 );
 
-deliverer_pricesRouter.get(
-  '/:price',
-  (req: Request, res: Response, next: NextFunction) => {
-    const { price } = req.params;
-    Deliverer_price.getDeliverer_priceByPrice(Number(price))
-      .then((result: IDeliverer_price) => {
-        if (result === undefined)
-          res.status(404).send('Deliverer_price not found');
-        else res.status(200).json(result);
-      })
-      .catch((err) => next(err));
-  }
-);
+// deliverer_pricesRouter.get(
+//   '/:price',
+//   (req: Request, res: Response, next: NextFunction) => {
+//     const { price } = req.params;
+//     Deliverer_price.getDeliverer_priceByPrice(Number(price))
+//       .then((result: IDeliverer_price) => {
+//         if (result === undefined)
+//           res.status(404).send('Deliverer_price not found');
+//         else res.status(200).json(result);
+//       })
+//       .catch((err) => next(err));
+//   }
+// );
 
 deliverer_pricesRouter.post(
   '/',

@@ -9,10 +9,6 @@ import multer from 'multer';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
 const validateOffer = (req: Request, res: Response, next: NextFunction) => {
-<<<<<<< HEAD
-  
-=======
->>>>>>> 2ddcf253a8b44e1a03d68f0b118459659790f41c
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -242,10 +238,6 @@ const getAll = async (
     .promise()
     .query<IOffer[]>(sql)
     .then(([results]) => {
-<<<<<<< HEAD
-     
-=======
->>>>>>> 2ddcf253a8b44e1a03d68f0b118459659790f41c
       return results;
     });
 };
