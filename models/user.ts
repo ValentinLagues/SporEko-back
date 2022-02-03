@@ -25,6 +25,7 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     city: Joi.string().max(255),
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
+    hash_password: Joi.string().max(255),
     picture: Joi.string().max(255),
     id_country: Joi.number().integer().min(1).presence(presence),
     is_admin: Joi.number().integer().min(0).max(1),
@@ -251,6 +252,12 @@ const update = async (
   }
   if (attibutesToUpdate.password) {
     const hash_password = await hashPassword(attibutesToUpdate.password);
+    sql += oneValue ? ', hash_password = ? ' : ' hash_password = ? ';
+    sqlValues.push(hash_password);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.hash_password) {
+    const hash_password = await hashPassword(attibutesToUpdate.hash_password);
     sql += oneValue ? ', hash_password = ? ' : ' hash_password = ? ';
     sqlValues.push(hash_password);
     oneValue = true;

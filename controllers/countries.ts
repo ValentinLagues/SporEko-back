@@ -64,11 +64,11 @@ countriesRouter.put(
         req.body as ICountries
       );
       if (countryUpdated) {
-        res.status(200).send('Athletic updated');
+        res.status(200).json({ id: id });
       } else if (!countryUpdated) {
-        res.status(404).send('Athletic not found');
+        res.status(404).send('Country not found');
       } else {
-        throw new ErrorHandler(500, `Athletic can't be updated`);
+        throw new ErrorHandler(500, `Country can't be updated`);
       }
     })();
   }
@@ -82,9 +82,9 @@ countriesRouter.delete(
         const { id } = req.params;
         const countriesDeleted = await Countries.destroy(Number(id));
         if (countriesDeleted) {
-          res.status(200).send('Athletic deleted');
+          res.status(200).send('Country deleted');
         } else {
-          throw new ErrorHandler(404, `Athletic not found`);
+          throw new ErrorHandler(404, `Country not found`);
         }
       } catch (err) {
         next(err);

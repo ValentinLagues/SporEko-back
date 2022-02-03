@@ -4,6 +4,7 @@ import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
 import ISport from '../interfaces/ISport';
+import multer from 'multer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -38,6 +39,34 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
     }
   })();
 };
+
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, './imageSport');
+  },
+  filename: function (_req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+  //reject file
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png'
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error('error'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 167 },
+  fileFilter: fileFilter,
+});
 
 /* ------------------------------------------------Models----------------------------------------------------------- */
 
@@ -82,8 +111,9 @@ const getByName = (name: string): Promise<ISport> => {
 const create = (newSport: ISport): Promise<number> => {
   return connection
     .promise()
-    .query<ResultSetHeader>('INSERT INTO sports (name) VALUES (?)', [
+    .query<ResultSetHeader>('INSERT INTO sports (name, icon) VALUES (?, ?)', [
       newSport.name,
+      newSport.icon,
     ])
     .then(([results]) => results.insertId);
 };
@@ -94,10 +124,17 @@ const update = (
 ): Promise<boolean> => {
   let sql = 'UPDATE sports SET ';
   const sqlValues: Array<string | number> = [];
+  let oneValue = false;
 
   if (attibutesToUpdate.name) {
     sql += 'name = ? ';
     sqlValues.push(attibutesToUpdate.name);
+    oneValue = true;
+  }
+  if (attibutesToUpdate.icon) {
+    sql += oneValue ? ', icon = ? ' : ' icon = ? ';
+    sqlValues.push(attibutesToUpdate.icon);
+    oneValue = true;
   }
   sql += ' WHERE id_sport = ?';
   sqlValues.push(idSport);
@@ -105,6 +142,15 @@ const update = (
   return connection
     .promise()
     .query<ResultSetHeader>(sql, sqlValues)
+    .then(([results]) => results.affectedRows === 1);
+};
+
+const updateImage = (idSport: number, icon: string): Promise<boolean> => {
+  const sql = 'UPDATE sports SET icon = ? WHERE id_sport = ? ';
+
+  return connection
+    .promise()
+    .query<ResultSetHeader>(sql, [icon, idSport])
     .then(([results]) => results.affectedRows === 1);
 };
 
@@ -116,12 +162,14 @@ const destroy = (idSport: number): Promise<boolean> => {
 };
 
 export {
+  upload,
   getAll,
   getById,
   getByName,
   nameIsFree,
   create,
   update,
+  updateImage,
   destroy,
   validateSport,
 };

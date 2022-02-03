@@ -68,7 +68,7 @@ deliverer_pricesRouter.put(
             req.body as IDeliverer_price
           );
         if (deliverer_priceUpdated) {
-          res.status(200).send('Deliverer_price updated');
+          res.status(200).json({ id: idDeliverer_price });
         } else {
           res.status(404).send('Deliverer_price not found');
         }

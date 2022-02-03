@@ -66,7 +66,7 @@ conditionsRouter.put(
         req.body as ICondition
       );
       if (conditionUpdated) {
-        res.status(200).send('Condition updated');
+        res.status(200).json({ id: idCondition });
       } else if (!conditionUpdated) {
         res.status(404).send('Condition not found');
       } else {

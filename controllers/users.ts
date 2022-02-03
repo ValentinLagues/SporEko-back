@@ -136,6 +136,11 @@ usersRouter.put(
     void (async () => {
       const { idUser } = req.params;
 
+      // as react-admin send all fields even when nothing has changed -> that prevent from hashing again the hash_password (would make user unable to connect)
+      if (req.body.hash_password.includes('$argon2')) {
+        req.body.hash_password = undefined;
+      }
+
       const userUpdated = await User.update(Number(idUser), req.body as IUser);
       if (userUpdated) {
         res.status(200).send(req.body);

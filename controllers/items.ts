@@ -86,7 +86,7 @@ itemsRouter.put(
           id_size_type
         );
         if (itemUpdated) {
-          res.status(200).send('Item updated');
+          res.status(200).json({ id: idItem });
         } else {
           res.status(404).send('Item not found');
         }

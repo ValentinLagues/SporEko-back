@@ -67,7 +67,7 @@ brandsRouter.put(
           req.body as IBrand
         );
         if (brandUpdated) {
-          res.status(200).send('Brand updated');
+          res.status(200).json({ id: idBrand });
         } else {
           res.status(404).send('Brand not found');
         }

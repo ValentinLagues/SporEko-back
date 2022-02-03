@@ -64,7 +64,7 @@ athleticsRouter.put(
         req.body as IAthletics
       );
       if (athleticUpdated) {
-        res.status(200).send('Athletic updated');
+        res.status(200).json({ id: idAthletic });
       } else if (!athleticUpdated) {
         res.status(404).send('Athletic not found');
       } else {

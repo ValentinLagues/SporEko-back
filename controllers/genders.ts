@@ -62,7 +62,7 @@ gendersRouter.put(
           child_name
         );
         if (genderUpdated) {
-          res.status(200).send('Gender updated');
+          res.status(200).json({ id: idGender });
         } else {
           res.status(404).send('Gender not found');
         }

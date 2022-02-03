@@ -67,7 +67,7 @@ textilesRouter.put(
         req.body as ITextile
       );
       if (textileUpdated) {
-        res.status(200).send('Textile updated');
+        res.status(200).json({ id: idtextile });
       } else if (!textileUpdated) {
         res.status(404).send('Textile not found');
       } else {

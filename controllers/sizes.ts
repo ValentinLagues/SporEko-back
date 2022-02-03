@@ -63,7 +63,7 @@ sizesRouter.put(
           req.body as ISize
         );
         if (sizeUpdated) {
-          res.status(200).send('Size updated');
+          res.status(200).json({ id: idSize });
         } else {
           res.status(404).send('Size not found');
         }

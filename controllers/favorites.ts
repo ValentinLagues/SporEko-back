@@ -59,7 +59,7 @@ favoritesRouter.put(
         req.body as IFavorite
       );
       if (favoriteUpdated) {
-        res.status(200).send('Favorite updated');
+        res.status(200).json({ id: idFavorite });
       } else if (!favoriteUpdated) {
         res.status(404).send('Favorite not found');
       } else {

@@ -165,7 +165,7 @@ offersRouter.put(
         req.body as IOffer
       );
       if (offerUpdated) {
-        res.status(200).send('Offer updated');
+        res.status(200).json({ id: idOffer });
       } else {
         throw new ErrorHandler(500, `Offer can't be updated`);
       }

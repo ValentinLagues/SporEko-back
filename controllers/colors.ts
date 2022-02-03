@@ -70,7 +70,7 @@ colorsRouter.put(
         req.body as IColor
       );
       if (colorUpdated) {
-        res.status(200).send('Color updated');
+        res.status(200).json({ id: idColor });
       } else {
         throw new ErrorHandler(500, `Color can't be updated`);
       }

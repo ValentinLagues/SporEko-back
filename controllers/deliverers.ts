@@ -66,7 +66,7 @@ deliverersRouter.put(
         req.body as IDeliverer
       );
       if (delivererUpdated) {
-        res.status(200).send('Deliverer updated');
+        res.status(200).json({ id: idDeliverer });
       } else if (!delivererUpdated) {
         res.status(404).send('Deliverer not found');
       } else {

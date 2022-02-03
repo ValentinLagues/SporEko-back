@@ -54,6 +54,23 @@ sportsRouter.post(
   }
 );
 
+sportsRouter.post(
+  '/:id/image',
+  Sport.upload.single('imageSport'),
+  (req: Request, res: Response, next: NextFunction) => {
+    void (() => {
+      try {
+        const icon = `${req.protocol}://${req.get('host')}/imageSport/${
+          req.file?.filename
+        }`;
+        res.status(201).json(icon);
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
+
 sportsRouter.put(
   '/:idsport',
   Sport.nameIsFree,
@@ -67,7 +84,7 @@ sportsRouter.put(
         req.body as ISport
       );
       if (sportUpdated) {
-        res.status(200).send('Sport updated');
+        res.status(200).json({ id: idsport });
       } else if (!sportUpdated) {
         res.status(404).send('Sport not found');
       } else {

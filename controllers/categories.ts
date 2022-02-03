@@ -98,7 +98,7 @@ categoriesRouter.put(
           req.body as ICategory
         );
         if (categoryUpdated) {
-          res.status(200).send('Category updated');
+          res.status(200).json({ id: idCategory });
         } else {
           res.status(404).send('Category not found');
         }

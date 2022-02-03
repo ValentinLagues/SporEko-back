@@ -64,7 +64,7 @@ offer_deliverersRouter.put(
         req.body as IOffer_deliverer
       );
       if (offer_delivererUpdated) {
-        res.status(200).send('Offer_deliverer updated');
+        res.status(200).json({ id: idOffer_deliverer });
       } else if (!offer_delivererUpdated) {
         res.status(404).send('Offer_deliverer not found');
       } else {

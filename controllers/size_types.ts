@@ -67,7 +67,7 @@ size_typesRouter.put(
         req.body as ISize_type
       );
       if (size_typeUpdated) {
-        res.status(200).send('Size_type updated');
+        res.status(200).json({ id: idsize_type });
       } else if (!size_typeUpdated) {
         res.status(404).send('Size_type not found');
       } else {
