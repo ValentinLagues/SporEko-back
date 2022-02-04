@@ -114,6 +114,21 @@ offersRouter.get(
       .catch((err) => next(err));
   }
 );
+offersRouter.get(
+  '/:idOffer/offer_deliv',
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const { idOffer } = req.params;
+    Offer_deliverer.getDelivByIdOffer(Number(idOffer))
+      .then((deliverers) => {
+        if (deliverers === undefined) {
+          res.status(404).send('Offer not found');
+        }
+        res.status(200).json(deliverers);
+      })
+      .catch((err) => next(err));
+  }
+);
 
 offersRouter.post(
   '/images',
@@ -121,6 +136,7 @@ offersRouter.post(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
+        console.log(req.files);
         const reqFile: any = req.files;
         const pictures: Array<string> = [];
         reqFile.map((el: any) => {
@@ -184,6 +200,26 @@ offersRouter.delete(
           res.status(200).send('Offer deleted');
         } else {
           throw new ErrorHandler(404, `Offer not found`);
+        }
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
+offersRouter.delete(
+  '/:idOffer/offer_deliverers',
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const { idOffer } = req.params;
+        const offerDeliverersDeleted = await Offer_deliverer.deleteByIdOffer(
+          Number(idOffer)
+        );
+        if (offerDeliverersDeleted) {
+          res.status(200).send('Offer deliverers deleted');
+        } else {
+          throw new ErrorHandler(404, `Offer deliverers not found`);
         }
       } catch (err) {
         next(err);

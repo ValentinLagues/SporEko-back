@@ -111,10 +111,11 @@ usersRouter.put(
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
     void (async () => {
+      const path = req.file?.originalname.split('.');
       const idUser = req.params.id;
       const picture = `${req.protocol}://${req.get('host')}/imageUser/${
-        req.file?.filename
-      }`;
+        req.params.id
+      }.${path[1]}`;
       const userUpdated = await User.updateImage(Number(idUser), picture);
       if (userUpdated) {
         res.status(200).send({ picture: picture, ...req.file });
