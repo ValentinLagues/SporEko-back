@@ -109,8 +109,9 @@ const storage = multer.diskStorage({
   destination: function (_req, _file, cb) {
     cb(null, './imageUser');
   },
-  filename: function (_req, file, cb) {
-    cb(null, new Date().getTime() + file.originalname);
+  filename: function (req, file, cb) {
+    const path = file.originalname.split('.');
+    cb(null, `${req.params.id}.${path[1]}`);
   },
 });
 
