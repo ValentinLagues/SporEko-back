@@ -14,7 +14,7 @@ const validateSizeType = (req: Request, res: Response, next: NextFunction) => {
   }
   const errors = Joi.object({
     id: Joi.number(),
-    id_sizeType: Joi.number(),
+    id_size_type: Joi.number(),
     name: Joi.string().max(80).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -88,14 +88,14 @@ const create = (newSizeType: ISizeType): Promise<number> => {
 
 const update = (
   idSizeType: number,
-  attibutesToUpdate: ISizeType
+  attributesToUpdate: ISizeType
 ): Promise<boolean> => {
   let sql = 'UPDATE size_types SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_size_type = ?';
   sqlValues.push(idSizeType);

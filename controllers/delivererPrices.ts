@@ -29,7 +29,7 @@ delivererPricesRouter.get(
 delivererPricesRouter.get(
   '/:idDelivererPrice',
   (req: Request, res: Response, next: NextFunction) => {
-    const idDelivererPrice = req.params.idDelivererPrice ;
+    const idDelivererPrice = req.params.idDelivererPrice;
     DelivererPrice.getDelivererPriceById(Number(idDelivererPrice))
       .then((result: IDelivererPrice) => {
         if (result === undefined)
@@ -45,12 +45,19 @@ delivererPricesRouter.post(
   DelivererPrice.validateDelivererPrice,
   DelivererPrice.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
-    const delivererPrice = req.body as IDelivererPrice;
-    DelivererPrice.createDelivererPrice(delivererPrice)
-      .then((createDelivererPrice) =>
-        res.status(201).json({ id: createDelivererPrice, ...req.body })
-      )
-      .catch((err) => next(err));
+    void (async () => {
+      try {
+        const delivererPrice = req.body as IDelivererPrice;
+        const idDelivererPrice = await DelivererPrice.create(delivererPrice);
+        res.status(201).json({
+          id_deliverer_price: idDelivererPrice,
+          id: idDelivererPrice,
+          ...req.body,
+        });
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
@@ -61,7 +68,7 @@ delivererPricesRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idDelivererPrice = req.params.idDelivererPrice ;
+        const idDelivererPrice = req.params.idDelivererPrice;
         const delivererPriceUpdated = await DelivererPrice.updateDelivererPrice(
           Number(idDelivererPrice),
           req.body as IDelivererPrice
@@ -81,7 +88,7 @@ delivererPricesRouter.put(
 delivererPricesRouter.delete(
   '/:idDelivererPrice',
   (req: Request, res: Response, next: NextFunction) => {
-    const idDelivererPrice = req.params.idDelivererPrice ;
+    const idDelivererPrice = req.params.idDelivererPrice;
     DelivererPrice.deleteDelivererPrice(Number(idDelivererPrice))
       .then((deletedDelivererPrice) => {
         if (deletedDelivererPrice)

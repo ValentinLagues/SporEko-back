@@ -8,7 +8,7 @@ const offerDeliverersRouter = Router();
 offerDeliverersRouter.get(
   '/',
   (req: Request, res: Response, next: NextFunction) => {
-    const sortBy = 'id_offerDeliverer';
+    const sortBy = 'id_offer_deliverer';
     const order = 'ASC';
 
     OfferDeliverer.getAll(sortBy, order)
@@ -22,7 +22,7 @@ offerDeliverersRouter.get(
 offerDeliverersRouter.get(
   '/:idOfferDeliverer',
   (req: Request, res: Response, next: NextFunction) => {
-    const idOfferDeliverer = req.params.idOfferDeliverer ;
+    const idOfferDeliverer = req.params.idOfferDeliverer;
     OfferDeliverer.getById(Number(idOfferDeliverer))
       .then((offerDeliverer: IOfferDeliverer) => {
         if (offerDeliverer === undefined) {
@@ -57,7 +57,7 @@ offerDeliverersRouter.put(
   OfferDeliverer.validateOfferDeliverer,
   (req: Request, res: Response) => {
     void (async () => {
-      const idOfferDeliverer = req.params.idOfferDeliverer ;
+      const idOfferDeliverer = req.params.idOfferDeliverer;
 
       const offerDelivererUpdated = await OfferDeliverer.update(
         Number(idOfferDeliverer),
@@ -79,7 +79,7 @@ offerDeliverersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idOfferDeliverer = req.params.idOfferDeliverer ;
+        const idOfferDeliverer = req.params.idOfferDeliverer;
         const offerDelivererDeleted = await OfferDeliverer.destroy(
           Number(idOfferDeliverer)
         );

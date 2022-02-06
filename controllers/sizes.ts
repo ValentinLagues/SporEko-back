@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import ISize from '../interfaces/ISize';
-import Sizes from '../models/size';
+import Size from '../models/size';
 
 const sizesRouter = Router();
 
@@ -10,7 +10,7 @@ sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const firstItem = req.query.firstItem as string;
   const limit = req.query.limit as string;
 
-  Sizes.getAllSizes(sortBy, order, firstItem, limit)
+  Size.getAllSizes(sortBy, order, firstItem, limit)
     .then((sizes: Array<ISize>) => {
       res.setHeader(
         'Content-Range',
@@ -26,8 +26,8 @@ sizesRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idSize = req.params.idSize ;
-        const result = await Sizes.getSizeById(Number(idSize));
+        const idSize = req.params.idSize;
+        const result = await Size.getSizeById(Number(idSize));
         if (result) res.status(200).json(result);
         else res.status(404).send(`Size id:${idSize} not found.`);
       } catch (err) {
@@ -39,12 +39,12 @@ sizesRouter.get(
 
 sizesRouter.post(
   '/',
-  Sizes.validateSize,
+  Size.validateSize,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const size = req.body as ISize;
-      size.id_size = await Sizes.createSize(size);
-      res.status(201).json(size);
+      const idSize = await Size.create(size);
+      res.status(201).json({ id_size: idSize, id: idSize, ...req.body });
     } catch (err) {
       next(err);
     }
@@ -53,12 +53,12 @@ sizesRouter.post(
 
 sizesRouter.put(
   '/:idSize',
-  Sizes.validateSize,
+  Size.validateSize,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idSize = req.params.idSize ;
-        const sizeUpdated = await Sizes.updateSize(
+        const idSize = req.params.idSize;
+        const sizeUpdated = await Size.updateSize(
           Number(idSize),
           req.body as ISize
         );
@@ -76,8 +76,8 @@ sizesRouter.put(
 
 sizesRouter.delete('/:idSize', (req: Request, res: Response) => {
   void (async () => {
-    const idSize = req.params.idSize ;
-    const sizeDeleted = await Sizes.deleteSize(Number(idSize));
+    const idSize = req.params.idSize;
+    const sizeDeleted = await Size.deleteSize(Number(idSize));
     if (sizeDeleted) res.status(201).json(`Size id:${idSize} deleted`);
     else res.status(404).json(`Size id:${idSize} not exist`);
   })();

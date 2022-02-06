@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import Countries from '../models/country';
+import Country from '../models/country';
 import ICountry from '../interfaces/ICountry';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -11,7 +11,7 @@ countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const firstItem = req.query.firstItem as string;
   const limit = req.query.limit as string;
 
-  Countries.getAll(sortBy, order, firstItem, limit)
+  Country.getAll(sortBy, order, firstItem, limit)
     .then((countries: Array<ICountry>) => {
       res.setHeader(
         'Content-Range',
@@ -26,7 +26,7 @@ countriesRouter.get(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    Countries.getById(Number(id))
+    Country.getById(Number(id))
       .then((country: ICountry) => {
         if (country) res.status(200).json(country);
         else res.status(404).send(`Country id:${id} not found.`);
@@ -37,14 +37,16 @@ countriesRouter.get(
 
 countriesRouter.post(
   '/',
-  Countries.nameIsFree,
-  Countries.validatecountries,
+  Country.nameIsFree,
+  Country.validateCountry,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const countries = req.body as ICountry;
-        countries.id_country = await countries.create(countries);
-        res.status(201).json(countries);
+        const country = req.body as ICountry;
+        const idCountry = await Country.create(country);
+        res
+          .status(201)
+          .json({ id_country: idCountry, id: idCountry, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -54,12 +56,12 @@ countriesRouter.post(
 
 countriesRouter.put(
   '/:id',
-  Countries.nameIsFree,
-  Countries.validatecountries,
+  Country.nameIsFree,
+  Country.validateCountry,
   (req: Request, res: Response) => {
     void (async () => {
       const id = req.params.id;
-      const countryUpdated = await Countries.update(
+      const countryUpdated = await Country.update(
         Number(id),
         req.body as ICountry
       );
@@ -80,7 +82,7 @@ countriesRouter.delete(
     void (async () => {
       try {
         const id = req.params.id;
-        const countriesDeleted = await Countries.destroy(Number(id));
+        const countriesDeleted = await Country.destroy(Number(id));
         if (countriesDeleted) {
           res.status(200).send('Country deleted');
         } else {

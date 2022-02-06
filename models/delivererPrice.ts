@@ -17,7 +17,7 @@ const validateDelivererPrice = (
   }
   const errors = Joi.object({
     id: Joi.number(),
-    id_delivererPrice: Joi.number().integer(),
+    id_deliverer_price: Joi.number().integer(),
     name: Joi.string().max(150).presence(required),
     min_weight: Joi.number().integer().presence(required),
     max_weight: Joi.number().integer().presence(required),
@@ -38,8 +38,8 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
       await getDelivererPriceByName(delivererPrice.name);
     if (
       delivererPriceWithSameName &&
-      delivererPriceWithSameName.id_delivererPrice !==
-        req.body.id_delivererPrice
+      delivererPriceWithSameName.id_deliverer_price !==
+        delivererPrice.id_deliverer_price
     ) {
       next(new ErrorHandler(409, `DelivererPrice name already exists`));
     } else {
@@ -91,13 +91,11 @@ const getDelivererPriceByName = (name: string) => {
     .then(([results]) => results[0]);
 };
 
-const createDelivererPrice = (
-  newDelivererPrice: IDelivererPrice
-): Promise<number> => {
+const create = (newDelivererPrice: IDelivererPrice): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO deliverer_prices (name, min_weight, max_weight, price, id_deliverer,) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO deliverer_prices (name, min_weight, max_weight, price, id_deliverer) VALUES (?, ?, ?, ?, ?)',
       [
         newDelivererPrice.name,
         newDelivererPrice.min_weight,
@@ -111,35 +109,35 @@ const createDelivererPrice = (
 
 const updateDelivererPrice = (
   id: number,
-  attibutesToUpdate: IDelivererPrice
+  attributesToUpdate: IDelivererPrice
 ): Promise<boolean> => {
   let sql = 'UPDATE deliverer_prices SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
     oneValue = true;
   }
-  if (attibutesToUpdate.min_weight) {
+  if (attributesToUpdate.min_weight) {
     sql += oneValue ? ', min_weight = ? ' : ' min_weight = ? ';
-    sqlValues.push(attibutesToUpdate.min_weight);
+    sqlValues.push(attributesToUpdate.min_weight);
     oneValue = true;
   }
-  if (attibutesToUpdate.max_weight) {
+  if (attributesToUpdate.max_weight) {
     sql += oneValue ? ', max_weight = ? ' : ' max_weight = ? ';
-    sqlValues.push(attibutesToUpdate.max_weight);
+    sqlValues.push(attributesToUpdate.max_weight);
     oneValue = true;
   }
-  if (attibutesToUpdate.price) {
+  if (attributesToUpdate.price) {
     sql += oneValue ? ', price = ? ' : ' price = ? ';
-    sqlValues.push(attibutesToUpdate.price);
+    sqlValues.push(attributesToUpdate.price);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_deliverer) {
+  if (attributesToUpdate.id_deliverer) {
     sql += oneValue ? ', id_deliverer = ? ' : ' id_deliverer = ? ';
-    sqlValues.push(attibutesToUpdate.id_deliverer);
+    sqlValues.push(attributesToUpdate.id_deliverer);
     oneValue = true;
   }
   sql += ' WHERE id_deliverer_price = ?';
@@ -165,7 +163,7 @@ export default {
   getAllDelivererPrice,
   nameIsFree,
   getDelivererPriceById,
-  createDelivererPrice,
+  create,
   updateDelivererPrice,
   deleteDelivererPrice,
   validateDelivererPrice,

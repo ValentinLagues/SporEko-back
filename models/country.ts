@@ -7,7 +7,7 @@ import ICountry from '../interfaces/ICountry';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validatecountries = (req: Request, res: Response, next: NextFunction) => {
+const validateCountry = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -81,7 +81,7 @@ const create = (newCountry: ICountry): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>('INSERT INTO countries SET ?', [newCountry])
-    .then(([results]) => results.insertId );
+    .then(([results]) => results.insertId);
 };
 
 const update = (
@@ -121,5 +121,5 @@ export default {
   create,
   update,
   destroy,
-  validatecountries,
+  validateCountry,
 };

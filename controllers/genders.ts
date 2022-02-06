@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import IGender from '../interfaces/IGender';
-import Genders from '../models/gender';
+import Gender from '../models/gender';
 
 const gendersRouter = Router();
 
@@ -10,7 +10,7 @@ gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const firstItem = req.query.firstItem as string;
   const limit = req.query.limit as string;
 
-  Genders.getAllGenders(sortBy, order, firstItem, limit)
+  Gender.getAllGenders(sortBy, order, firstItem, limit)
     .then((genders) => {
       res.setHeader(
         'Content-Range',
@@ -24,8 +24,8 @@ gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 gendersRouter.get(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
-    const idGender = req.params.idGender ;
-    Genders.getGenderById(Number(idGender))
+    const idGender = req.params.idGender;
+    Gender.getGenderById(Number(idGender))
       .then((result: IGender) => {
         if (result === undefined)
           res.status(404).send('Error retrieiving data');
@@ -37,26 +37,31 @@ gendersRouter.get(
 
 gendersRouter.post(
   '/',
-  Genders.validateGender,
+  Gender.validateGender,
   (req: Request, res: Response, next: NextFunction) => {
-    const gender = req.body as IGender;
-    Genders.createGender(gender)
-      .then((createGender) =>
-        res.status(201).json({ id: createGender, ...req.body })
-      )
-      .catch((err) => next(err));
+    void (async () => {
+      try {
+        const gender = req.body as IGender;
+        const idGender = await Gender.create(gender);
+        res
+          .status(201)
+          .json({ id_gender: idGender, id: idGender, ...req.body });
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
 gendersRouter.put(
   '/:idGender',
-  Genders.validateGender,
+  Gender.validateGender,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idGender = req.params.idGender ;
+        const idGender = req.params.idGender;
         const { adult_name, child_name } = req.body as IGender;
-        const genderUpdated = await Genders.updateGender(
+        const genderUpdated = await Gender.updateGender(
           Number(idGender),
           adult_name,
           child_name
@@ -76,8 +81,8 @@ gendersRouter.put(
 gendersRouter.delete(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
-    const idGender = req.params.idGender ;
-    Genders.deleteGender(Number(idGender))
+    const idGender = req.params.idGender;
+    Gender.deleteGender(Number(idGender))
       .then((deletedGender) => {
         if (deletedGender)
           res.status(201).json(`Gender id:${idGender} deleted`);

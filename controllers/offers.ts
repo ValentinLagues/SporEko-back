@@ -88,7 +88,7 @@ offersRouter.get(
 offersRouter.get(
   '/:idOffer',
   (req: Request, res: Response, next: NextFunction) => {
-    const idOffer = req.params.idOffer ;
+    const idOffer = req.params.idOffer;
     Offer.getById(Number(idOffer))
       .then((offer: IOffer) => {
         if (offer === undefined) {
@@ -103,7 +103,7 @@ offersRouter.get(
   '/:idOffer/offer_deliverers',
 
   (req: Request, res: Response, next: NextFunction) => {
-    const idOffer = req.params.idOffer ;
+    const idOffer = req.params.idOffer;
     OfferDeliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
         if (deliverers === undefined) {
@@ -118,7 +118,7 @@ offersRouter.get(
   '/:idOffer/offer_deliv',
 
   (req: Request, res: Response, next: NextFunction) => {
-    const idOffer = req.params.idOffer ;
+    const idOffer = req.params.idOffer;
     OfferDeliverer.getDelivByIdOffer(Number(idOffer))
       .then((deliverers) => {
         if (deliverers === undefined) {
@@ -158,8 +158,8 @@ offersRouter.post(
     void (async () => {
       try {
         const offer = req.body as IOffer;
-        offer.id_offer = await Offer.create(offer);
-        res.status(201).json(offer);
+        const idOffer = await Offer.create(offer);
+        res.status(201).json({ id_offer: idOffer, id: idOffer, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -173,7 +173,7 @@ offersRouter.put(
   Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
-      const idOffer = req.params.idOffer ;
+      const idOffer = req.params.idOffer;
 
       const offerUpdated = await Offer.update(
         Number(idOffer),
@@ -193,7 +193,7 @@ offersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idOffer = req.params.idOffer ;
+        const idOffer = req.params.idOffer;
         const offerDeleted = await Offer.destroy(Number(idOffer));
         if (offerDeleted) {
           res.status(200).send('Offer deleted');
@@ -211,7 +211,7 @@ offersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idOffer = req.params.idOffer ;
+        const idOffer = req.params.idOffer;
         const offerDeliverersDeleted = await OfferDeliverer.destroyByIdOffer(
           Number(idOffer)
         );

@@ -45,4 +45,5 @@ export default interface IOffer extends RowDataPacket {
   picture17: string;
   picture18: string;
   picture19: string;
+  picture20: string;
 }

@@ -55,7 +55,7 @@ const getGenderById = (id: number): Promise<IGender> => {
     .then(([result]) => result[0]);
 };
 
-const createGender = (newGender: IGender): Promise<number> => {
+const create = (newGender: IGender): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
@@ -103,7 +103,7 @@ const deleteGender = (id: number): Promise<boolean> => {
 export default {
   getAllGenders,
   getGenderById,
-  createGender,
+  create,
   updateGender,
   deleteGender,
   validateGender,

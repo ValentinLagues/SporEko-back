@@ -7,7 +7,7 @@ import IAthletic from '../interfaces/IAthletic';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
+const validateAthletic = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -25,11 +25,11 @@ const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const Athletic = req.body as IAthletic;
-    const AthleticWithSameName: IAthletic = await getByName(Athletic.name);
+    const athletic = req.body as IAthletic;
+    const AthleticWithSameName: IAthletic = await getByName(athletic.name);
     if (
       AthleticWithSameName &&
-      AthleticWithSameName.id_athletic !== req.body.id_athletic
+      AthleticWithSameName.id_athletic !== athletic.id_athletic
     ) {
       next(new ErrorHandler(409, `Athletic name already exists`));
     } else {
@@ -89,14 +89,14 @@ const create = (newAthletic: IAthletic): Promise<number> => {
 
 const update = (
   idAthletic: number,
-  attibutesToUpdate: IAthletic
+  attributesToUpdate: IAthletic
 ): Promise<boolean> => {
   let sql = 'UPDATE athletics SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_athletic = ?';
   sqlValues.push(idAthletic);
@@ -124,5 +124,5 @@ export default {
   create,
   update,
   destroy,
-  validateAthletics,
+  validateAthletic,
 };

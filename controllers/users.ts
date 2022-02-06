@@ -34,7 +34,7 @@ usersRouter.get(
 usersRouter.get(
   '/:idUser',
   (req: Request, res: Response, next: NextFunction) => {
-    const idUser = req.params.idUser ;
+    const idUser = req.params.idUser;
     User.getById(Number(idUser))
       .then((user: IUser) => {
         if (user === undefined) {
@@ -49,7 +49,7 @@ usersRouter.get(
 usersRouter.get(
   '/:idUser/favorites',
   (req: Request, res: Response, next: NextFunction) => {
-    const idUser = req.params.idUser ;
+    const idUser = req.params.idUser;
     Favorite.getFavoritesByUser(Number(idUser))
       .then((favorites) => res.status(200).json(favorites))
       .catch((err) => next(err));
@@ -60,8 +60,8 @@ usersRouter.get(
   '/:idUser/offers',
 
   (req: Request, res: Response, next: NextFunction) => {
-    const idUser = req.params.idUser ;
-    Offer.getOfferByIdUser(Number(idUser))
+    const idUser = req.params.idUser;
+    Offer.getOffersByIdUser(Number(idUser))
       .then((user) => {
         if (user === undefined) {
           res.status(404).send('User not found');
@@ -96,7 +96,7 @@ usersRouter.post(
     void (async () => {
       try {
         const favorite = req.body as IFavorite;
-        favorite.id_favorite = await Favorite.createFavorite(favorite);
+        favorite.id_favorite = await Favorite.create(favorite);
         res.status(201).json(favorite);
       } catch (err) {
         next(err);
@@ -135,16 +135,17 @@ usersRouter.put(
   User.validateUser,
   (req: Request, res: Response) => {
     void (async () => {
-      const idUser = req.params.idUser ;
+      const idUser = req.params.idUser;
+      const user = req.body as IUser;
 
       // as react-admin send all fields even when nothing has changed -> that prevent from hashing again the hash_password (would make user unable to connect)
-      if (req.body.hash_password.includes('$argon2')) {
-        req.body.hash_password = undefined;
+      if (user.hash_password.includes('$argon2')) {
+        user.hash_password = '';
       }
 
-      const userUpdated = await User.update(Number(idUser), req.body as IUser);
+      const userUpdated = await User.update(Number(idUser), user);
       if (userUpdated) {
-        res.status(200).send(req.body);
+        res.status(200).send(user);
       } else {
         throw new ErrorHandler(500, `User can't be updated`);
       }
@@ -157,7 +158,7 @@ usersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idFavorite = req.params.idFavorite ;
+        const idFavorite = req.params.idFavorite;
         const favoriteDeleted = await Favorite.destroyFavorite(
           Number(idFavorite)
         );
@@ -180,7 +181,7 @@ usersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idUser = req.params.idUser ;
+        const idUser = req.params.idUser;
         const userDeleted = await User.destroy(Number(idUser));
         if (userDeleted) {
           res.status(200).send('User deleted');

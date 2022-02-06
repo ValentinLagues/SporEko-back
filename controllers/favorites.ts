@@ -19,7 +19,7 @@ favoritesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 favoritesRouter.get(
   '/:idFavorite',
   (req: Request, res: Response, next: NextFunction) => {
-    const idFavorite = req.params.idFavorite ;
+    const idFavorite = req.params.idFavorite;
     Favorite.getById(Number(idFavorite))
       .then((favorite: IFavorite) => {
         if (favorite === undefined) {
@@ -38,8 +38,10 @@ favoritesRouter.post(
     void (async () => {
       try {
         const favorite = req.body as IFavorite;
-        favorite.id_favorite = await Favorite.createFavorite(favorite);
-        res.status(201).json(favorite);
+        const idFavorite = await Favorite.create(favorite);
+        res
+          .status(201)
+          .json({ id_favorite: idFavorite, id: idFavorite, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -52,7 +54,7 @@ favoritesRouter.put(
   Favorite.validateFavorite,
   (req: Request, res: Response) => {
     void (async () => {
-      const idFavorite = req.params.idFavorite ;
+      const idFavorite = req.params.idFavorite;
 
       const favoriteUpdated = await Favorite.update(
         Number(idFavorite),
@@ -74,7 +76,7 @@ favoritesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idFavorite = req.params.idFavorite ;
+        const idFavorite = req.params.idFavorite;
         const favoriteDeleted = await Favorite.destroyFavorite(
           Number(idFavorite)
         );

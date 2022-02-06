@@ -89,14 +89,14 @@ const create = (newCondition: ICondition): Promise<number> => {
 
 const update = (
   idCondition: number,
-  attibutesToUpdate: ICondition
+  attributesToUpdate: ICondition
 ): Promise<boolean> => {
   let sql = 'UPDATE conditions SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_condition = ?';
   sqlValues.push(idCondition);
