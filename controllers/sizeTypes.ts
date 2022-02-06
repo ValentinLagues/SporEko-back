@@ -25,7 +25,7 @@ sizeTypesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 sizeTypesRouter.get(
   '/:idSizeType',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idSizeType } = req.params;
+    const idSizeType = req.params.idSizeType ;
     SizeType.getById(Number(idSizeType))
       .then((sizeType: ISizeType) => {
         if (sizeType === undefined) {
@@ -60,7 +60,7 @@ sizeTypesRouter.put(
   SizeType.validateSizeType,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idsizeType } = req.params;
+      const idsizeType = req.params.idSizeType ;
 
       const sizeTypeUpdated = await SizeType.update(
         Number(idsizeType),
@@ -82,7 +82,7 @@ sizeTypesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idsizeType } = req.params;
+        const idsizeType = req.params.idSizeType ;
         const sizeTypeDeleted = await SizeType.destroy(Number(idsizeType));
         if (sizeTypeDeleted) {
           res.status(200).send('SizeType deleted');

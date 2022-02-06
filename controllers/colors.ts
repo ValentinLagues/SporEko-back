@@ -25,7 +25,7 @@ colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 colorsRouter.get(
   '/:idColor',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idColor } = req.params;
+    const idColor = req.params.idColor ;
     Color.getById(Number(idColor))
       .then((color: IColor) => {
         if (color === undefined) {
@@ -63,7 +63,7 @@ colorsRouter.put(
   Color.validateColor,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idColor } = req.params;
+      const idColor = req.params.idColor ;
 
       const colorUpdated = await Color.update(
         Number(idColor),
@@ -83,7 +83,7 @@ colorsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idColor } = req.params;
+        const idColor = req.params.idColor ;
         const colorDeleted = await Color.destroy(Number(idColor));
         if (colorDeleted) {
           res.status(200).send('Color deleted');

@@ -25,7 +25,7 @@ textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 textilesRouter.get(
   '/:idTextile',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idTextile } = req.params;
+    const idTextile = req.params.idTextile ;
     Textile.getById(Number(idTextile))
       .then((textile: ITextile) => {
         if (textile === undefined) {
@@ -60,7 +60,7 @@ textilesRouter.put(
   Textile.validateTextile,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idtextile } = req.params;
+      const idtextile = req.params.idTextile ;
 
       const textileUpdated = await Textile.update(
         Number(idtextile),
@@ -82,7 +82,7 @@ textilesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idtextile } = req.params;
+        const idtextile = req.params.idTextile ;
         const textileDeleted = await Textile.destroy(Number(idtextile));
         if (textileDeleted) {
           res.status(200).send('Textile deleted');

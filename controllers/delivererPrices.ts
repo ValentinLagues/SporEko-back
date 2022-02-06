@@ -29,7 +29,7 @@ delivererPricesRouter.get(
 delivererPricesRouter.get(
   '/:idDelivererPrice',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idDelivererPrice } = req.params;
+    const idDelivererPrice = req.params.idDelivererPrice ;
     DelivererPrice.getDelivererPriceById(Number(idDelivererPrice))
       .then((result: IDelivererPrice) => {
         if (result === undefined)
@@ -61,7 +61,7 @@ delivererPricesRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idDelivererPrice } = req.params;
+        const idDelivererPrice = req.params.idDelivererPrice ;
         const delivererPriceUpdated = await DelivererPrice.updateDelivererPrice(
           Number(idDelivererPrice),
           req.body as IDelivererPrice
@@ -81,7 +81,7 @@ delivererPricesRouter.put(
 delivererPricesRouter.delete(
   '/:idDelivererPrice',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idDelivererPrice } = req.params;
+    const idDelivererPrice = req.params.idDelivererPrice ;
     DelivererPrice.deleteDelivererPrice(Number(idDelivererPrice))
       .then((deletedDelivererPrice) => {
         if (deletedDelivererPrice)

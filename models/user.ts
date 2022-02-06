@@ -1,6 +1,6 @@
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
-import Joi, { number } from 'joi';
+import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
@@ -110,8 +110,9 @@ const storage = multer.diskStorage({
   destination: function (_req, _file, cb) {
     cb(null, './imageUser');
   },
-  filename: function (_req, file, cb) {
-    cb(null, new Date().getTime() + file.originalname);
+  filename: function (req, file, cb) {
+    const path = file.originalname.split('.');
+    cb(null, `${req.params.id}.${path[1]}`);
   },
 });
 

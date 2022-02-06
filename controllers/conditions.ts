@@ -25,7 +25,7 @@ conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 conditionsRouter.get(
   '/:idCondition',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idCondition } = req.params;
+    const idCondition = req.params.idCondition ;
     Condition.getById(Number(idCondition))
       .then((condition: ICondition) => {
         if (condition === undefined) {
@@ -60,7 +60,7 @@ conditionsRouter.put(
   Condition.validateCondition,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idCondition } = req.params;
+      const idCondition = req.params.idCondition ;
       const conditionUpdated = await Condition.update(
         Number(idCondition),
         req.body as ICondition
@@ -81,7 +81,7 @@ conditionsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idCondition } = req.params;
+        const idCondition = req.params.idCondition ;
         const conditionDeleted = await Condition.destroy(Number(idCondition));
         if (conditionDeleted) {
           res.status(200).send('Condition deleted');

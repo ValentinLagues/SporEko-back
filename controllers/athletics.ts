@@ -25,7 +25,7 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 athleticsRouter.get(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const id = req.params.id ;
     Athletics.getById(Number(id))
       .then((athletic: IAthletic) => {
         if (athletic) res.status(200).json(athletic);
@@ -58,7 +58,7 @@ athleticsRouter.put(
   Athletics.validateAthletics,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idAthletic } = req.params;
+      const idAthletic = req.params.idAthletic ;
       const athleticUpdated = await Athletics.update(
         Number(idAthletic),
         req.body as IAthletic
@@ -79,7 +79,7 @@ athleticsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { id } = req.params;
+        const id = req.params.id ;
         const athleticsDeleted = await Athletics.destroy(Number(id));
         if (athleticsDeleted) {
           res.status(200).send('Athletic deleted');

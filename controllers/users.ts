@@ -34,7 +34,7 @@ usersRouter.get(
 usersRouter.get(
   '/:idUser',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idUser } = req.params;
+    const idUser = req.params.idUser ;
     User.getById(Number(idUser))
       .then((user: IUser) => {
         if (user === undefined) {
@@ -49,7 +49,7 @@ usersRouter.get(
 usersRouter.get(
   '/:idUser/favorites',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idUser } = req.params;
+    const idUser = req.params.idUser ;
     Favorite.getFavoritesByUser(Number(idUser))
       .then((favorites) => res.status(200).json(favorites))
       .catch((err) => next(err));
@@ -60,7 +60,7 @@ usersRouter.get(
   '/:idUser/offers',
 
   (req: Request, res: Response, next: NextFunction) => {
-    const { idUser } = req.params;
+    const idUser = req.params.idUser ;
     Offer.getOfferByIdUser(Number(idUser))
       .then((user) => {
         if (user === undefined) {
@@ -111,10 +111,11 @@ usersRouter.put(
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
     void (async () => {
+      const path = req.file?.originalname.split('.');
       const idUser = req.params.id;
       const picture = `${req.protocol}://${req.get('host')}/imageUser/${
-        req.file?.filename
-      }`;
+        req.params.id
+      }.${path[1]}`;
       const userUpdated = await User.updateImage(Number(idUser), picture);
       if (userUpdated) {
         res.status(200).send({ picture: picture, ...req.file });
@@ -134,7 +135,7 @@ usersRouter.put(
   User.validateUser,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idUser } = req.params;
+      const idUser = req.params.idUser ;
 
       // as react-admin send all fields even when nothing has changed -> that prevent from hashing again the hash_password (would make user unable to connect)
       if (req.body.hash_password.includes('$argon2')) {
@@ -156,7 +157,7 @@ usersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idFavorite } = req.params;
+        const idFavorite = req.params.idFavorite ;
         const favoriteDeleted = await Favorite.destroyFavorite(
           Number(idFavorite)
         );
@@ -179,7 +180,7 @@ usersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idUser } = req.params;
+        const idUser = req.params.idUser ;
         const userDeleted = await User.destroy(Number(idUser));
         if (userDeleted) {
           res.status(200).send('User deleted');

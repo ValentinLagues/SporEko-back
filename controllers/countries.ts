@@ -25,7 +25,7 @@ countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 countriesRouter.get(
   '/:id',
   (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const id = req.params.id;
     Countries.getById(Number(id))
       .then((country: ICountry) => {
         if (country) res.status(200).json(country);
@@ -58,7 +58,7 @@ countriesRouter.put(
   Countries.validatecountries,
   (req: Request, res: Response) => {
     void (async () => {
-      const { id } = req.params;
+      const id = req.params.id;
       const countryUpdated = await Countries.update(
         Number(id),
         req.body as ICountry
@@ -79,7 +79,7 @@ countriesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { id } = req.params;
+        const id = req.params.id;
         const countriesDeleted = await Countries.destroy(Number(id));
         if (countriesDeleted) {
           res.status(200).send('Country deleted');

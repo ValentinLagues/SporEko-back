@@ -64,6 +64,15 @@ const getDeliverersByIdOffer = async (
     )
     .then(([results]) => results);
 };
+const getDelivByIdOffer = async (idOffer: number): Promise<IOfferDeliverer> => {
+  return connection
+    .promise()
+    .query<IOfferDeliverer[string | number]>(
+      'SELECT * FROM offer_deliverers WHERE id_offer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
 
 const create = (newOfferDeliverer: IOfferDeliverer): Promise<number> => {
   return connection
@@ -112,12 +121,22 @@ const destroy = (idOfferDeliverer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
+const destroyByIdOffer = (idOffer: number): Promise<boolean> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('DELETE FROM offer_deliverers WHERE id_offer = ?', [
+      idOffer,
+    ])
+    .then(([results]) => results.affectedRows === 1);
+};
 export default {
   getAll,
   getById,
   getDeliverersByIdOffer,
+  getDelivByIdOffer,
   create,
   update,
   destroy,
   validateOfferDeliverer,
+  destroyByIdOffer,
 };

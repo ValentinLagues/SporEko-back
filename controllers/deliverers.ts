@@ -25,7 +25,7 @@ deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 deliverersRouter.get(
   '/:idDeliverer',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idDeliverer } = req.params;
+    const idDeliverer = req.params.idDeliverer ;
     Deliverer.getById(Number(idDeliverer))
       .then((deliverer: IDeliverer) => {
         if (deliverer === undefined) {
@@ -60,7 +60,7 @@ deliverersRouter.put(
   Deliverer.validateDeliverer,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idDeliverer } = req.params;
+      const idDeliverer = req.params.idDeliverer ;
       const delivererUpdated = await Deliverer.update(
         Number(idDeliverer),
         req.body as IDeliverer
@@ -81,7 +81,7 @@ deliverersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idDeliverer } = req.params;
+        const idDeliverer = req.params.idDeliverer ;
         const delivererDeleted = await Deliverer.destroy(Number(idDeliverer));
         if (delivererDeleted) {
           res.status(200).send('Deliverer deleted');

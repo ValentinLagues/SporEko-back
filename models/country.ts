@@ -81,7 +81,7 @@ const create = (newCountry: ICountry): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>('INSERT INTO countries SET ?', [newCountry])
-    .then(([results]) => results.insertId);
+    .then(([results]) => results.insertId );
 };
 
 const update = (

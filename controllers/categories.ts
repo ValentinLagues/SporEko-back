@@ -27,7 +27,7 @@ categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 categoriesRouter.get(
   '/:idCategory',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idCategory } = req.params;
+    const idCategory = req.params.idCategory ;
     Category.getById(Number(idCategory))
       .then((category: ICategory) => {
         if (category === undefined) {
@@ -42,8 +42,9 @@ categoriesRouter.get(
 categoriesRouter.get(
   '/:idCategory/sizes',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idCategory } = req.params;
-    const { id_gender, is_child } = req.query;
+    const idCategory = req.params.idCategory ;
+    const id_gender = req.query.id_gender as string;
+    const is_child = req.query.is_child as string;
     Size.getSizesByCategory(
       Number(idCategory),
       Number(id_gender),
@@ -59,7 +60,7 @@ categoriesRouter.get(
 categoriesRouter.get(
   '/:idCategory/items',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idCategory } = req.params;
+    const idCategory = req.params.idCategory ;
     Item.getItemsByCategory(Number(idCategory))
       .then((results) => {
         res.status(200).json(results);
@@ -92,7 +93,7 @@ categoriesRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idCategory } = req.params;
+        const idCategory = req.params.idCategory ;
         const categoryUpdated = await Category.update(
           Number(idCategory),
           req.body as ICategory
@@ -114,7 +115,7 @@ categoriesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idCategory } = req.params;
+        const idCategory = req.params.idCategory ;
         const categoryDeleted = await Category.destroy(Number(idCategory));
         if (categoryDeleted) {
           res.status(200).send('Category deleted');

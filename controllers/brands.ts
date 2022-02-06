@@ -25,7 +25,7 @@ brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 brandsRouter.get(
   '/:idBrand',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idBrand } = req.params;
+    const idBrand = req.params.idBrand ;
     Brand.getById(Number(idBrand))
       .then((brand: IBrand) => {
         if (brand === undefined) {
@@ -61,7 +61,7 @@ brandsRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idBrand } = req.params;
+        const idBrand = req.params.idBrand ;
         const brandUpdated = await Brand.update(
           Number(idBrand),
           req.body as IBrand
@@ -83,7 +83,7 @@ brandsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idBrand } = req.params;
+        const idBrand = req.params.idBrand ;
         const brandDeleted = await Brand.destroy(Number(idBrand));
         if (brandDeleted) {
           res.status(200).send('Brand deleted');

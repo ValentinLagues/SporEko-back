@@ -24,7 +24,7 @@ gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 gendersRouter.get(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idGender } = req.params;
+    const idGender = req.params.idGender ;
     Genders.getGenderById(Number(idGender))
       .then((result: IGender) => {
         if (result === undefined)
@@ -54,7 +54,7 @@ gendersRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idGender } = req.params;
+        const idGender = req.params.idGender ;
         const { adult_name, child_name } = req.body as IGender;
         const genderUpdated = await Genders.updateGender(
           Number(idGender),
@@ -76,7 +76,7 @@ gendersRouter.put(
 gendersRouter.delete(
   '/:idGender',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idGender } = req.params;
+    const idGender = req.params.idGender ;
     Genders.deleteGender(Number(idGender))
       .then((deletedGender) => {
         if (deletedGender)
