@@ -31,6 +31,8 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
               id: user.id_user,
               pseudo: user.pseudo,
               picture: user.picture,
+              firstname: user.firstname,
+              lastname: user.lastname,
               admin: Number(user.is_admin),
             });
           } else throw new ErrorHandler(401, 'Email or password incorrect');
