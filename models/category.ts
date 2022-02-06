@@ -115,7 +115,7 @@ const destroy = async (idCategory: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateCategory,
   getAll,
   getById,

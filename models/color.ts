@@ -148,7 +148,7 @@ const destroy = async (idColor: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   recordExists,

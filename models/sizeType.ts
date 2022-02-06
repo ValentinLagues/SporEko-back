@@ -3,18 +3,18 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import ISize_type from '../interfaces/ISize_type';
+import ISizeType from '../interfaces/ISizeType';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateSize_type = (req: Request, res: Response, next: NextFunction) => {
+const validateSizeType = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
   }
   const errors = Joi.object({
     id: Joi.number(),
-    id_size_type: Joi.number(),
+    id_sizeType: Joi.number(),
     name: Joi.string().max(80).presence(presence),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
@@ -25,10 +25,10 @@ const validateSize_type = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const size_type = req.body as ISize_type;
-    const size_typeWithSameName: ISize_type = await getByName(size_type.name);
-    if (size_typeWithSameName) {
-      next(new ErrorHandler(409, `Size_type name already exists`));
+    const sizeType = req.body as ISizeType;
+    const sizeTypeWithSameName: ISizeType = await getByName(sizeType.name);
+    if (sizeTypeWithSameName) {
+      next(new ErrorHandler(409, `SizeType name already exists`));
     } else {
       next();
     }
@@ -42,7 +42,7 @@ const getAll = (
   order: string,
   firstItem: string,
   limit: string
-): Promise<ISize_type[]> => {
+): Promise<ISizeType[]> => {
   let sql = `SELECT *, id_size_type as id FROM size_types`;
 
   if (!sortBy) {
@@ -57,38 +57,38 @@ const getAll = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<ISize_type[]>(sql)
+    .query<ISizeType[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idSize_type: number): Promise<ISize_type> => {
+const getById = (idSizeType: number): Promise<ISizeType> => {
   return connection
     .promise()
-    .query<ISize_type[]>('SELECT * FROM size_types WHERE id_size_type = ?', [
-      idSize_type,
+    .query<ISizeType[]>('SELECT * FROM size_types WHERE id_size_type = ?', [
+      idSizeType,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = (name: string): Promise<ISize_type> => {
+const getByName = (name: string): Promise<ISizeType> => {
   return connection
     .promise()
-    .query<ISize_type[]>('SELECT * FROM size_types WHERE name = ?', [name])
+    .query<ISizeType[]>('SELECT * FROM size_types WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = (newSize_type: ISize_type): Promise<number> => {
+const create = (newSizeType: ISizeType): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>('INSERT INTO size_types (name) VALUES (?)', [
-      newSize_type.name,
+      newSizeType.name,
     ])
     .then(([results]) => results.insertId);
 };
 
 const update = (
-  idSize_type: number,
-  attibutesToUpdate: ISize_type
+  idSizeType: number,
+  attibutesToUpdate: ISizeType
 ): Promise<boolean> => {
   let sql = 'UPDATE size_types SET ';
   const sqlValues: Array<string | number> = [];
@@ -98,7 +98,7 @@ const update = (
     sqlValues.push(attibutesToUpdate.name);
   }
   sql += ' WHERE id_size_type = ?';
-  sqlValues.push(idSize_type);
+  sqlValues.push(idSizeType);
 
   return connection
     .promise()
@@ -106,16 +106,16 @@ const update = (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = (idSize_type: number): Promise<boolean> => {
+const destroy = (idSizeType: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>('DELETE FROM size_types WHERE id_size_type = ?', [
-      idSize_type,
+      idSizeType,
     ])
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   getByName,
@@ -123,5 +123,5 @@ export {
   create,
   update,
   destroy,
-  validateSize_type,
+  validateSizeType,
 };

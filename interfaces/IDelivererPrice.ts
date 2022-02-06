@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2';
 
-export default interface IDeliverer_price extends RowDataPacket {
+export default interface IDelivererPrice extends RowDataPacket {
   id_item: number;
   name: string;
   min_weight: number;

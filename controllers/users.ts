@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as User from '../models/user';
-import * as Offer from '../models/offer';
-import * as Favorite from '../models/favorite';
+import User from '../models/user';
+import Offer from '../models/offer';
+import Favorite from '../models/favorite';
 import IUser from '../interfaces/IUser';
-import * as Auth from '../helpers/auth';
+import Auth from '../helpers/auth';
 import { ErrorHandler } from '../helpers/errors';
 import IFavorite from '../interfaces/IFavorite';
 
@@ -23,7 +23,7 @@ usersRouter.get(
       .then((users: Array<IUser>) => {
         res.setHeader(
           'Content-Range',
-          `addresses : 0-${users.length}/${users.length + 1}`
+          `users : 0-${users.length}/${users.length + 1}`
         );
         res.status(200).json(users);
       })

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Countries from '../models/country';
-import ICountries from '../interfaces/ICountries';
+import Countries from '../models/country';
+import ICountry from '../interfaces/ICountry';
 import { ErrorHandler } from '../helpers/errors';
 
 const countriesRouter = Router();
@@ -12,10 +12,10 @@ countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const limit = req.query.limit as string;
 
   Countries.getAll(sortBy, order, firstItem, limit)
-    .then((countries: Array<ICountries>) => {
+    .then((countries: Array<ICountry>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${countries.length}/${countries.length + 1}`
+        `countries : 0-${countries.length}/${countries.length + 1}`
       );
       res.status(200).json(countries);
     })
@@ -27,7 +27,7 @@ countriesRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     Countries.getById(Number(id))
-      .then((country: ICountries) => {
+      .then((country: ICountry) => {
         if (country) res.status(200).json(country);
         else res.status(404).send(`Country id:${id} not found.`);
       })
@@ -42,7 +42,7 @@ countriesRouter.post(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const countries = req.body as ICountries;
+        const countries = req.body as ICountry;
         countries.id_country = await countries.create(countries);
         res.status(201).json(countries);
       } catch (err) {
@@ -61,7 +61,7 @@ countriesRouter.put(
       const { id } = req.params;
       const countryUpdated = await Countries.update(
         Number(id),
-        req.body as ICountries
+        req.body as ICountry
       );
       if (countryUpdated) {
         res.status(200).json({ id: id });

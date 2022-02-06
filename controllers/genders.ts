@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import IGender from '../interfaces/IGender';
-import * as Genders from '../models/gender';
+import Genders from '../models/gender';
 
 const gendersRouter = Router();
 
@@ -14,7 +14,7 @@ gendersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((genders) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${genders.length}/${genders.length + 1}`
+        `genders : 0-${genders.length}/${genders.length + 1}`
       );
       res.status(200).json(genders);
     })

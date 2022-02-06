@@ -111,7 +111,7 @@ const destroy = async (idBrand: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateBrand,
   getAll,
   getById,

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Sport from '../models/sport';
+import Sport from '../models/sport';
 import ISport from '../interfaces/ISport';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((sports: Array<ISport>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${sports.length}/${sports.length + 1}`
+        `sports : 0-${sports.length}/${sports.length + 1}`
       );
       res.status(200).json(sports);
     })

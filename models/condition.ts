@@ -116,7 +116,7 @@ const destroy = (idCondition: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateCondition,
   getAll,
   getById,

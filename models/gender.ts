@@ -100,7 +100,7 @@ const deleteGender = (id: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAllGenders,
   getGenderById,
   createGender,

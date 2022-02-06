@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as User from '../models/user';
+import User from '../models/user';
 import IUser from '../interfaces/IUser';
 import { ErrorHandler } from '../helpers/errors';
-import { calculateToken } from '../helpers/auth';
+import Auth from '../helpers/auth';
 
 const authRouter = Router();
 
@@ -18,7 +18,7 @@ authRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
             user.hash_password
           );
           if (passwordIsCorrect) {
-            const token = calculateToken(
+            const token = Auth.calculateToken(
               user.pseudo,
               user.picture,
               Number(user.id_user),

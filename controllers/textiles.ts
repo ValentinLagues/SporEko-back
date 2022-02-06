@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Textile from '../models/textile';
+import Textile from '../models/textile';
 import ITextile from '../interfaces/ITextile';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((textiles: Array<ITextile>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${textiles.length}/${textiles.length + 1}`
+        `textiles : 0-${textiles.length}/${textiles.length + 1}`
       );
       res.status(200).json(textiles);
     })

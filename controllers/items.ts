@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import IItem from '../interfaces/IItem';
-import * as Size from '../models/size';
-import * as Item from '../models/item';
+import Size from '../models/size';
+import Item from '../models/item';
 
 const itemsRouter = Router();
 
@@ -15,7 +15,7 @@ itemsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((items: Array<IItem>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${items.length}/${items.length + 1}`
+        `items : 0-${items.length}/${items.length + 1}`
       );
       res.status(200).json(items);
     })
@@ -44,7 +44,7 @@ itemsRouter.get(
     Item.getItemById(Number(idItem))
       .then((item) =>
         Size.getSizesBySizeType(
-          item.id_size_type,
+          item.id_sizeType,
           Number(id_gender),
           Number(is_child)
         )
@@ -78,12 +78,12 @@ itemsRouter.put(
     void (async () => {
       try {
         const { idItem } = req.params;
-        const { name, id_category, id_size_type } = req.body as IItem;
+        const { name, id_category, id_sizeType } = req.body as IItem;
         const itemUpdated = await Item.updateItem(
           Number(idItem),
           name,
           id_category,
-          id_size_type
+          id_sizeType
         );
         if (itemUpdated) {
           res.status(200).json({ id: idItem });

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Offer from '../models/offer';
+import Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
-import * as Offer_deliverer from '../models/offer_deliverer';
+import OfferDeliverer from '../models/offerDeliverer';
 import { ErrorHandler } from '../helpers/errors';
 
 const offersRouter = Router();
@@ -77,7 +77,7 @@ offersRouter.get(
       .then((offers: Array<IOffer>) => {
         res.setHeader(
           'Content-Range',
-          `addresses : 0-${offers.length}/${offers.length + 1}`
+          `offers : 0-${offers.length}/${offers.length + 1}`
         );
         res.status(200).json(offers);
       })
@@ -100,11 +100,11 @@ offersRouter.get(
   }
 );
 offersRouter.get(
-  '/:idOffer/offer_deliverers',
+  '/:idOffer/offerDeliverers',
 
   (req: Request, res: Response, next: NextFunction) => {
     const { idOffer } = req.params;
-    Offer_deliverer.getDeliverersByIdOffer(Number(idOffer))
+    OfferDeliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');

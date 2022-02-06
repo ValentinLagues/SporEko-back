@@ -161,7 +161,7 @@ const destroy = (idSport: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   upload,
   getAll,
   getById,

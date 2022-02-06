@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Brand from '../models/brand';
+import Brand from '../models/brand';
 import IBrand from '../interfaces/IBrand';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ brandsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((brands: Array<IBrand>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${brands.length}/${brands.length + 1}`
+        `brands : 0-${brands.length}/${brands.length + 1}`
       );
       res.status(200).json(brands);
     })

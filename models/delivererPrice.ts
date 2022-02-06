@@ -2,10 +2,10 @@ import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
 import { ErrorHandler } from '../helpers/errors';
 import { Request, Response, NextFunction } from 'express';
-import IDeliverer_price from '../interfaces/IDeliverer_price';
+import IDelivererPrice from '../interfaces/IDelivererPrice';
 import Joi from 'joi';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
-const validateDeliverer_price = (
+const validateDelivererPrice = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -17,7 +17,7 @@ const validateDeliverer_price = (
   }
   const errors = Joi.object({
     id: Joi.number(),
-    id_deliverer_price: Joi.number().integer(),
+    id_delivererPrice: Joi.number().integer(),
     name: Joi.string().max(150).presence(required),
     min_weight: Joi.number().integer().presence(required),
     max_weight: Joi.number().integer().presence(required),
@@ -33,27 +33,27 @@ const validateDeliverer_price = (
 
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const deliverer_price = req.body as IDeliverer_price;
-    const deliverer_priceWithSameName: IDeliverer_price =
-      await getDeliverer_priceByName(deliverer_price.name);
+    const delivererPrice = req.body as IDelivererPrice;
+    const delivererPriceWithSameName: IDelivererPrice =
+      await getDelivererPriceByName(delivererPrice.name);
     if (
-      deliverer_priceWithSameName &&
-      deliverer_priceWithSameName.id_deliverer_price !==
-        req.body.id_deliverer_price
+      delivererPriceWithSameName &&
+      delivererPriceWithSameName.id_delivererPrice !==
+        req.body.id_delivererPrice
     ) {
-      next(new ErrorHandler(409, `Deliverer_price name already exists`));
+      next(new ErrorHandler(409, `DelivererPrice name already exists`));
     } else {
       next();
     }
   })();
 };
 /* ------------------------------------------------Models----------------------------------------------------------- */
-const getAllDeliverer_price = (
+const getAllDelivererPrice = (
   sortBy: string,
   order: string,
   firstItem: string,
   limit: string
-): Promise<IDeliverer_price[]> => {
+): Promise<IDelivererPrice[]> => {
   let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
 
   if (!sortBy) {
@@ -68,51 +68,50 @@ const getAllDeliverer_price = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<IDeliverer_price[]>(sql)
+    .query<IDelivererPrice[]>(sql)
     .then(([results]) => results);
 };
 
-const getDeliverer_priceById = (id: number): Promise<IDeliverer_price> => {
+const getDelivererPriceById = (id: number): Promise<IDelivererPrice> => {
   return connection
     .promise()
-    .query<IDeliverer_price[]>(
+    .query<IDelivererPrice[]>(
       'SELECT * FROM deliverer_prices WHERE id_deliverer_price = ? ',
       [id]
     )
     .then(([result]) => result[0]);
 };
 
-const getDeliverer_priceByName = (name: string) => {
+const getDelivererPriceByName = (name: string) => {
   return connection
     .promise()
-    .query<IDeliverer_price[]>(
-      'SELECT * FROM deliverer_prices WHERE name = ?',
-      [name]
-    )
+    .query<IDelivererPrice[]>('SELECT * FROM deliverer_prices WHERE name = ?', [
+      name,
+    ])
     .then(([results]) => results[0]);
 };
 
-const createDeliverer_price = (
-  newDeliverer_price: IDeliverer_price
+const createDelivererPrice = (
+  newDelivererPrice: IDelivererPrice
 ): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
       'INSERT INTO deliverer_prices (name, min_weight, max_weight, price, id_deliverer,) VALUES (?, ?, ?, ?, ?)',
       [
-        newDeliverer_price.name,
-        newDeliverer_price.min_weight,
-        newDeliverer_price.max_weight,
-        newDeliverer_price.price,
-        newDeliverer_price.id_deliverer,
+        newDelivererPrice.name,
+        newDelivererPrice.min_weight,
+        newDelivererPrice.max_weight,
+        newDelivererPrice.price,
+        newDelivererPrice.id_deliverer,
       ]
     )
     .then(([results]) => results.insertId);
 };
 
-const updateDeliverer_price = (
+const updateDelivererPrice = (
   id: number,
-  attibutesToUpdate: IDeliverer_price
+  attibutesToUpdate: IDelivererPrice
 ): Promise<boolean> => {
   let sql = 'UPDATE deliverer_prices SET ';
   const sqlValues: Array<string | number> = [];
@@ -151,7 +150,7 @@ const updateDeliverer_price = (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const deleteDeliverer_price = (id: number): Promise<boolean> => {
+const deleteDelivererPrice = (id: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
@@ -161,13 +160,13 @@ const deleteDeliverer_price = (id: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
-  getDeliverer_priceByName,
-  getAllDeliverer_price,
+export default {
+  getDelivererPriceByName,
+  getAllDelivererPrice,
   nameIsFree,
-  getDeliverer_priceById,
-  createDeliverer_price,
-  updateDeliverer_price,
-  deleteDeliverer_price,
-  validateDeliverer_price,
+  getDelivererPriceById,
+  createDelivererPrice,
+  updateDelivererPrice,
+  deleteDelivererPrice,
+  validateDelivererPrice,
 };

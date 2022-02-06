@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import ISize from '../interfaces/ISize';
-import * as Sizes from '../models/size';
+import Sizes from '../models/size';
 
 const sizesRouter = Router();
 
@@ -14,7 +14,7 @@ sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((sizes: Array<ISize>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${sizes.length}/${sizes.length + 1}`
+        `sizes : 0-${sizes.length}/${sizes.length + 1}`
       );
       res.status(200).json(sizes);
     })

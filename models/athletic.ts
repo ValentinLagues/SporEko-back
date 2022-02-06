@@ -3,7 +3,7 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import IAthletics from '../interfaces/IAthletics';
+import IAthletic from '../interfaces/IAthletic';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -25,8 +25,8 @@ const validateAthletics = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const Athletic = req.body as IAthletics;
-    const AthleticWithSameName: IAthletics = await getByName(Athletic.name);
+    const Athletic = req.body as IAthletic;
+    const AthleticWithSameName: IAthletic = await getByName(Athletic.name);
     if (
       AthleticWithSameName &&
       AthleticWithSameName.id_athletic !== req.body.id_athletic
@@ -45,7 +45,7 @@ const getAll = (
   order: string,
   firstItem: string,
   limit: string
-): Promise<IAthletics[]> => {
+): Promise<IAthletic[]> => {
   let sql = `SELECT *, id_athletic as id FROM athletics`;
 
   if (!sortBy) {
@@ -60,27 +60,27 @@ const getAll = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<IAthletics[]>(sql)
+    .query<IAthletic[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idAthletic: number): Promise<IAthletics> => {
+const getById = (idAthletic: number): Promise<IAthletic> => {
   return connection
     .promise()
-    .query<IAthletics[]>('SELECT * FROM athletics WHERE id_athletic = ?', [
+    .query<IAthletic[]>('SELECT * FROM athletics WHERE id_athletic = ?', [
       idAthletic,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = (name: string): Promise<IAthletics> => {
+const getByName = (name: string): Promise<IAthletic> => {
   return connection
     .promise()
-    .query<IAthletics[]>('SELECT * FROM athletics WHERE name = ?', [name])
+    .query<IAthletic[]>('SELECT * FROM athletics WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = (newAthletic: IAthletics): Promise<number> => {
+const create = (newAthletic: IAthletic): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>('INSERT INTO athletics SET ?', [newAthletic])
@@ -89,7 +89,7 @@ const create = (newAthletic: IAthletics): Promise<number> => {
 
 const update = (
   idAthletic: number,
-  attibutesToUpdate: IAthletics
+  attibutesToUpdate: IAthletic
 ): Promise<boolean> => {
   let sql = 'UPDATE athletics SET ';
   const sqlValues: Array<string | number> = [];
@@ -116,7 +116,7 @@ const destroy = (idAthletic: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   getByName,

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Deliverer from '../models/deliverer';
+import Deliverer from '../models/deliverer';
 import IDeliverer from '../interfaces/IDeliverer';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((deliverers: Array<IDeliverer>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${deliverers.length}/${deliverers.length + 1}`
+        `deliverers : 0-${deliverers.length}/${deliverers.length + 1}`
       );
       res.status(200).json(deliverers);
     })

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Favorite from '../models/favorite';
+import Favorite from '../models/favorite';
 import IFavorite from '../interfaces/IFavorite';
 import { ErrorHandler } from '../helpers/errors';
 

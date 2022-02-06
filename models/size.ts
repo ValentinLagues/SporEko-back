@@ -17,7 +17,7 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
     id_size: Joi.number().integer(),
     id_gender: Joi.number().integer().allow(null),
     is_child: Joi.number().integer().min(0).max(1),
-    id_size_type: Joi.number().integer().presence(required),
+    id_sizeType: Joi.number().integer().presence(required),
     size_int: Joi.string().max(8),
     size_eu: Joi.string().max(8),
     size_fr: Joi.string().max(8),
@@ -77,12 +77,12 @@ const getSizeById = (id: number): Promise<ISize> => {
 };
 
 const getSizesBySizeType = (
-  idSize_type: number,
+  idSizeType: number,
   id_gender: number,
   is_child: number
 ) => {
-  let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
-  const sqlValues: Array<string | number> = [idSize_type];
+  let sql = `SELECT * FROM sizes WHERE id_sizeType = ?`;
+  const sqlValues: Array<string | number> = [idSizeType];
 
   if (id_gender) {
     sql += ` AND id_gender = ?`;
@@ -107,19 +107,19 @@ const getSizesByCategory = (
   let sql = `SELECT * FROM sizes`;
 
   if (idCategory === 1 && !id_gender && !is_child) {
-    sql += ` WHERE id_size_type = 2 OR id_size_type = 3 OR id_size_type = 6`;
+    sql += ` WHERE id_sizeType = 2 OR id_sizeType = 3 OR id_sizeType = 6`;
   }
   if (idCategory === 1 && is_child) {
-    sql += ` WHERE id_size_type = 6`;
+    sql += ` WHERE id_sizeType = 6`;
   } else if (idCategory === 1 && id_gender === 1) {
-    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 1`;
+    sql += ` WHERE (id_sizeType = 2 OR id_sizeType = 3) AND id_gender = 1`;
   } else if (idCategory === 1 && id_gender === 2) {
-    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 2`;
+    sql += ` WHERE (id_sizeType = 2 OR id_sizeType = 3) AND id_gender = 2`;
   }
   if (idCategory === 2 && !is_child) {
-    sql += ` WHERE id_size_type = 1`;
+    sql += ` WHERE id_sizeType = 1`;
   } else if (idCategory === 2 && is_child) {
-    sql += ` WHERE id_size_type = 1 AND is_child = 1`;
+    sql += ` WHERE id_sizeType = 1 AND is_child = 1`;
   }
 
   return connection
@@ -132,11 +132,11 @@ const createSize = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO sizes ( id_gender, is_child, id_size_type, size_int, size_eu, size_fr, size_uk, size_us, size_foot, size_chest, size_pool, size_jeans, age_child, height, hand_turn, size_glove, crotch, size_bike_inches, size_bike, size_wheel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
+      'INSERT INTO sizes ( id_gender, is_child, id_sizeType, size_int, size_eu, size_fr, size_uk, size_us, size_foot, size_chest, size_pool, size_jeans, age_child, height, hand_turn, size_glove, crotch, size_bike_inches, size_bike, size_wheel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
       [
         newSize.id_gender,
         newSize.is_child,
-        newSize.id_size_type,
+        newSize.id_sizeType,
         newSize.size_int,
         newSize.size_eu,
         newSize.size_fr,
@@ -176,9 +176,9 @@ const updateSize = (
     sqlValues.push(attibutesToUpdate.is_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_size_type) {
-    sql += oneValue ? ', id_size_type = ? ' : ' id_size_type = ? ';
-    sqlValues.push(attibutesToUpdate.id_size_type);
+  if (attibutesToUpdate.id_sizeType) {
+    sql += oneValue ? ', id_sizeType = ? ' : ' id_sizeType = ? ';
+    sqlValues.push(attibutesToUpdate.id_sizeType);
     oneValue = true;
   }
   if (attibutesToUpdate.size_int) {
@@ -281,7 +281,7 @@ const deleteSize = (id: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAllSizes,
   getSizeById,
   getSizesBySizeType,

@@ -3,11 +3,11 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import IOffer_deliverer from '../interfaces/IOffer_deliverer';
+import IOfferDeliverer from '../interfaces/IOfferDeliverer';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validateOffer_deliverer = (
+const validateOfferDeliverer = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -32,52 +32,52 @@ const validateOffer_deliverer = (
 const getAll = (
   sortBy = 'id_offer_deliverer',
   order = 'ASC'
-): Promise<IOffer_deliverer[]> => {
+): Promise<IOfferDeliverer[]> => {
   const sql = `SELECT * FROM offer_deliverers ORDER BY ${sortBy} ${order}`;
   if (sortBy === 'id') {
     sortBy = 'id_offer_deliverer';
   }
   return connection
     .promise()
-    .query<IOffer_deliverer[]>(sql)
+    .query<IOfferDeliverer[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idOffer_deliverer: number): Promise<IOffer_deliverer> => {
+const getById = (idOfferDeliverer: number): Promise<IOfferDeliverer> => {
   return connection
     .promise()
-    .query<IOffer_deliverer[]>(
+    .query<IOfferDeliverer[]>(
       'SELECT * FROM offer_deliverers WHERE id_offer_deliverer = ?',
-      [idOffer_deliverer]
+      [idOfferDeliverer]
     )
     .then(([results]) => results[0]);
 };
 
 const getDeliverersByIdOffer = async (
   idOffer: number
-): Promise<IOffer_deliverer> => {
+): Promise<IOfferDeliverer> => {
   return connection
     .promise()
-    .query<IOffer_deliverer[string | number]>(
+    .query<IOfferDeliverer[string | number]>(
       'SELECT id_deliverer FROM offer_deliverers WHERE id_offer = ?',
       [idOffer]
     )
     .then(([results]) => results);
 };
 
-const create = (newOffer_deliverer: IOffer_deliverer): Promise<number> => {
+const create = (newOfferDeliverer: IOfferDeliverer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
       'INSERT INTO offer_deliverers (id_offer, id_deliverer) VALUES (?, ?)',
-      [newOffer_deliverer.id_offer, newOffer_deliverer.id_deliverer]
+      [newOfferDeliverer.id_offer, newOfferDeliverer.id_deliverer]
     )
     .then(([results]) => results.insertId);
 };
 
 const update = (
-  idOffer_deliverer: number,
-  attibutesToUpdate: IOffer_deliverer
+  idOfferDeliverer: number,
+  attibutesToUpdate: IOfferDeliverer
 ): Promise<boolean> => {
   let sql = 'UPDATE offer_deliverers SET ';
   const sqlValues: Array<string | number> = [];
@@ -94,7 +94,7 @@ const update = (
     oneValue = true;
   }
   sql += ' WHERE id_offer_deliverer = ?';
-  sqlValues.push(idOffer_deliverer);
+  sqlValues.push(idOfferDeliverer);
 
   return connection
     .promise()
@@ -102,22 +102,22 @@ const update = (
     .then(([results]) => results.affectedRows === 1);
 };
 
-const destroy = (idOffer_deliverer: number): Promise<boolean> => {
+const destroy = (idOfferDeliverer: number): Promise<boolean> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
       'DELETE FROM offer_deliverers WHERE id_offer_deliverer = ?',
-      [idOffer_deliverer]
+      [idOfferDeliverer]
     )
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   getDeliverersByIdOffer,
   create,
   update,
   destroy,
-  validateOffer_deliverer,
+  validateOfferDeliverer,
 };

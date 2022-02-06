@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Color from '../models/color';
+import Color from '../models/color';
 import IColor from '../interfaces/IColor';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((colors: Array<IColor>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${colors.length}/${colors.length + 1}`
+        `colors : 0-${colors.length}/${colors.length + 1}`
       );
       res.status(200).json(colors);
     })

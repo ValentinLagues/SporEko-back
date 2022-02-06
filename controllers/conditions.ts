@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Condition from '../models/condition';
+import Condition from '../models/condition';
 import ICondition from '../interfaces/ICondition';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((conditions: Array<ICondition>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${conditions.length}/${conditions.length + 1}`
+        `conditions : 0-${conditions.length}/${conditions.length + 1}`
       );
       res.status(200).json(conditions);
     })

@@ -3,7 +3,7 @@ import { ResultSetHeader } from 'mysql2';
 import Joi from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
-import ICountries from '../interfaces/ICountries';
+import ICountry from '../interfaces/ICountry';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -25,8 +25,8 @@ const validatecountries = (req: Request, res: Response, next: NextFunction) => {
 };
 const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
-    const Country = req.body as ICountries;
-    const CountryWithSameName: ICountries = await getByName(Country.name);
+    const Country = req.body as ICountry;
+    const CountryWithSameName: ICountry = await getByName(Country.name);
     if (CountryWithSameName) {
       next(new ErrorHandler(409, `Country name already exists`));
     } else {
@@ -42,7 +42,7 @@ const getAll = (
   order: string,
   firstItem: string,
   limit: string
-): Promise<ICountries[]> => {
+): Promise<ICountry[]> => {
   let sql = `SELECT *, id_country as id FROM countries`;
 
   if (!sortBy) {
@@ -57,27 +57,27 @@ const getAll = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<ICountries[]>(sql)
+    .query<ICountry[]>(sql)
     .then(([results]) => results);
 };
 
-const getById = (idCountry: number): Promise<ICountries> => {
+const getById = (idCountry: number): Promise<ICountry> => {
   return connection
     .promise()
-    .query<ICountries[]>('SELECT * FROM countries WHERE id_country = ?', [
+    .query<ICountry[]>('SELECT * FROM countries WHERE id_country = ?', [
       idCountry,
     ])
     .then(([results]) => results[0]);
 };
 
-const getByName = (name: string): Promise<ICountries> => {
+const getByName = (name: string): Promise<ICountry> => {
   return connection
     .promise()
-    .query<ICountries[]>('SELECT * FROM countries WHERE name = ?', [name])
+    .query<ICountry[]>('SELECT * FROM countries WHERE name = ?', [name])
     .then(([results]) => results[0]);
 };
 
-const create = (newCountry: ICountries): Promise<number> => {
+const create = (newCountry: ICountry): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>('INSERT INTO countries SET ?', [newCountry])
@@ -86,7 +86,7 @@ const create = (newCountry: ICountries): Promise<number> => {
 
 const update = (
   idCountry: number,
-  newAttributes: ICountries
+  newAttributes: ICountry
 ): Promise<boolean> => {
   let sql = 'UPDATE countries SET ';
   const sqlValues: Array<string | number> = [];
@@ -113,7 +113,7 @@ const destroy = (idCountry: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   getByName,

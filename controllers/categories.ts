@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Category from '../models/category';
-import * as Size from '../models/size';
+import Category from '../models/category';
+import Size from '../models/size';
 import ICategory from '../interfaces/ICategory';
 import { ErrorHandler } from '../helpers/errors';
-import * as Item from '../models/item';
+import Item from '../models/item';
 
 const categoriesRouter = Router();
 
@@ -17,7 +17,7 @@ categoriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((categories: Array<ICategory>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${categories.length}/${categories.length + 1}`
+        `categories : 0-${categories.length}/${categories.length + 1}`
       );
       res.status(200).json(categories);
     })

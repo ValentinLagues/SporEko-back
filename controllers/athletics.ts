@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Athletics from '../models/athletic';
-import IAthletics from '../interfaces/IAthletics';
+import Athletics from '../models/athletic';
+import IAthletic from '../interfaces/IAthletic';
 import { ErrorHandler } from '../helpers/errors';
 
 const athleticsRouter = Router();
@@ -12,10 +12,10 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const limit = req.query.limit as string;
 
   Athletics.getAll(sortBy, order, firstItem, limit)
-    .then((athletics: Array<IAthletics>) => {
+    .then((athletics: Array<IAthletic>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${athletics.length}/${athletics.length + 1}`
+        `athletics : 0-${athletics.length}/${athletics.length + 1}`
       );
       res.status(200).json(athletics);
     })
@@ -27,7 +27,7 @@ athleticsRouter.get(
   (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     Athletics.getById(Number(id))
-      .then((athletic: IAthletics) => {
+      .then((athletic: IAthletic) => {
         if (athletic) res.status(200).json(athletic);
         else res.status(404).send(`Athletic id:${id} not found.`);
       })
@@ -42,7 +42,7 @@ athleticsRouter.post(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const athletics = req.body as IAthletics;
+        const athletics = req.body as IAthletic;
         athletics.id_athletic = await Athletics.create(athletics);
         res.status(201).json(athletics);
       } catch (err) {
@@ -61,7 +61,7 @@ athleticsRouter.put(
       const { idAthletic } = req.params;
       const athleticUpdated = await Athletics.update(
         Number(idAthletic),
-        req.body as IAthletics
+        req.body as IAthletic
       );
       if (athleticUpdated) {
         res.status(200).json({ id: idAthletic });
