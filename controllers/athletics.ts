@@ -23,13 +23,14 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 athleticsRouter.get(
-  '/:id',
+  '/:idAthletic',
   (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    Athletic.getById(Number(id))
+    const idAthletic = req.params.idAthletic;
+    Athletic.getById(Number(idAthletic))
       .then((athletic: IAthletic) => {
         if (athletic) res.status(200).json(athletic);
-        else res.status(404).send(`Athletic id:${id} not found.`);
+        else
+          res.status(404).send(`Athletic idAthletic:${idAthletic} not found.`);
       })
       .catch((err) => next(err));
   }
@@ -77,12 +78,12 @@ athleticsRouter.put(
 );
 
 athleticsRouter.delete(
-  '/:id',
+  '/:idAthletic',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const id = req.params.id;
-        const athleticsDeleted = await Athletic.destroy(Number(id));
+        const idAthletic = req.params.idAthletic;
+        const athleticsDeleted = await Athletic.destroy(Number(idAthletic));
         if (athleticsDeleted) {
           res.status(200).send('Athletic deleted');
         } else {

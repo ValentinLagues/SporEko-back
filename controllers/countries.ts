@@ -23,13 +23,13 @@ countriesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 countriesRouter.get(
-  '/:id',
+  '/:idCountry',
   (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    Country.getById(Number(id))
+    const idCountry = req.params.idCountry;
+    Country.getById(Number(idCountry))
       .then((country: ICountry) => {
         if (country) res.status(200).json(country);
-        else res.status(404).send(`Country id:${id} not found.`);
+        else res.status(404).send(`Country idCountry:${idCountry} not found.`);
       })
       .catch((err) => next(err));
   }
@@ -55,18 +55,18 @@ countriesRouter.post(
 );
 
 countriesRouter.put(
-  '/:id',
+  '/:idCountry',
   Country.nameIsFree,
   Country.validateCountry,
   (req: Request, res: Response) => {
     void (async () => {
-      const id = req.params.id;
+      const idCountry = req.params.idCountry;
       const countryUpdated = await Country.update(
-        Number(id),
+        Number(idCountry),
         req.body as ICountry
       );
       if (countryUpdated) {
-        res.status(200).json({ id: id });
+        res.status(200).json({ id: idCountry });
       } else if (!countryUpdated) {
         res.status(404).send('Country not found');
       } else {
@@ -77,12 +77,12 @@ countriesRouter.put(
 );
 
 countriesRouter.delete(
-  '/:id',
+  '/:idCountry',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const id = req.params.id;
-        const countriesDeleted = await Country.destroy(Number(id));
+        const idCountry = req.params.idCountry;
+        const countriesDeleted = await Country.destroy(Number(idCountry));
         if (countriesDeleted) {
           res.status(200).send('Country deleted');
         } else {

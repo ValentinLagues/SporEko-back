@@ -26,7 +26,6 @@ colorsRouter.get(
   '/:idColor',
   (req: Request, res: Response, next: NextFunction) => {
     const idColor = req.params.idColor;
-    console.log(idColor);
     Color.getById(Number(idColor))
       .then((color: IColor) => {
         if (color === undefined) {
