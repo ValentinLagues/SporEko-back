@@ -11,8 +11,10 @@ deliverer_pricesRouter.get(
     const order = req.query.order as string;
     const firstItem = req.query.firstItem as string;
     const limit = req.query.limit as string;
+    const idDeliverer= req.query.idDeliverer as string;
+    const weight = req.query.weight as string;
 
-    Deliverer_price.getAllDeliverer_price(sortBy, order, firstItem, limit)
+    Deliverer_price.getAllDeliverer_price(sortBy, order, firstItem, limit, idDeliverer, weight)
       .then((deliverer_prices: Array<IDeliverer_price>) => {
         res.setHeader(
           'Content-Range',
@@ -39,20 +41,6 @@ deliverer_pricesRouter.get(
       .catch((err) => next(err));
   }
 );
-
-// deliverer_pricesRouter.get(
-//   '/:price',
-//   (req: Request, res: Response, next: NextFunction) => {
-//     const { price } = req.params;
-//     Deliverer_price.getDeliverer_priceByPrice(Number(price))
-//       .then((result: IDeliverer_price) => {
-//         if (result === undefined)
-//           res.status(404).send('Deliverer_price not found');
-//         else res.status(200).json(result);
-//       })
-//       .catch((err) => next(err));
-//   }
-// );
 
 deliverer_pricesRouter.post(
   '/',

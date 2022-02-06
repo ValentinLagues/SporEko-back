@@ -52,10 +52,18 @@ const getAllDeliverer_price = (
   sortBy: string,
   order: string,
   firstItem: string,
-  limit: string
+  limit: string,
+  idDeliverer: string,
+  weight: string
 ): Promise<IDeliverer_price[]> => {
   let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
-
+  let sqlValues: string[] = [];
+  let oneValue = false;
+  if (idDeliverer && weight) {
+    sql += ` WHERE id_deliverer = ? AND ? BETWEEN min_weight AND max_weight`;
+    sqlValues.push(idDeliverer, weight);
+    oneValue = true;
+  }
   if (!sortBy) {
     sql += ` ORDER BY id_deliverer_price ASC`;
   }
@@ -68,7 +76,7 @@ const getAllDeliverer_price = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<IDeliverer_price[]>(sql)
+    .query<IDeliverer_price[]>(sql, sqlValues)
     .then(([results]) => results);
 };
 
@@ -90,17 +98,7 @@ const getDeliverer_priceByName = (name: string) => {
       [name]
     )
     .then(([results]) => results[0]);
-};
-
-// const getDeliverer_priceByPrice = (name: string) => {
-//   return connection
-//     .promise()
-//     .query<IDeliverer_price[]>(
-//       'SELECT price FROM deliverer_prices AS dp INNER JOIN offers AS o WHERE dp.id_deliverer = ? AND o.weight BETWEEN dp.min_weight AND dp.max_weight',
-//       [name]
-//     )
-//     .then(([results]) => results[0]);
-// };
+}
 
 const createDeliverer_price = (
   newDeliverer_price: IDeliverer_price
@@ -176,7 +174,6 @@ export {
   getAllDeliverer_price,
   nameIsFree,
   getDeliverer_priceById,
-  // getDeliverer_priceByPrice,
   createDeliverer_price,
   updateDeliverer_price,
   deleteDeliverer_price,
