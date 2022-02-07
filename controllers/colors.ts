@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Color from '../models/color';
+import Color from '../models/color';
 import IColor from '../interfaces/IColor';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((colors: Array<IColor>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${colors.length}/${colors.length + 1}`
+        `colors : 0-${colors.length}/${colors.length + 1}`
       );
       res.status(200).json(colors);
     })
@@ -25,7 +25,7 @@ colorsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 colorsRouter.get(
   '/:idColor',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idColor } = req.params;
+    const idColor = req.params.idColor;
     Color.getById(Number(idColor))
       .then((color: IColor) => {
         if (color === undefined) {
@@ -46,8 +46,8 @@ colorsRouter.post(
     void (async () => {
       try {
         const color = req.body as IColor;
-        color.id_color = await Color.create(color);
-        res.status(201).json(color);
+        const idColor = await Color.create(color);
+        res.status(201).json({ id_color: idColor, id: idColor, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -63,14 +63,14 @@ colorsRouter.put(
   Color.validateColor,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idColor } = req.params;
+      const idColor = req.params.idColor;
 
       const colorUpdated = await Color.update(
         Number(idColor),
         req.body as IColor
       );
       if (colorUpdated) {
-        res.status(200).send('Color updated');
+        res.status(200).json({ id: idColor });
       } else {
         throw new ErrorHandler(500, `Color can't be updated`);
       }
@@ -83,7 +83,7 @@ colorsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idColor } = req.params;
+        const idColor = req.params.idColor;
         const colorDeleted = await Color.destroy(Number(idColor));
         if (colorDeleted) {
           res.status(200).send('Color deleted');

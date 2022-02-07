@@ -88,14 +88,14 @@ const create = async (newCategory: ICategory): Promise<number> => {
 
 const update = async (
   idCategory: number,
-  attibutesToUpdate: ICategory
+  attributesToUpdate: ICategory
 ): Promise<boolean> => {
   let sql = 'UPDATE categories SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_category = ?';
   sqlValues.push(idCategory);
@@ -115,7 +115,7 @@ const destroy = async (idCategory: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateCategory,
   getAll,
   getById,

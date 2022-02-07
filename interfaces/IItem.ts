@@ -4,5 +4,5 @@ export default interface IItems extends RowDataPacket {
   id_item: number;
   name: string;
   id_category: number;
-  id_size_type: number;
+  id_sizeType: number;
 }

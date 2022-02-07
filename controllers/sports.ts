@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Sport from '../models/sport';
+import Sport from '../models/sport';
 import ISport from '../interfaces/ISport';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((sports: Array<ISport>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${sports.length}/${sports.length + 1}`
+        `sports : 0-${sports.length}/${sports.length + 1}`
       );
       res.status(200).json(sports);
     })
@@ -25,7 +25,7 @@ sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 sportsRouter.get(
   '/:idSport',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idSport } = req.params;
+    const idSport = req.params.idSport;
     Sport.getById(Number(idSport))
       .then((sport: ISport) => {
         if (sport === undefined) {
@@ -45,8 +45,25 @@ sportsRouter.post(
     void (async () => {
       try {
         const sport = req.body as ISport;
-        sport.id_sport = await Sport.create(sport);
-        res.status(201).json(sport);
+        const idSport = await Sport.create(sport);
+        res.status(201).json({ id_sport: idSport, id: idSport, ...req.body });
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
+
+sportsRouter.post(
+  '/:id/image',
+  Sport.upload.single('imageSport'),
+  (req: Request, res: Response, next: NextFunction) => {
+    void (() => {
+      try {
+        const icon = `${req.protocol}://${req.get('host')}/imageSport/${
+          req.file?.filename
+        }`;
+        res.status(201).json(icon);
       } catch (err) {
         next(err);
       }
@@ -60,14 +77,14 @@ sportsRouter.put(
   Sport.validateSport,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idsport } = req.params;
+      const idsport = req.params.idSport;
 
       const sportUpdated = await Sport.update(
         Number(idsport),
         req.body as ISport
       );
       if (sportUpdated) {
-        res.status(200).send('Sport updated');
+        res.status(200).json({ id: idsport });
       } else if (!sportUpdated) {
         res.status(404).send('Sport not found');
       } else {
@@ -82,7 +99,7 @@ sportsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idsport } = req.params;
+        const idsport = req.params.idSport;
         const sportDeleted = await Sport.destroy(Number(idsport));
         if (sportDeleted) {
           res.status(200).send('Sport deleted');

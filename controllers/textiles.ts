@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Textile from '../models/textile';
+import Textile from '../models/textile';
 import ITextile from '../interfaces/ITextile';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((textiles: Array<ITextile>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${textiles.length}/${textiles.length + 1}`
+        `textiles : 0-${textiles.length}/${textiles.length + 1}`
       );
       res.status(200).json(textiles);
     })
@@ -25,7 +25,7 @@ textilesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 textilesRouter.get(
   '/:idTextile',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idTextile } = req.params;
+    const idTextile = req.params.idTextile;
     Textile.getById(Number(idTextile))
       .then((textile: ITextile) => {
         if (textile === undefined) {
@@ -45,8 +45,10 @@ textilesRouter.post(
     void (async () => {
       try {
         const textile = req.body as ITextile;
-        textile.id_textile = await Textile.create(textile);
-        res.status(201).json(textile);
+        const idTextile = await Textile.create(textile);
+        res
+          .status(201)
+          .json({ id_textile: idTextile, id: idTextile, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -60,14 +62,14 @@ textilesRouter.put(
   Textile.validateTextile,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idtextile } = req.params;
+      const idtextile = req.params.idTextile;
 
       const textileUpdated = await Textile.update(
         Number(idtextile),
         req.body as ITextile
       );
       if (textileUpdated) {
-        res.status(200).send('Textile updated');
+        res.status(200).json({ id: idtextile });
       } else if (!textileUpdated) {
         res.status(404).send('Textile not found');
       } else {
@@ -82,7 +84,7 @@ textilesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idtextile } = req.params;
+        const idtextile = req.params.idTextile;
         const textileDeleted = await Textile.destroy(Number(idtextile));
         if (textileDeleted) {
           res.status(200).send('Textile deleted');
