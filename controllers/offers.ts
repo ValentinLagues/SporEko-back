@@ -48,7 +48,6 @@ offersRouter.get(
       id_textile,
       id_size,
       id_color1,
-      id_color2,
       id_condition,
       minPrice,
       maxPrice,
@@ -69,7 +68,6 @@ offersRouter.get(
       Number(id_textile),
       Number(id_size),
       Number(id_color1),
-      Number(id_color2),
       Number(id_condition),
       Number(minPrice),
       Number(maxPrice)

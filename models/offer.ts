@@ -124,101 +124,111 @@ const getAll = async (
   id_textile: number,
   id_size: number,
   id_color1: number,
-  id_color2: number,
   id_condition: number,
   minPrice: number,
   maxPrice: number
 ): Promise<IOffer[]> => {
   let sql = `SELECT *, id_offer as id FROM offers`;
+  const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
   if (id_user_seller) {
-    sql += ` WHERE id_user_seller = ${id_user_seller}`;
+    sql += ` WHERE id_user_seller = ?`;
+    sqlValues.push(id_user_seller);
     oneValue = true;
   }
   if (title) {
     sql += oneValue
-      ? ` AND title LIKE '%${title}%'`
-      : ` WHERE title LIKE '%${title}%'`;
+      ? ` AND title LIKE ?`
+      : ` WHERE title LIKE ?`;
+      title = '%' + title + '%';
+      sqlValues.push(title);
     oneValue = true;
   }
   if (id_sport) {
     sql += oneValue
-      ? ` AND id_sport = ${id_sport}`
-      : ` WHERE id_sport = ${id_sport}`;
+      ? ` AND id_sport = ?`
+      : ` WHERE id_sport = ?`;
+      sqlValues.push(id_sport);
     oneValue = true;
   }
   if (id_gender) {
     sql += oneValue
-      ? ` AND id_gender = ${id_gender}`
-      : ` WHERE id_gender = ${id_gender}`;
+      ? ` AND id_gender = ?`
+      : ` WHERE id_gender = ?`;
+      sqlValues.push(id_gender);
     oneValue = true;
   }
   if (is_child) {
     sql += oneValue
-      ? ` AND is_child = ${is_child}`
-      : ` WHERE is_child = ${is_child}`;
+      ? ` AND is_child = ?`
+      : ` WHERE is_child = ?`;
+      sqlValues.push(is_child);
     oneValue = true;
   }
   if (id_category) {
     sql += oneValue
-      ? ` AND id_category = ${id_category}`
-      : ` WHERE id_category = ${id_category}`;
+      ? ` AND id_category = ?`
+      : ` WHERE id_category = ?`;
+      sqlValues.push(id_category);
     oneValue = true;
   }
   if (id_item) {
     sql += oneValue
-      ? ` AND id_item = ${id_item}`
-      : ` WHERE id_item = ${id_item}`;
+      ? ` AND id_item = ?`
+      : ` WHERE id_item = ?`;
+      sqlValues.push(id_item);
     oneValue = true;
   }
   if (id_brand) {
     sql += oneValue
-      ? ` AND id_brand = ${id_brand}`
-      : ` WHERE id_brand = ${id_brand}`;
+      ? ` AND id_brand = ?`
+      : ` WHERE id_brand = ?`;
+      sqlValues.push(id_brand);
     oneValue = true;
   }
   if (id_textile) {
     sql += oneValue
-      ? ` AND id_textile = ${id_textile}`
-      : ` WHERE id_textile = ${id_textile}`;
+      ? ` AND id_textile = ?`
+      : ` WHERE id_textile = ?`;
+      sqlValues.push(id_textile);
     oneValue = true;
   }
   if (id_size) {
     sql += oneValue
-      ? ` AND id_size = ${id_size}`
-      : ` WHERE id_size = ${id_size}`;
+      ? ` AND id_size = ?`
+      : ` WHERE id_size = ?`;
+      sqlValues.push(id_size);
     oneValue = true;
   }
   if (id_color1) {
     sql += oneValue
-      ? ` AND id_color1 = ${id_color1}`
-      : ` WHERE id_color1 = ${id_color1}`;
-    oneValue = true;
-  }
-  if (id_color2) {
-    sql += oneValue
-      ? ` AND id_color2 = ${id_color2}`
-      : ` WHERE id_color2 = ${id_color2}`;
+      ? ` AND id_color1 = ? OR id_color2 = ?`
+      : ` WHERE id_color1 = ? OR id_color2 = ?`;
+      sqlValues.push(id_color1, id_color1);
     oneValue = true;
   }
   if (id_condition) {
     sql += oneValue
-      ? ` AND id_condition = ${id_condition}`
-      : ` WHERE id_condition = ${id_condition}`;
+      ? ` AND id_condition = ?`
+      : ` WHERE id_condition = ?`;
+      sqlValues.push(id_condition);
     oneValue = true;
   }
 
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
       sql += oneValue
-        ? ` AND price BETWEEN ${minPrice} AND ${maxPrice}`
-        : ` WHERE price BETWEEN ${minPrice} AND ${maxPrice}`;
+        ? ` AND price BETWEEN ? AND ?`
+        : ` WHERE price BETWEEN ? AND ?`;
+        sqlValues.push(minPrice, maxPrice);
       oneValue = true;
-    } else {
+    } else { 
+      // for > 100€ value (no max)
       sql += oneValue
-        ? ` AND price > ${minPrice}`
-        : ` WHERE price > ${minPrice}`;
+        ? ` AND price > ?`
+        : ` WHERE price > ?`;
+        sqlValues.push(minPrice);
       oneValue = true;
     }
   }
@@ -236,7 +246,7 @@ const getAll = async (
 
   return connection
     .promise()
-    .query<IOffer[]>(sql)
+    .query<IOffer[]>(sql, sqlValues)
     .then(([results]) => {
       return results;
     });
