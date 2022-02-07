@@ -58,7 +58,7 @@ const getDeliverersByIdOffer = async (
 ): Promise<IOfferDeliverer[]> => {
   return connection
     .promise()
-    .query<IOfferDeliverer[string | number]>(
+    .query<IOfferDeliverer[]>(
       'SELECT d.* FROM deliverers AS d INNER JOIN offer_deliverers AS od ON d.id_deliverer = od.id_deliverer WHERE od.id_offer = ?',
       [idOffer]
     )
