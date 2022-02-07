@@ -71,6 +71,18 @@ const getById = (idDeliverer: number): Promise<IDeliverer> => {
     .then(([results]) => results[0]);
 };
 
+const getDeliverersByIdOffer = async (
+  idOffer: number
+): Promise<IDeliverer[]> => {
+  return connection
+    .promise()
+    .query<IDeliverer[]>(
+      'SELECT d.* FROM deliverers AS d INNER JOIN offer_deliverers AS od ON d.id_deliverer = od.id_deliverer WHERE od.id_offer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
+
 const getByName = (name: string): Promise<IDeliverer> => {
   return connection
     .promise()
@@ -125,4 +137,5 @@ export default {
   create,
   update,
   destroy,
+  getDeliverersByIdOffer
 };

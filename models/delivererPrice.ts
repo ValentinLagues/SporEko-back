@@ -3,6 +3,7 @@ import { ResultSetHeader } from 'mysql2';
 import { ErrorHandler } from '../helpers/errors';
 import { Request, Response, NextFunction } from 'express';
 import IDelivererPrice from '../interfaces/IDelivererPrice';
+import IDeliverer from '../interfaces/IDeliverer.js';
 import Joi from 'joi';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 const validateDelivererPrice = (
@@ -52,10 +53,18 @@ const getAllDelivererPrice = (
   sortBy: string,
   order: string,
   firstItem: string,
-  limit: string
+  limit: string,
+  idDeliverer: string,
+  weight: string
 ): Promise<IDelivererPrice[]> => {
   let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
-
+  let sqlValues: string[] = [];
+  let oneValue = false;
+  if (idDeliverer && weight) {
+    sql += ` WHERE id_deliverer = ? AND ? BETWEEN min_weight AND max_weight`;
+    sqlValues.push(idDeliverer, weight);
+    oneValue = true;
+  }
   if (!sortBy) {
     sql += ` ORDER BY id_deliverer_price ASC`;
   }
@@ -68,7 +77,7 @@ const getAllDelivererPrice = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<IDelivererPrice[]>(sql)
+    .query<IDelivererPrice[]>(sql, sqlValues)
     .then(([results]) => results);
 };
 
@@ -89,7 +98,8 @@ const getDelivererPriceByName = (name: string) => {
       name,
     ])
     .then(([results]) => results[0]);
-};
+}
+
 
 const create = (newDelivererPrice: IDelivererPrice): Promise<number> => {
   return connection

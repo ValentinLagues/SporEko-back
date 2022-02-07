@@ -11,8 +11,10 @@ delivererPricesRouter.get(
     const order = req.query.order as string;
     const firstItem = req.query.firstItem as string;
     const limit = req.query.limit as string;
+    const idDeliverer= req.query.idDeliverer as string;
+    const weight = req.query.weight as string;
 
-    DelivererPrice.getAllDelivererPrice(sortBy, order, firstItem, limit)
+    DelivererPrice.getAllDelivererPrice(sortBy, order, firstItem, limit, idDeliverer, weight)
       .then((delivererPrices: Array<IDelivererPrice>) => {
         res.setHeader(
           'Content-Range',

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from 'express';
 import Offer from '../models/offer';
 import IOffer from '../interfaces/IOffer';
 import OfferDeliverer from '../models/offerDeliverer';
+import Deliverer from '../models/deliverer';
 import { ErrorHandler } from '../helpers/errors';
 
 const offersRouter = Router();
@@ -98,11 +99,11 @@ offersRouter.get(
   }
 );
 offersRouter.get(
-  '/:idOffer/offer_deliverers',
+  '/:idOffer/deliverers',
 
   (req: Request, res: Response, next: NextFunction) => {
     const idOffer = req.params.idOffer;
-    OfferDeliverer.getDeliverersByIdOffer(Number(idOffer))
+    Deliverer.getDeliverersByIdOffer(Number(idOffer))
       .then((deliverers) => {
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');

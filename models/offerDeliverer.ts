@@ -53,17 +53,6 @@ const getById = (idOfferDeliverer: number): Promise<IOfferDeliverer> => {
     .then(([results]) => results[0]);
 };
 
-const getDeliverersByIdOffer = async (
-  idOffer: number
-): Promise<IOfferDeliverer[]> => {
-  return connection
-    .promise()
-    .query<IOfferDeliverer[]>(
-      'SELECT id_deliverer FROM offer_deliverers WHERE id_offer = ?',
-      [idOffer]
-    )
-    .then(([results]) => results);
-};
 const getDelivByIdOffer = async (
   idOffer: number
 ): Promise<IOfferDeliverer[]> => {
@@ -134,7 +123,6 @@ const destroyByIdOffer = (idOffer: number): Promise<boolean> => {
 export default {
   getAll,
   getById,
-  getDeliverersByIdOffer,
   getDelivByIdOffer,
   create,
   update,
