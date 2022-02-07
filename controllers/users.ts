@@ -111,7 +111,7 @@ usersRouter.put(
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
     void (async () => {
-      const path = req.file?.originalname.split('.');
+      const path = req.file?.originalname.split('.') || [];
       const idUser = req.params.idUser;
       const picture = `${req.protocol}://${req.get('host')}/imageUser/${
         req.params.id
@@ -139,7 +139,7 @@ usersRouter.put(
       const user = req.body as IUser;
 
       // as react-admin send all fields even when nothing has changed -> that prevent from hashing again the hash_password (would make user unable to connect)
-      if (user.hash_password.includes('$argon2')) {
+      if (user.hash_password?.includes('$argon2')) {
         user.hash_password = '';
       }
 
