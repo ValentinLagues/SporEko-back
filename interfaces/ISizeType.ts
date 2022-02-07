@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2';
 
 export default interface ISizeType extends RowDataPacket {
-  id_sizeType: number;
+  id_size_type: number;
   name: string;
 }

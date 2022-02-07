@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import Athletics from '../models/athletic';
+import Athletic from '../models/athletic';
 import IAthletic from '../interfaces/IAthletic';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -11,7 +11,7 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const firstItem = req.query.firstItem as string;
   const limit = req.query.limit as string;
 
-  Athletics.getAll(sortBy, order, firstItem, limit)
+  Athletic.getAll(sortBy, order, firstItem, limit)
     .then((athletics: Array<IAthletic>) => {
       res.setHeader(
         'Content-Range',
@@ -23,13 +23,14 @@ athleticsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 athleticsRouter.get(
-  '/:id',
+  '/:idAthletic',
   (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    Athletics.getById(Number(id))
+    const idAthletic = req.params.idAthletic;
+    Athletic.getById(Number(idAthletic))
       .then((athletic: IAthletic) => {
         if (athletic) res.status(200).json(athletic);
-        else res.status(404).send(`Athletic id:${id} not found.`);
+        else
+          res.status(404).send(`Athletic idAthletic:${idAthletic} not found.`);
       })
       .catch((err) => next(err));
   }
@@ -37,14 +38,16 @@ athleticsRouter.get(
 
 athleticsRouter.post(
   '/',
-  Athletics.nameIsFree,
-  Athletics.validateAthletics,
+  Athletic.nameIsFree,
+  Athletic.validateAthletic,
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
         const athletics = req.body as IAthletic;
-        athletics.id_athletic = await Athletics.create(athletics);
-        res.status(201).json(athletics);
+        const idAthletic = await Athletic.create(athletics);
+        res
+          .status(201)
+          .json({ id_athletic: idAthletic, id: idAthletic, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -54,12 +57,12 @@ athleticsRouter.post(
 
 athleticsRouter.put(
   '/:idAthletic',
-  Athletics.nameIsFree,
-  Athletics.validateAthletics,
+  Athletic.nameIsFree,
+  Athletic.validateAthletic,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idAthletic } = req.params;
-      const athleticUpdated = await Athletics.update(
+      const idAthletic = req.params.idAthletic;
+      const athleticUpdated = await Athletic.update(
         Number(idAthletic),
         req.body as IAthletic
       );
@@ -75,12 +78,12 @@ athleticsRouter.put(
 );
 
 athleticsRouter.delete(
-  '/:id',
+  '/:idAthletic',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { id } = req.params;
-        const athleticsDeleted = await Athletics.destroy(Number(id));
+        const idAthletic = req.params.idAthletic;
+        const athleticsDeleted = await Athletic.destroy(Number(idAthletic));
         if (athleticsDeleted) {
           res.status(200).send('Athletic deleted');
         } else {

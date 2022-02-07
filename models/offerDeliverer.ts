@@ -55,11 +55,22 @@ const getById = (idOfferDeliverer: number): Promise<IOfferDeliverer> => {
 
 const getDeliverersByIdOffer = async (
   idOffer: number
-): Promise<IOfferDeliverer> => {
+): Promise<IOfferDeliverer[]> => {
   return connection
     .promise()
-    .query<IOfferDeliverer[string | number]>(
+    .query<IOfferDeliverer[]>(
       'SELECT id_deliverer FROM offer_deliverers WHERE id_offer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
+const getDelivByIdOffer = async (
+  idOffer: number
+): Promise<IOfferDeliverer[]> => {
+  return connection
+    .promise()
+    .query<IOfferDeliverer[]>(
+      'SELECT * FROM offer_deliverers WHERE id_offer = ?',
       [idOffer]
     )
     .then(([results]) => results);
@@ -77,20 +88,20 @@ const create = (newOfferDeliverer: IOfferDeliverer): Promise<number> => {
 
 const update = (
   idOfferDeliverer: number,
-  attibutesToUpdate: IOfferDeliverer
+  attributesToUpdate: IOfferDeliverer
 ): Promise<boolean> => {
   let sql = 'UPDATE offer_deliverers SET ';
   const sqlValues: Array<string | number> = [];
 
   let oneValue = false;
-  if (attibutesToUpdate.id_offer) {
+  if (attributesToUpdate.id_offer) {
     sql += 'id_offer = ? ';
-    sqlValues.push(attibutesToUpdate.id_offer);
+    sqlValues.push(attributesToUpdate.id_offer);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_deliverer) {
+  if (attributesToUpdate.id_deliverer) {
     sql += oneValue ? ', id_deliverer = ? ' : ' id_deliverer = ? ';
-    sqlValues.push(attibutesToUpdate.id_deliverer);
+    sqlValues.push(attributesToUpdate.id_deliverer);
     oneValue = true;
   }
   sql += ' WHERE id_offer_deliverer = ?';
@@ -112,12 +123,22 @@ const destroy = (idOfferDeliverer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
+const destroyByIdOffer = (idOffer: number): Promise<boolean> => {
+  return connection
+    .promise()
+    .query<ResultSetHeader>('DELETE FROM offer_deliverers WHERE id_offer = ?', [
+      idOffer,
+    ])
+    .then(([results]) => results.affectedRows === 1);
+};
 export default {
   getAll,
   getById,
   getDeliverersByIdOffer,
+  getDelivByIdOffer,
   create,
   update,
   destroy,
   validateOfferDeliverer,
+  destroyByIdOffer,
 };

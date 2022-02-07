@@ -48,7 +48,6 @@ offersRouter.get(
       id_textile,
       id_size,
       id_color1,
-      id_color2,
       id_condition,
       minPrice,
       maxPrice,
@@ -69,7 +68,6 @@ offersRouter.get(
       Number(id_textile),
       Number(id_size),
       Number(id_color1),
-      Number(id_color2),
       Number(id_condition),
       Number(minPrice),
       Number(maxPrice)
@@ -88,7 +86,7 @@ offersRouter.get(
 offersRouter.get(
   '/:idOffer',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idOffer } = req.params;
+    const idOffer = req.params.idOffer;
     Offer.getById(Number(idOffer))
       .then((offer: IOffer) => {
         if (offer === undefined) {
@@ -100,11 +98,26 @@ offersRouter.get(
   }
 );
 offersRouter.get(
-  '/:idOffer/offerDeliverers',
+  '/:idOffer/offer_deliverers',
 
   (req: Request, res: Response, next: NextFunction) => {
-    const { idOffer } = req.params;
+    const idOffer = req.params.idOffer;
     OfferDeliverer.getDeliverersByIdOffer(Number(idOffer))
+      .then((deliverers) => {
+        if (deliverers === undefined) {
+          res.status(404).send('Offer not found');
+        }
+        res.status(200).json(deliverers);
+      })
+      .catch((err) => next(err));
+  }
+);
+offersRouter.get(
+  '/:idOffer/offer_deliv',
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const idOffer = req.params.idOffer;
+    OfferDeliverer.getDelivByIdOffer(Number(idOffer))
       .then((deliverers) => {
         if (deliverers === undefined) {
           res.status(404).send('Offer not found');
@@ -143,8 +156,8 @@ offersRouter.post(
     void (async () => {
       try {
         const offer = req.body as IOffer;
-        offer.id_offer = await Offer.create(offer);
-        res.status(201).json(offer);
+        const idOffer = await Offer.create(offer);
+        res.status(201).json({ id_offer: idOffer, id: idOffer, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -158,7 +171,7 @@ offersRouter.put(
   Offer.validateOffer,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idOffer } = req.params;
+      const idOffer = req.params.idOffer;
 
       const offerUpdated = await Offer.update(
         Number(idOffer),
@@ -178,12 +191,32 @@ offersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idOffer } = req.params;
+        const idOffer = req.params.idOffer;
         const offerDeleted = await Offer.destroy(Number(idOffer));
         if (offerDeleted) {
           res.status(200).send('Offer deleted');
         } else {
           throw new ErrorHandler(404, `Offer not found`);
+        }
+      } catch (err) {
+        next(err);
+      }
+    })();
+  }
+);
+offersRouter.delete(
+  '/:idOffer/offer_deliverers',
+  (req: Request, res: Response, next: NextFunction) => {
+    void (async () => {
+      try {
+        const idOffer = req.params.idOffer;
+        const offerDeliverersDeleted = await OfferDeliverer.destroyByIdOffer(
+          Number(idOffer)
+        );
+        if (offerDeliverersDeleted) {
+          res.status(200).send('Offer deliverers deleted');
+        } else {
+          throw new ErrorHandler(404, `Offer deliverers not found`);
         }
       } catch (err) {
         next(err);

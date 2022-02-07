@@ -25,7 +25,7 @@ itemsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 itemsRouter.get(
   '/:idItem',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idItem } = req.params;
+    const idItem = req.params.idItem;
     Item.getItemById(Number(idItem))
       .then((result: IItem) => {
         if (result === undefined)
@@ -39,8 +39,9 @@ itemsRouter.get(
 itemsRouter.get(
   '/:idItem/sizes',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idItem } = req.params;
-    const { id_gender, is_child } = req.query;
+    const idItem = req.params.idItem;
+    const id_gender = req.query.id_gender as string;
+    const is_child = req.query.is_child as string;
     Item.getItemById(Number(idItem))
       .then((item) =>
         Size.getSizesBySizeType(
@@ -61,12 +62,15 @@ itemsRouter.post(
   Item.validateItem,
   Item.nameIsFree,
   (req: Request, res: Response, next: NextFunction) => {
-    const item = req.body as IItem;
-    Item.createItem(item)
-      .then((createItem) =>
-        res.status(201).json({ id: createItem, ...req.body })
-      )
-      .catch((err) => next(err));
+    void (async () => {
+      try {
+        const item = req.body as IItem;
+        const idItem = await Item.create(item);
+        res.status(201).json({ id_item: idItem, id: idItem, ...req.body });
+      } catch (err) {
+        next(err);
+      }
+    })();
   }
 );
 
@@ -77,7 +81,7 @@ itemsRouter.put(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idItem } = req.params;
+        const idItem = req.params.idItem;
         const { name, id_category, id_sizeType } = req.body as IItem;
         const itemUpdated = await Item.updateItem(
           Number(idItem),
@@ -100,7 +104,7 @@ itemsRouter.put(
 itemsRouter.delete(
   '/:idItem',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idItem } = req.params;
+    const idItem = req.params.idItem;
     Item.deleteItem(Number(idItem))
       .then((deletedItem) => {
         if (deletedItem) res.status(201).json(`Item id:${idItem} deleted`);

@@ -17,7 +17,7 @@ const validateSize = (req: Request, res: Response, next: NextFunction) => {
     id_size: Joi.number().integer(),
     id_gender: Joi.number().integer().allow(null),
     is_child: Joi.number().integer().min(0).max(1),
-    id_sizeType: Joi.number().integer().presence(required),
+    id_size_type: Joi.number().integer().presence(required),
     size_int: Joi.string().max(8),
     size_eu: Joi.string().max(8),
     size_fr: Joi.string().max(8),
@@ -128,15 +128,15 @@ const getSizesByCategory = (
     .then(([results]) => results);
 };
 
-const createSize = (newSize: ISize): Promise<number> => {
+const create = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO sizes ( id_gender, is_child, id_sizeType, size_int, size_eu, size_fr, size_uk, size_us, size_foot, size_chest, size_pool, size_jeans, age_child, height, hand_turn, size_glove, crotch, size_bike_inches, size_bike, size_wheel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
+      'INSERT INTO sizes ( id_gender, is_child, id_size_type, size_int, size_eu, size_fr, size_uk, size_us, size_foot, size_chest, size_pool, size_jeans, age_child, height, hand_turn, size_glove, crotch, size_bike_inches, size_bike, size_wheel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
       [
         newSize.id_gender,
         newSize.is_child,
-        newSize.id_sizeType,
+        newSize.id_size_type,
         newSize.size_int,
         newSize.size_eu,
         newSize.size_fr,
@@ -161,109 +161,109 @@ const createSize = (newSize: ISize): Promise<number> => {
 
 const updateSize = (
   idSize: number,
-  attibutesToUpdate: ISize
+  attributesToUpdate: ISize
 ): Promise<boolean> => {
   let sql = 'UPDATE sizes SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
-  if (attibutesToUpdate.id_gender) {
+  if (attributesToUpdate.id_gender) {
     sql += 'id_gender = ? ';
-    sqlValues.push(attibutesToUpdate.id_gender);
+    sqlValues.push(attributesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_child) {
+  if (attributesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.is_child);
+    sqlValues.push(attributesToUpdate.is_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_sizeType) {
+  if (attributesToUpdate.id_sizeType) {
     sql += oneValue ? ', id_sizeType = ? ' : ' id_sizeType = ? ';
-    sqlValues.push(attibutesToUpdate.id_sizeType);
+    sqlValues.push(attributesToUpdate.id_sizeType);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_int) {
+  if (attributesToUpdate.size_int) {
     sql += oneValue ? ', size_int = ? ' : ' size_int = ? ';
-    sqlValues.push(attibutesToUpdate.size_int);
+    sqlValues.push(attributesToUpdate.size_int);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_eu) {
+  if (attributesToUpdate.size_eu) {
     sql += oneValue ? ', size_eu = ? ' : ' size_eu = ? ';
-    sqlValues.push(attibutesToUpdate.size_eu);
+    sqlValues.push(attributesToUpdate.size_eu);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_fr) {
+  if (attributesToUpdate.size_fr) {
     sql += oneValue ? ', size_fr = ? ' : ' size_fr = ? ';
-    sqlValues.push(attibutesToUpdate.size_fr);
+    sqlValues.push(attributesToUpdate.size_fr);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_uk) {
+  if (attributesToUpdate.size_uk) {
     sql += oneValue ? ', size_uk = ? ' : ' size_uk = ? ';
-    sqlValues.push(attibutesToUpdate.size_uk);
+    sqlValues.push(attributesToUpdate.size_uk);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_us) {
+  if (attributesToUpdate.size_us) {
     sql += oneValue ? ', size_us = ? ' : ' size_us = ? ';
-    sqlValues.push(attibutesToUpdate.size_us);
+    sqlValues.push(attributesToUpdate.size_us);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_foot) {
+  if (attributesToUpdate.size_foot) {
     sql += oneValue ? ', size_foot = ? ' : ' size_foot = ? ';
-    sqlValues.push(attibutesToUpdate.size_foot);
+    sqlValues.push(attributesToUpdate.size_foot);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_chest) {
+  if (attributesToUpdate.size_chest) {
     sql += oneValue ? ', size_chest = ? ' : ' size_chest = ? ';
-    sqlValues.push(attibutesToUpdate.size_chest);
+    sqlValues.push(attributesToUpdate.size_chest);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_pool) {
+  if (attributesToUpdate.size_pool) {
     sql += oneValue ? ', size_pool = ? ' : ' size_pool = ? ';
-    sqlValues.push(attibutesToUpdate.size_pool);
+    sqlValues.push(attributesToUpdate.size_pool);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_jeans) {
+  if (attributesToUpdate.size_jeans) {
     sql += oneValue ? ', size_jeans = ? ' : ' size_jeans = ? ';
-    sqlValues.push(attibutesToUpdate.size_jeans);
+    sqlValues.push(attributesToUpdate.size_jeans);
     oneValue = true;
   }
-  if (attibutesToUpdate.age_child) {
+  if (attributesToUpdate.age_child) {
     sql += oneValue ? ', age_child = ? ' : ' age_child = ? ';
-    sqlValues.push(attibutesToUpdate.age_child);
+    sqlValues.push(attributesToUpdate.age_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.height) {
+  if (attributesToUpdate.height) {
     sql += oneValue ? ', height = ? ' : ' height = ? ';
-    sqlValues.push(attibutesToUpdate.height);
+    sqlValues.push(attributesToUpdate.height);
     oneValue = true;
   }
-  if (attibutesToUpdate.hand_turn) {
+  if (attributesToUpdate.hand_turn) {
     sql += oneValue ? ', hand_turn = ? ' : ' hand_turn = ? ';
-    sqlValues.push(attibutesToUpdate.hand_turn);
+    sqlValues.push(attributesToUpdate.hand_turn);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_glove) {
+  if (attributesToUpdate.size_glove) {
     sql += oneValue ? ', size_glove = ? ' : ' size_glove = ? ';
-    sqlValues.push(attibutesToUpdate.size_glove);
+    sqlValues.push(attributesToUpdate.size_glove);
     oneValue = true;
   }
-  if (attibutesToUpdate.crotch) {
+  if (attributesToUpdate.crotch) {
     sql += oneValue ? ', crotch = ? ' : ' crotch = ? ';
-    sqlValues.push(attibutesToUpdate.crotch);
+    sqlValues.push(attributesToUpdate.crotch);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_bike_inches) {
+  if (attributesToUpdate.size_bike_inches) {
     sql += oneValue ? ', size_bike_inches = ? ' : ' size_bike_inches = ? ';
-    sqlValues.push(attibutesToUpdate.size_bike_inches);
+    sqlValues.push(attributesToUpdate.size_bike_inches);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_bike) {
+  if (attributesToUpdate.size_bike) {
     sql += oneValue ? ', size_bike = ? ' : ' size_bike = ? ';
-    sqlValues.push(attibutesToUpdate.size_bike);
+    sqlValues.push(attributesToUpdate.size_bike);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_wheel) {
+  if (attributesToUpdate.size_wheel) {
     sql += oneValue ? ', size_wheel = ? ' : ' size_wheel = ? ';
-    sqlValues.push(attibutesToUpdate.size_wheel);
+    sqlValues.push(attributesToUpdate.size_wheel);
     oneValue = true;
   }
   sql += ' WHERE id_size = ?';
@@ -286,7 +286,7 @@ export default {
   getSizeById,
   getSizesBySizeType,
   getSizesByCategory,
-  createSize,
+  create,
   updateSize,
   deleteSize,
   validateSize,

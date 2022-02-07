@@ -87,14 +87,14 @@ const create = async (newTextile: ITextile): Promise<number> => {
 
 const update = async (
   idTextile: number,
-  attibutesToUpdate: ITextile
+  attributesToUpdate: ITextile
 ): Promise<boolean> => {
   let sql = 'UPDATE textiles SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_textile = ?';
   sqlValues.push(idTextile);

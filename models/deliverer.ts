@@ -89,14 +89,14 @@ const create = (newDeliverer: IDeliverer): Promise<number> => {
 
 const update = (
   idDeliverer: number,
-  attibutesToUpdate: IDeliverer
+  attributesToUpdate: IDeliverer
 ): Promise<boolean> => {
   let sql = 'UPDATE deliverers SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_deliverer = ?';
   sqlValues.push(idDeliverer);

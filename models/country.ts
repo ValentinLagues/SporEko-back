@@ -7,7 +7,7 @@ import ICountry from '../interfaces/ICountry';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
-const validatecountries = (req: Request, res: Response, next: NextFunction) => {
+const validateCountry = (req: Request, res: Response, next: NextFunction) => {
   let presence: Joi.PresenceMode = 'optional';
   if (req.method === 'POST') {
     presence = 'required';
@@ -121,5 +121,5 @@ export default {
   create,
   update,
   destroy,
-  validatecountries,
+  validateCountry,
 };
