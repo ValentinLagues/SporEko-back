@@ -91,7 +91,7 @@ usersRouter.post(
 );
 
 usersRouter.post(
-  '/:id/favorites',
+  '/:idUser/favorites',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
@@ -106,13 +106,13 @@ usersRouter.post(
 );
 
 usersRouter.put(
-  '/:id/image',
+  '/:idUser/image',
   Auth.userConnected,
   User.upload.single('imageUser'),
   (req: Request, res: Response) => {
     void (async () => {
       const path = req.file?.originalname.split('.');
-      const idUser = req.params.id;
+      const idUser = req.params.idUser;
       const picture = `${req.protocol}://${req.get('host')}/imageUser/${
         req.params.id
       }.${path[1]}`;
@@ -154,7 +154,7 @@ usersRouter.put(
 );
 
 usersRouter.delete(
-  '/:id/favorites/:idFavorite',
+  '/:idUser/favorites/:idFavorite',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {

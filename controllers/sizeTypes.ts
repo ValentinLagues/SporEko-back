@@ -57,19 +57,19 @@ sizeTypesRouter.post(
 );
 
 sizeTypesRouter.put(
-  '/:idsizeType',
+  '/:idSizeType',
   SizeType.nameIsFree,
   SizeType.validateSizeType,
   (req: Request, res: Response) => {
     void (async () => {
-      const idsizeType = req.params.idSizeType;
+      const idSizeType = req.params.idSizeType;
 
       const sizeTypeUpdated = await SizeType.update(
-        Number(idsizeType),
+        Number(idSizeType),
         req.body as ISizeType
       );
       if (sizeTypeUpdated) {
-        res.status(200).json({ id: idsizeType });
+        res.status(200).json({ id: idSizeType });
       } else if (!sizeTypeUpdated) {
         res.status(404).send('SizeType not found');
       } else {
@@ -80,12 +80,12 @@ sizeTypesRouter.put(
 );
 
 sizeTypesRouter.delete(
-  '/:idsizeType',
+  '/:idSizeType',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idsizeType = req.params.idSizeType;
-        const sizeTypeDeleted = await SizeType.destroy(Number(idsizeType));
+        const idSizeType = req.params.idSizeType;
+        const sizeTypeDeleted = await SizeType.destroy(Number(idSizeType));
         if (sizeTypeDeleted) {
           res.status(200).send('SizeType deleted');
         } else {
