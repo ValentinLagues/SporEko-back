@@ -3,7 +3,7 @@ import { ErrorHandler } from '../helpers/errors';
 import { ResultSetHeader } from 'mysql2';
 import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
-import Joi from 'joi';
+import Joi from 'joi'; 
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -81,7 +81,7 @@ const getSizesBySizeType = (
   id_gender: number,
   is_child: number
 ) => {
-  let sql = `SELECT * FROM sizes WHERE id_sizeType = ?`;
+  let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
   const sqlValues: Array<string | number> = [idSizeType];
 
   if (id_gender) {
@@ -107,25 +107,26 @@ const getSizesByCategory = (
   let sql = `SELECT * FROM sizes`;
 
   if (idCategory === 1 && !id_gender && !is_child) {
-    sql += ` WHERE id_sizeType = 2 OR id_sizeType = 3 OR id_sizeType = 6`;
+    sql += ` WHERE id_size_type = 2 OR id_size_type = 3 OR id_size_type = 6`;
   }
   if (idCategory === 1 && is_child) {
-    sql += ` WHERE id_sizeType = 6`;
+    sql += ` WHERE id_size_type = 6`;
   } else if (idCategory === 1 && id_gender === 1) {
-    sql += ` WHERE (id_sizeType = 2 OR id_sizeType = 3) AND id_gender = 1`;
+    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 1`;
   } else if (idCategory === 1 && id_gender === 2) {
-    sql += ` WHERE (id_sizeType = 2 OR id_sizeType = 3) AND id_gender = 2`;
+    sql += ` WHERE (id_size_type = 2 OR id_size_type = 3) AND id_gender = 2`;
   }
   if (idCategory === 2 && !is_child) {
-    sql += ` WHERE id_sizeType = 1`;
+    sql += ` WHERE id_size_type = 1`;
   } else if (idCategory === 2 && is_child) {
-    sql += ` WHERE id_sizeType = 1 AND is_child = 1`;
+    sql += ` WHERE id_size_type = 1 AND is_child = 1`;
   }
 
   return connection
     .promise()
     .query<ISize[]>(sql)
-    .then(([results]) => results);
+    .then(([results]) => {
+      return results});
 };
 
 const create = (newSize: ISize): Promise<number> => {

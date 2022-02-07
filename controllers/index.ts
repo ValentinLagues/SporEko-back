@@ -26,11 +26,11 @@ const setupRoutes = (app: express.Application) => {
   app.use('/countries', countriesRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
-  app.use('/sizeTypes', sizeTypesRouter);
+  app.use('/size_types', sizeTypesRouter);
   app.use('/conditions', conditionsRouter);
   app.use('/deliverers', deliverersRouter);
-  app.use('/delivererPrices', delivererPricesRouter);
-  app.use('/offerDeliverers', offerDeliverersRouter);
+  app.use('/deliverer_prices', delivererPricesRouter);
+  app.use('/offer_deliverers', offerDeliverersRouter);
   app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);
   app.use('/athletics', athleticsRouter);
