@@ -124,107 +124,117 @@ const getAll = async (
   id_textile: number,
   id_size: number,
   id_color1: number,
-  id_color2: number,
   id_condition: number,
   minPrice: number,
   maxPrice: number
 ): Promise<IOffer[]> => {
   let sql = `SELECT *, id_offer as id FROM offers`;
+  const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
   if (id_user_seller) {
-    sql += ` WHERE id_user_seller = ${id_user_seller}`;
+    sql += ` WHERE id_user_seller = ?`;
+    sqlValues.push(id_user_seller);
     oneValue = true;
   }
   if (title) {
     sql += oneValue
-      ? ` AND title LIKE '%${title}%'`
-      : ` WHERE title LIKE '%${title}%'`;
+      ? ` AND title LIKE ?`
+      : ` WHERE title LIKE ?`;
+      title = '%' + title + '%';
+      sqlValues.push(title);
     oneValue = true;
   }
   if (id_sport) {
     sql += oneValue
-      ? ` AND id_sport = ${id_sport}`
-      : ` WHERE id_sport = ${id_sport}`;
+      ? ` AND id_sport = ?`
+      : ` WHERE id_sport = ?`;
+      sqlValues.push(id_sport);
     oneValue = true;
   }
   if (id_gender) {
     sql += oneValue
-      ? ` AND id_gender = ${id_gender}`
-      : ` WHERE id_gender = ${id_gender}`;
+      ? ` AND id_gender = ?`
+      : ` WHERE id_gender = ?`;
+      sqlValues.push(id_gender);
     oneValue = true;
   }
   if (is_child) {
     sql += oneValue
-      ? ` AND is_child = ${is_child}`
-      : ` WHERE is_child = ${is_child}`;
+      ? ` AND is_child = ?`
+      : ` WHERE is_child = ?`;
+      sqlValues.push(is_child);
     oneValue = true;
   }
   if (id_category) {
     sql += oneValue
-      ? ` AND id_category = ${id_category}`
-      : ` WHERE id_category = ${id_category}`;
+      ? ` AND id_category = ?`
+      : ` WHERE id_category = ?`;
+      sqlValues.push(id_category);
     oneValue = true;
   }
   if (id_item) {
     sql += oneValue
-      ? ` AND id_item = ${id_item}`
-      : ` WHERE id_item = ${id_item}`;
+      ? ` AND id_item = ?`
+      : ` WHERE id_item = ?`;
+      sqlValues.push(id_item);
     oneValue = true;
   }
   if (id_brand) {
     sql += oneValue
-      ? ` AND id_brand = ${id_brand}`
-      : ` WHERE id_brand = ${id_brand}`;
+      ? ` AND id_brand = ?`
+      : ` WHERE id_brand = ?`;
+      sqlValues.push(id_brand);
     oneValue = true;
   }
   if (id_textile) {
     sql += oneValue
-      ? ` AND id_textile = ${id_textile}`
-      : ` WHERE id_textile = ${id_textile}`;
+      ? ` AND id_textile = ?`
+      : ` WHERE id_textile = ?`;
+      sqlValues.push(id_textile);
     oneValue = true;
   }
   if (id_size) {
     sql += oneValue
-      ? ` AND id_size = ${id_size}`
-      : ` WHERE id_size = ${id_size}`;
+      ? ` AND id_size = ?`
+      : ` WHERE id_size = ?`;
+      sqlValues.push(id_size);
     oneValue = true;
   }
   if (id_color1) {
     sql += oneValue
-      ? ` AND id_color1 = ${id_color1}`
-      : ` WHERE id_color1 = ${id_color1}`;
-    oneValue = true;
-  }
-  if (id_color2) {
-    sql += oneValue
-      ? ` AND id_color2 = ${id_color2}`
-      : ` WHERE id_color2 = ${id_color2}`;
+      ? ` AND id_color1 = ? OR id_color2 = ?`
+      : ` WHERE id_color1 = ? OR id_color2 = ?`;
+      sqlValues.push(id_color1, id_color1);
     oneValue = true;
   }
   if (id_condition) {
     sql += oneValue
-      ? ` AND id_condition = ${id_condition}`
-      : ` WHERE id_condition = ${id_condition}`;
+      ? ` AND id_condition = ?`
+      : ` WHERE id_condition = ?`;
+      sqlValues.push(id_condition);
     oneValue = true;
   }
 
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
       sql += oneValue
-        ? ` AND price BETWEEN ${minPrice} AND ${maxPrice}`
-        : ` WHERE price BETWEEN ${minPrice} AND ${maxPrice}`;
+        ? ` AND price BETWEEN ? AND ?`
+        : ` WHERE price BETWEEN ? AND ?`;
+        sqlValues.push(minPrice, maxPrice);
       oneValue = true;
-    } else {
+    } else { 
+      // for > 100€ value (no max)
       sql += oneValue
-        ? ` AND price > ${minPrice}`
-        : ` WHERE price > ${minPrice}`;
+        ? ` AND price > ?`
+        : ` WHERE price > ?`;
+        sqlValues.push(minPrice);
       oneValue = true;
     }
   }
 
   if (!sortBy) {
-    sql += ` ORDER BY id_offer ASC`;
+    sql += ` ORDER BY creation_date DESC`;
   }
   if (sortBy) {
     sql += ` ORDER BY ${sortBy} ${order}`;
@@ -236,7 +246,7 @@ const getAll = async (
 
   return connection
     .promise()
-    .query<IOffer[]>(sql)
+    .query<IOffer[]>(sql, sqlValues)
     .then(([results]) => {
       return results;
     });
@@ -249,10 +259,10 @@ const getById = async (idOffer: number): Promise<IOffer> => {
     .then(([results]) => results[0]);
 };
 
-const getOfferByIdUser = async (idOffer: number): Promise<IOffer> => {
+const getOffersByIdUser = async (idOffer: number): Promise<IOffer[]> => {
   return connection
     .promise()
-    .query<IOffer[string | number]>(
+    .query<IOffer[]>(
       'SELECT * FROM offers WHERE id_user_seller = ? or id_user_buyer = ?',
       [idOffer, idOffer]
     )
@@ -311,210 +321,210 @@ const create = async (newOffer: IOffer): Promise<number> => {
 
 const update = async (
   idOffer: number,
-  attibutesToUpdate: IOffer
+  attributesToUpdate: IOffer
 ): Promise<boolean> => {
   let sql = 'UPDATE offers SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-  if (attibutesToUpdate.picture1) {
+  if (attributesToUpdate.picture1) {
     sql += 'picture1 = ? ';
-    sqlValues.push(attibutesToUpdate.picture1);
+    sqlValues.push(attributesToUpdate.picture1);
     oneValue = true;
   }
-  if (attibutesToUpdate.title) {
+  if (attributesToUpdate.title) {
     sql += oneValue ? ', title = ? ' : ' title = ? ';
-    sqlValues.push(attibutesToUpdate.title);
+    sqlValues.push(attributesToUpdate.title);
     oneValue = true;
   }
-  if (attibutesToUpdate.description) {
+  if (attributesToUpdate.description) {
     sql += oneValue ? ', description = ? ' : ' description = ? ';
-    sqlValues.push(attibutesToUpdate.description);
+    sqlValues.push(attributesToUpdate.description);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_sport) {
+  if (attributesToUpdate.id_sport) {
     sql += oneValue ? ', id_sport = ? ' : ' id_sport = ? ';
-    sqlValues.push(attibutesToUpdate.id_sport);
+    sqlValues.push(attributesToUpdate.id_sport);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_gender) {
+  if (attributesToUpdate.id_gender) {
     sql += oneValue ? ', id_gender = ? ' : ' id_gender = ? ';
-    sqlValues.push(attibutesToUpdate.id_gender);
+    sqlValues.push(attributesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_child) {
+  if (attributesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.is_child);
+    sqlValues.push(attributesToUpdate.is_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_category) {
+  if (attributesToUpdate.id_category) {
     sql += oneValue ? ', id_category = ? ' : ' id_category = ? ';
-    sqlValues.push(attibutesToUpdate.id_category);
+    sqlValues.push(attributesToUpdate.id_category);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_item) {
+  if (attributesToUpdate.id_item) {
     sql += oneValue ? ', id_item = ? ' : ' id_item = ? ';
-    sqlValues.push(attibutesToUpdate.id_item);
+    sqlValues.push(attributesToUpdate.id_item);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_brand) {
+  if (attributesToUpdate.id_brand) {
     sql += oneValue ? ', id_brand = ? ' : ' id_brand = ? ';
-    sqlValues.push(attibutesToUpdate.id_brand);
+    sqlValues.push(attributesToUpdate.id_brand);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_textile) {
+  if (attributesToUpdate.id_textile) {
     sql += oneValue ? ', id_textile = ? ' : ' id_textile = ? ';
-    sqlValues.push(attibutesToUpdate.id_textile);
+    sqlValues.push(attributesToUpdate.id_textile);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_size) {
+  if (attributesToUpdate.id_size) {
     sql += oneValue ? ', id_size = ? ' : ' id_size = ? ';
-    sqlValues.push(attibutesToUpdate.id_size);
+    sqlValues.push(attributesToUpdate.id_size);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_color1) {
+  if (attributesToUpdate.id_color1) {
     sql += oneValue ? ', id_color1 = ? ' : ' id_color1 = ? ';
-    sqlValues.push(attibutesToUpdate.id_color1);
+    sqlValues.push(attributesToUpdate.id_color1);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_color2) {
+  if (attributesToUpdate.id_color2) {
     sql += oneValue ? ', id_color2 = ? ' : ' id_color2 = ? ';
-    sqlValues.push(attibutesToUpdate.id_color2);
+    sqlValues.push(attributesToUpdate.id_color2);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_condition) {
+  if (attributesToUpdate.id_condition) {
     sql += oneValue ? ', id_condition = ? ' : ' id_condition = ? ';
-    sqlValues.push(attibutesToUpdate.id_condition);
+    sqlValues.push(attributesToUpdate.id_condition);
     oneValue = true;
   }
-  if (attibutesToUpdate.price) {
+  if (attributesToUpdate.price) {
     sql += oneValue ? ', price = ? ' : ' price = ? ';
-    sqlValues.push(attibutesToUpdate.price);
+    sqlValues.push(attributesToUpdate.price);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_weight) {
+  if (attributesToUpdate.id_weight) {
     sql += oneValue ? ', id_weight = ? ' : ' id_weight = ? ';
-    sqlValues.push(attibutesToUpdate.id_weight);
+    sqlValues.push(attributesToUpdate.id_weight);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_user_buyer) {
+  if (attributesToUpdate.id_user_buyer) {
     sql += oneValue ? ', id_user_buyer = ? ' : ' id_user_buyer = ? ';
-    sqlValues.push(attibutesToUpdate.id_user_buyer);
+    sqlValues.push(attributesToUpdate.id_user_buyer);
     oneValue = true;
   }
-  if (attibutesToUpdate.purchase_date) {
+  if (attributesToUpdate.purchase_date) {
     sql += oneValue ? ', purchase_date = ? ' : ' purchase_date = ? ';
-    sqlValues.push(attibutesToUpdate.purchase_date);
+    sqlValues.push(attributesToUpdate.purchase_date);
     oneValue = true;
   }
-  if (attibutesToUpdate.hand_delivery) {
+  if (attributesToUpdate.hand_delivery) {
     sql += oneValue ? ', hand_delivery = ? ' : ' hand_delivery = ? ';
-    sqlValues.push(attibutesToUpdate.hand_delivery);
+    sqlValues.push(attributesToUpdate.hand_delivery);
     oneValue = true;
   }
-  if (attibutesToUpdate.isarchived) {
+  if (attributesToUpdate.is_archived) {
     sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
-    sqlValues.push(attibutesToUpdate.isarchived);
+    sqlValues.push(attributesToUpdate.is_archived);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_draft) {
+  if (attributesToUpdate.is_draft) {
     sql += oneValue ? ', is_draft = ? ' : ' is_draft = ? ';
-    sqlValues.push(attibutesToUpdate.is_draft);
+    sqlValues.push(attributesToUpdate.is_draft);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture2) {
+  if (attributesToUpdate.picture2) {
     sql += oneValue ? ', picture2 = ? ' : ' picture2 = ? ';
-    sqlValues.push(attibutesToUpdate.picture2);
+    sqlValues.push(attributesToUpdate.picture2);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture3) {
+  if (attributesToUpdate.picture3) {
     sql += oneValue ? ', picture3 = ? ' : ' picture3 = ? ';
-    sqlValues.push(attibutesToUpdate.picture3);
+    sqlValues.push(attributesToUpdate.picture3);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture4) {
+  if (attributesToUpdate.picture4) {
     sql += oneValue ? ', picture4 = ? ' : ' picture4 = ? ';
-    sqlValues.push(attibutesToUpdate.picture4);
+    sqlValues.push(attributesToUpdate.picture4);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture5) {
+  if (attributesToUpdate.picture5) {
     sql += oneValue ? ', picture5 = ? ' : ' picture5 = ? ';
-    sqlValues.push(attibutesToUpdate.picture5);
+    sqlValues.push(attributesToUpdate.picture5);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture6) {
+  if (attributesToUpdate.picture6) {
     sql += oneValue ? ', picture6 = ? ' : ' picture6 = ? ';
-    sqlValues.push(attibutesToUpdate.picture6);
+    sqlValues.push(attributesToUpdate.picture6);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture7) {
+  if (attributesToUpdate.picture7) {
     sql += oneValue ? ', picture7 = ? ' : ' picture7 = ? ';
-    sqlValues.push(attibutesToUpdate.picture7);
+    sqlValues.push(attributesToUpdate.picture7);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture8) {
+  if (attributesToUpdate.picture8) {
     sql += oneValue ? ', picture8 = ? ' : ' picture8 = ? ';
-    sqlValues.push(attibutesToUpdate.picture8);
+    sqlValues.push(attributesToUpdate.picture8);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture9) {
+  if (attributesToUpdate.picture9) {
     sql += oneValue ? ', picture9 = ? ' : ' picture9 = ? ';
-    sqlValues.push(attibutesToUpdate.picture9);
+    sqlValues.push(attributesToUpdate.picture9);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture10) {
+  if (attributesToUpdate.picture10) {
     sql += oneValue ? ', picture10 = ? ' : ' picture10 = ? ';
-    sqlValues.push(attibutesToUpdate.picture10);
+    sqlValues.push(attributesToUpdate.picture10);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture11) {
+  if (attributesToUpdate.picture11) {
     sql += oneValue ? ', picture11 = ? ' : ' picture11 = ? ';
-    sqlValues.push(attibutesToUpdate.picture11);
+    sqlValues.push(attributesToUpdate.picture11);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture12) {
+  if (attributesToUpdate.picture12) {
     sql += oneValue ? ', picture12 = ? ' : ' picture12 = ? ';
-    sqlValues.push(attibutesToUpdate.picture12);
+    sqlValues.push(attributesToUpdate.picture12);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture13) {
+  if (attributesToUpdate.picture13) {
     sql += oneValue ? ', picture13 = ? ' : ' picture13 = ? ';
-    sqlValues.push(attibutesToUpdate.picture13);
+    sqlValues.push(attributesToUpdate.picture13);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture14) {
+  if (attributesToUpdate.picture14) {
     sql += oneValue ? ', picture14 = ? ' : ' picture14 = ? ';
-    sqlValues.push(attibutesToUpdate.picture14);
+    sqlValues.push(attributesToUpdate.picture14);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture15) {
+  if (attributesToUpdate.picture15) {
     sql += oneValue ? ', picture15 = ? ' : ' picture15 = ? ';
-    sqlValues.push(attibutesToUpdate.picture15);
+    sqlValues.push(attributesToUpdate.picture15);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture16) {
+  if (attributesToUpdate.picture16) {
     sql += oneValue ? ', picture16 = ? ' : ' picture16 = ? ';
-    sqlValues.push(attibutesToUpdate.picture16);
+    sqlValues.push(attributesToUpdate.picture16);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture17) {
+  if (attributesToUpdate.picture17) {
     sql += oneValue ? ', picture17 = ? ' : ' picture17 = ? ';
-    sqlValues.push(attibutesToUpdate.picture17);
+    sqlValues.push(attributesToUpdate.picture17);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture18) {
+  if (attributesToUpdate.picture18) {
     sql += oneValue ? ', picture18 = ? ' : ' picture18 = ? ';
-    sqlValues.push(attibutesToUpdate.picture18);
+    sqlValues.push(attributesToUpdate.picture18);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture19) {
+  if (attributesToUpdate.picture19) {
     sql += oneValue ? ', picture19 = ? ' : ' picture19 = ? ';
-    sqlValues.push(attibutesToUpdate.picture19);
+    sqlValues.push(attributesToUpdate.picture19);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture20) {
+  if (attributesToUpdate.picture20) {
     sql += oneValue ? ', picture20 = ? ' : ' picture20 = ? ';
-    sqlValues.push(attibutesToUpdate.picture20);
+    sqlValues.push(attributesToUpdate.picture20);
     oneValue = true;
   }
 
@@ -534,10 +544,10 @@ const destroy = async (idOffer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
-  getOfferByIdUser,
+  getOffersByIdUser,
   recordExists,
   create,
   update,

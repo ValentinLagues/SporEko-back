@@ -1,6 +1,6 @@
 import connection from '../db-config.js';
 import { ResultSetHeader } from 'mysql2';
-import Joi, { number } from 'joi';
+import Joi from 'joi';
 import argon2, { Options } from 'argon2';
 import { NextFunction, Request, Response } from 'express';
 import { ErrorHandler } from '../helpers/errors';
@@ -25,6 +25,7 @@ const validateUser = (req: Request, res: Response, next: NextFunction) => {
     city: Joi.string().max(255),
     email: Joi.string().max(255).presence(presence),
     password: Joi.string().min(8).max(100).presence(presence),
+    hash_password: Joi.string().max(255),
     picture: Joi.string().max(255),
     id_country: Joi.number().integer().min(1).presence(presence),
     is_admin: Joi.number().integer().min(0).max(1),
@@ -62,10 +63,7 @@ const emailIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSameEmail: IUser = await getByEmail(user.email);
-    if (
-      userWithSameEmail &&
-      userWithSameEmail.id_user !== (req.body.id_user as number)
-    ) {
+    if (userWithSameEmail && userWithSameEmail.id_user !== user.id_user) {
       next(new ErrorHandler(409, `Email already exists`));
     } else {
       next();
@@ -76,10 +74,7 @@ const pseudoIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const user = req.body as IUser;
     const userWithSamePseudo: IUser = await getByPseudo(user.pseudo);
-    if (
-      userWithSamePseudo &&
-      userWithSamePseudo.id_user !== (req.body.id_user as number)
-    ) {
+    if (userWithSamePseudo && userWithSamePseudo.id_user !== user.id_user) {
       next(new ErrorHandler(409, `Pseudo already exists`));
     } else {
       next();
@@ -214,108 +209,114 @@ const create = async (newUser: IUser): Promise<number> => {
 
 const update = async (
   idUser: number,
-  attibutesToUpdate: IUser
+  attributesToUpdate: IUser
 ): Promise<boolean> => {
   let sql = 'UPDATE users SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-  if (attibutesToUpdate.lastname) {
+  if (attributesToUpdate.lastname) {
     sql += ' lastname = ? ';
-    sqlValues.push(attibutesToUpdate.lastname);
+    sqlValues.push(attributesToUpdate.lastname);
     oneValue = true;
   }
-  if (attibutesToUpdate.firstname) {
+  if (attributesToUpdate.firstname) {
     sql += oneValue ? ', firstname = ? ' : ' firstname = ? ';
-    sqlValues.push(attibutesToUpdate.firstname);
+    sqlValues.push(attributesToUpdate.firstname);
     oneValue = true;
   }
-  if (attibutesToUpdate.address) {
+  if (attributesToUpdate.address) {
     sql += oneValue ? ', address = ? ' : ' address = ? ';
-    sqlValues.push(attibutesToUpdate.address);
+    sqlValues.push(attributesToUpdate.address);
     oneValue = true;
   }
-  if (attibutesToUpdate.zipcode) {
+  if (attributesToUpdate.zipcode) {
     sql += oneValue ? ', zipcode = ? ' : ' zipcode = ? ';
-    sqlValues.push(attibutesToUpdate.zipcode);
+    sqlValues.push(attributesToUpdate.zipcode);
     oneValue = true;
   }
-  if (attibutesToUpdate.city) {
+  if (attributesToUpdate.city) {
     sql += oneValue ? ', city = ? ' : ' city = ? ';
-    sqlValues.push(attibutesToUpdate.city);
+    sqlValues.push(attributesToUpdate.city);
     oneValue = true;
   }
-  if (attibutesToUpdate.email) {
+  if (attributesToUpdate.email) {
     sql += oneValue ? ', email = ? ' : ' email = ? ';
-    sqlValues.push(attibutesToUpdate.email);
+    sqlValues.push(attributesToUpdate.email);
     oneValue = true;
   }
-  if (attibutesToUpdate.password) {
-    const hash_password = await hashPassword(attibutesToUpdate.password);
+  if (attributesToUpdate.password) {
+    const hash_password = await hashPassword(attributesToUpdate.password);
     sql += oneValue ? ', hash_password = ? ' : ' hash_password = ? ';
     sqlValues.push(hash_password);
     oneValue = true;
   }
-  if (attibutesToUpdate.picture) {
+  if (attributesToUpdate.hash_password) {
+    const hash_password = await hashPassword(attributesToUpdate.hash_password);
+    sql += oneValue ? ', hash_password = ? ' : ' hash_password = ? ';
+    sqlValues.push(hash_password);
+    oneValue = true;
+  }
+  if (attributesToUpdate.picture) {
     sql += oneValue ? ', picture = ? ' : ' picture = ? ';
-    sqlValues.push(attibutesToUpdate.picture);
+    sqlValues.push(attributesToUpdate.picture);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_admin) {
+  if (attributesToUpdate.is_admin) {
     sql += oneValue ? ', is_admin = ? ' : ' is_admin = ? ';
-    sqlValues.push(attibutesToUpdate.is_admin);
+    sqlValues.push(attributesToUpdate.is_admin);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_archived) {
+  if (attributesToUpdate.is_archived) {
     sql += oneValue ? ', is_archived = ? ' : ' is_archived = ? ';
-    sqlValues.push(attibutesToUpdate.is_archived);
+    sqlValues.push(attributesToUpdate.is_archived);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_professional) {
+  if (attributesToUpdate.is_professional) {
     sql += oneValue ? ', is_professional = ? ' : ' is_professional = ? ';
-    sqlValues.push(attibutesToUpdate.is_professional);
+    sqlValues.push(attributesToUpdate.is_professional);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_gender) {
+  if (attributesToUpdate.id_gender) {
     sql += oneValue ? ', id_gender = ? ' : ' id_gender = ? ';
-    sqlValues.push(attibutesToUpdate.id_gender);
+    sqlValues.push(attributesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_country) {
+  if (attributesToUpdate.id_country) {
     sql += oneValue ? ', id_country = ? ' : ' id_country = ? ';
-    sqlValues.push(attibutesToUpdate.id_country);
+    sqlValues.push(attributesToUpdate.id_country);
     oneValue = true;
   }
-  if (attibutesToUpdate.address_complement) {
+  if (attributesToUpdate.address_complement) {
     sql += oneValue ? ', address_complement = ? ' : ' address_complement = ? ';
-    sqlValues.push(attibutesToUpdate.address_complement);
+    sqlValues.push(attributesToUpdate.address_complement);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_athletic) {
+  if (attributesToUpdate.id_athletic) {
     sql += oneValue ? ', id_athletic = ? ' : ' id_athletic = ? ';
-    sqlValues.push(attibutesToUpdate.id_athletic);
+    sqlValues.push(attributesToUpdate.id_athletic);
     oneValue = true;
   }
-  if (attibutesToUpdate.birthday) {
+  if (attributesToUpdate.birthday) {
     sql += oneValue ? ', birthday = ? ' : ' birthday = ? ';
-    sqlValues.push(attibutesToUpdate.birthday);
+    sqlValues.push(attributesToUpdate.birthday);
     oneValue = true;
   }
-  if (attibutesToUpdate.phone) {
+  if (attributesToUpdate.phone) {
     sql += oneValue ? ', phone = ? ' : ' phone = ? ';
-    sqlValues.push(attibutesToUpdate.phone);
+    sqlValues.push(attributesToUpdate.phone);
     oneValue = true;
   }
-  if (attibutesToUpdate.pseudo) {
+  if (attributesToUpdate.pseudo) {
     sql += oneValue ? ', pseudo = ? ' : ' pseudo = ? ';
-    sqlValues.push(attibutesToUpdate.pseudo);
+    sqlValues.push(attributesToUpdate.pseudo);
     oneValue = true;
   }
-  if (attibutesToUpdate.authentified_by_facebook) {
+  if (attributesToUpdate.authentified_by_facebook) {
     sql += oneValue
       ? ', authentified_by_facebook = ? '
       : ' authentified_by_facebook = ? ';
-    sqlValues.push(attibutesToUpdate.authentified_by_facebook);
+    sqlValues.push(attributesToUpdate.authentified_by_facebook);
     oneValue = true;
   }
   sql += ' WHERE id_user = ? ';
@@ -343,7 +344,7 @@ const destroy = (idUser: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   upload,
   getAll,
   getById,

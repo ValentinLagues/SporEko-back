@@ -45,4 +45,4 @@ const userIsAdmin = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { calculateToken, userConnected, userIsAdmin };
+export default { calculateToken, userConnected, userIsAdmin };

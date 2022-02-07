@@ -40,7 +40,7 @@ const nameIsFree = (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
     const color = req.body as IColor;
     const colorWithSameName: IColor = await getByName(color.name);
-    if (colorWithSameName && colorWithSameName.id_color !== req.body.id_color) {
+    if (colorWithSameName && colorWithSameName.id_color !== color.id_color) {
       next(new ErrorHandler(409, `Color name already exists`));
     } else {
       next();
@@ -90,7 +90,7 @@ const getByName = async (name: string): Promise<IColor> => {
 const codeIsFree = async (req: Request, res: Response, next: NextFunction) => {
   const color = req.body as IColor;
   const colorWithSameCode: IColor = await getByCode(color.color_code);
-  if (colorWithSameCode && colorWithSameCode.id_color !== req.body.id_color) {
+  if (colorWithSameCode && colorWithSameCode.id_color !== color.id_color) {
     next(new ErrorHandler(409, `Color code already exists`));
   } else {
     next();
@@ -116,20 +116,20 @@ const create = async (newColor: IColor): Promise<number> => {
 
 const update = async (
   idColor: number,
-  attibutesToUpdate: IColor
+  attributesToUpdate: IColor
 ): Promise<boolean> => {
   let sql = 'UPDATE colors SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
     oneValue = true;
   }
-  if (attibutesToUpdate.color_code) {
+  if (attributesToUpdate.color_code) {
     sql += oneValue ? ', color_code = ? ' : ' color_code = ? ';
-    sqlValues.push(attibutesToUpdate.color_code);
+    sqlValues.push(attributesToUpdate.color_code);
     oneValue = true;
   }
   sql += ' WHERE id_color = ?';
@@ -148,7 +148,7 @@ const destroy = async (idColor: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
   recordExists,

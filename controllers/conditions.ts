@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Condition from '../models/condition';
+import Condition from '../models/condition';
 import ICondition from '../interfaces/ICondition';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((conditions: Array<ICondition>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${conditions.length}/${conditions.length + 1}`
+        `conditions : 0-${conditions.length}/${conditions.length + 1}`
       );
       res.status(200).json(conditions);
     })
@@ -25,7 +25,7 @@ conditionsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 conditionsRouter.get(
   '/:idCondition',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idCondition } = req.params;
+    const idCondition = req.params.idCondition;
     Condition.getById(Number(idCondition))
       .then((condition: ICondition) => {
         if (condition === undefined) {
@@ -45,8 +45,10 @@ conditionsRouter.post(
     void (async () => {
       try {
         const condition = req.body as ICondition;
-        condition.id_condition = await Condition.create(condition);
-        res.status(201).json(condition);
+        const idCondition = await Condition.create(condition);
+        res
+          .status(201)
+          .json({ id_condition: idCondition, id: idCondition, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -60,13 +62,13 @@ conditionsRouter.put(
   Condition.validateCondition,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idCondition } = req.params;
+      const idCondition = req.params.idCondition;
       const conditionUpdated = await Condition.update(
         Number(idCondition),
         req.body as ICondition
       );
       if (conditionUpdated) {
-        res.status(200).send('Condition updated');
+        res.status(200).json({ id: idCondition });
       } else if (!conditionUpdated) {
         res.status(404).send('Condition not found');
       } else {
@@ -81,7 +83,7 @@ conditionsRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idCondition } = req.params;
+        const idCondition = req.params.idCondition;
         const conditionDeleted = await Condition.destroy(Number(idCondition));
         if (conditionDeleted) {
           res.status(200).send('Condition deleted');

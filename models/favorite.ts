@@ -55,7 +55,7 @@ const getFavoritesByUser = (idUser: number): Promise<IFavorite[]> => {
     .then(([results]) => results);
 };
 
-const createFavorite = (newFavorite: IFavorite): Promise<number> => {
+const create = (newFavorite: IFavorite): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
@@ -67,20 +67,20 @@ const createFavorite = (newFavorite: IFavorite): Promise<number> => {
 
 const update = (
   idFavorite: number,
-  attibutesToUpdate: IFavorite
+  attributesToUpdate: IFavorite
 ): Promise<boolean> => {
   let sql = 'UPDATE favorites SET ';
   const sqlValues: Array<string | number> = [];
 
   let oneValue = false;
-  if (attibutesToUpdate.id_offer) {
+  if (attributesToUpdate.id_offer) {
     sql += 'id_offer = ? ';
-    sqlValues.push(attibutesToUpdate.id_offer);
+    sqlValues.push(attributesToUpdate.id_offer);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_user) {
+  if (attributesToUpdate.id_user) {
     sql += oneValue ? ', id_user = ? ' : ' id_user = ? ';
-    sqlValues.push(attibutesToUpdate.id_user);
+    sqlValues.push(attributesToUpdate.id_user);
     oneValue = true;
   }
   sql += ' WHERE id_favorite = ?';
@@ -101,10 +101,10 @@ const destroyFavorite = (idFavorite: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAll,
   getById,
-  createFavorite,
+  create,
   update,
   destroyFavorite,
   validateFavorite,

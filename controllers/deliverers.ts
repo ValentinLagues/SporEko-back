@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Deliverer from '../models/deliverer';
+import Deliverer from '../models/deliverer';
 import IDeliverer from '../interfaces/IDeliverer';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -15,7 +15,7 @@ deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
     .then((deliverers: Array<IDeliverer>) => {
       res.setHeader(
         'Content-Range',
-        `addresses : 0-${deliverers.length}/${deliverers.length + 1}`
+        `deliverers : 0-${deliverers.length}/${deliverers.length + 1}`
       );
       res.status(200).json(deliverers);
     })
@@ -25,7 +25,7 @@ deliverersRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 deliverersRouter.get(
   '/:idDeliverer',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idDeliverer } = req.params;
+    const idDeliverer = req.params.idDeliverer;
     Deliverer.getById(Number(idDeliverer))
       .then((deliverer: IDeliverer) => {
         if (deliverer === undefined) {
@@ -45,8 +45,10 @@ deliverersRouter.post(
     void (async () => {
       try {
         const deliverer = req.body as IDeliverer;
-        deliverer.id_deliverer = await Deliverer.create(deliverer);
-        res.status(201).json(deliverer);
+        const idDeliverer = await Deliverer.create(deliverer);
+        res
+          .status(201)
+          .json({ id_deliverer: idDeliverer, id: idDeliverer, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -60,13 +62,13 @@ deliverersRouter.put(
   Deliverer.validateDeliverer,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idDeliverer } = req.params;
+      const idDeliverer = req.params.idDeliverer;
       const delivererUpdated = await Deliverer.update(
         Number(idDeliverer),
         req.body as IDeliverer
       );
       if (delivererUpdated) {
-        res.status(200).send('Deliverer updated');
+        res.status(200).json({ id: idDeliverer });
       } else if (!delivererUpdated) {
         res.status(404).send('Deliverer not found');
       } else {
@@ -81,7 +83,7 @@ deliverersRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idDeliverer } = req.params;
+        const idDeliverer = req.params.idDeliverer;
         const delivererDeleted = await Deliverer.destroy(Number(idDeliverer));
         if (delivererDeleted) {
           res.status(200).send('Deliverer deleted');

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from 'express';
-import * as Favorite from '../models/favorite';
+import Favorite from '../models/favorite';
 import IFavorite from '../interfaces/IFavorite';
 import { ErrorHandler } from '../helpers/errors';
 
@@ -19,7 +19,7 @@ favoritesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
 favoritesRouter.get(
   '/:idFavorite',
   (req: Request, res: Response, next: NextFunction) => {
-    const { idFavorite } = req.params;
+    const idFavorite = req.params.idFavorite;
     Favorite.getById(Number(idFavorite))
       .then((favorite: IFavorite) => {
         if (favorite === undefined) {
@@ -38,8 +38,10 @@ favoritesRouter.post(
     void (async () => {
       try {
         const favorite = req.body as IFavorite;
-        favorite.id_favorite = await Favorite.createFavorite(favorite);
-        res.status(201).json(favorite);
+        const idFavorite = await Favorite.create(favorite);
+        res
+          .status(201)
+          .json({ id_favorite: idFavorite, id: idFavorite, ...req.body });
       } catch (err) {
         next(err);
       }
@@ -52,14 +54,14 @@ favoritesRouter.put(
   Favorite.validateFavorite,
   (req: Request, res: Response) => {
     void (async () => {
-      const { idFavorite } = req.params;
+      const idFavorite = req.params.idFavorite;
 
       const favoriteUpdated = await Favorite.update(
         Number(idFavorite),
         req.body as IFavorite
       );
       if (favoriteUpdated) {
-        res.status(200).send('Favorite updated');
+        res.status(200).json({ id: idFavorite });
       } else if (!favoriteUpdated) {
         res.status(404).send('Favorite not found');
       } else {
@@ -74,7 +76,7 @@ favoritesRouter.delete(
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const { idFavorite } = req.params;
+        const idFavorite = req.params.idFavorite;
         const favoriteDeleted = await Favorite.destroyFavorite(
           Number(idFavorite)
         );
