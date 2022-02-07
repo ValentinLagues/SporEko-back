@@ -29,7 +29,7 @@ const setupRoutes = (app: express.Application) => {
   app.use('/sizeTypes', sizeTypesRouter);
   app.use('/conditions', conditionsRouter);
   app.use('/deliverers', deliverersRouter);
-  app.use('/delivererPrices', delivererPricesRouter);
+  app.use('/deliverer_prices', delivererPricesRouter);
   app.use('/offerDeliverers', offerDeliverersRouter);
   app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);

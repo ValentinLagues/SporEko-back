@@ -3,6 +3,7 @@ import { ResultSetHeader } from 'mysql2';
 import { ErrorHandler } from '../helpers/errors';
 import { Request, Response, NextFunction } from 'express';
 import IDelivererPrice from '../interfaces/IDelivererPrice';
+import IDeliverer from '../interfaces/IDeliverer.js';
 import Joi from 'joi';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 const validateDelivererPrice = (
@@ -98,6 +99,7 @@ const getDelivererPriceByName = (name: string) => {
     ])
     .then(([results]) => results[0]);
 }
+
 
 const create = (newDelivererPrice: IDelivererPrice): Promise<number> => {
   return connection
