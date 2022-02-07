@@ -9,7 +9,7 @@ sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const sortBy = req.query.sortBy as string;
   const order = req.query.order as string;
   const firstItem = req.query.firstItem as string;
-  const limit = req.query.limit as string;
+  const limit = req.query.limit as string; 
 
   Sport.getAll(sortBy, order, firstItem, limit)
     .then((sports: Array<ISport>) => {
@@ -55,7 +55,7 @@ sportsRouter.post(
 );
 
 sportsRouter.post(
-  '/:id/image',
+  '/:idSport/image',
   Sport.upload.single('imageSport'),
   (req: Request, res: Response, next: NextFunction) => {
     void (() => {
@@ -63,6 +63,7 @@ sportsRouter.post(
         const icon = `${req.protocol}://${req.get('host')}/imageSport/${
           req.file?.filename
         }`;
+        console.log(icon)
         res.status(201).json(icon);
       } catch (err) {
         next(err);
@@ -72,19 +73,19 @@ sportsRouter.post(
 );
 
 sportsRouter.put(
-  '/:idsport',
+  '/:idSport',
   Sport.nameIsFree,
   Sport.validateSport,
   (req: Request, res: Response) => {
     void (async () => {
-      const idsport = req.params.idSport;
+      const idSport = req.params.idSport;
 
       const sportUpdated = await Sport.update(
-        Number(idsport),
+        Number(idSport),
         req.body as ISport
       );
       if (sportUpdated) {
-        res.status(200).json({ id: idsport });
+        res.status(200).json({ id: idSport });
       } else if (!sportUpdated) {
         res.status(404).send('Sport not found');
       } else {
@@ -95,12 +96,12 @@ sportsRouter.put(
 );
 
 sportsRouter.delete(
-  '/:idsport',
+  '/:idSport',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idsport = req.params.idSport;
-        const sportDeleted = await Sport.destroy(Number(idsport));
+        const idSport = req.params.idSport;
+        const sportDeleted = await Sport.destroy(Number(idSport));
         if (sportDeleted) {
           res.status(200).send('Sport deleted');
         } else {

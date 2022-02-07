@@ -45,7 +45,7 @@ itemsRouter.get(
     Item.getItemById(Number(idItem))
       .then((item) =>
         Size.getSizesBySizeType(
-          item.id_sizeType,
+          item.id_size_type,
           Number(id_gender),
           Number(is_child)
         )

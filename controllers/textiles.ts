@@ -57,19 +57,19 @@ textilesRouter.post(
 );
 
 textilesRouter.put(
-  '/:idtextile',
+  '/:idTextile',
   Textile.nameIsFree,
   Textile.validateTextile,
   (req: Request, res: Response) => {
     void (async () => {
-      const idtextile = req.params.idTextile;
+      const idTextile = req.params.idTextile;
 
       const textileUpdated = await Textile.update(
-        Number(idtextile),
+        Number(idTextile),
         req.body as ITextile
       );
       if (textileUpdated) {
-        res.status(200).json({ id: idtextile });
+        res.status(200).json({ id: idTextile });
       } else if (!textileUpdated) {
         res.status(404).send('Textile not found');
       } else {
@@ -80,12 +80,12 @@ textilesRouter.put(
 );
 
 textilesRouter.delete(
-  '/:idtextile',
+  '/:idTextile',
   (req: Request, res: Response, next: NextFunction) => {
     void (async () => {
       try {
-        const idtextile = req.params.idTextile;
-        const textileDeleted = await Textile.destroy(Number(idtextile));
+        const idTextile = req.params.idTextile;
+        const textileDeleted = await Textile.destroy(Number(idTextile));
         if (textileDeleted) {
           res.status(200).send('Textile deleted');
         } else {
