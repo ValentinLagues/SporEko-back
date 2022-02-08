@@ -4,7 +4,7 @@ export default interface ISize extends RowDataPacket {
   id_size: number;
   id_gender: number;
   is_child: number;
-  id_size_type: number;
+  id_sizeType: number;
   size_int: string;
   size_eu: string;
   size_fr: string;

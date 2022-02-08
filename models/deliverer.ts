@@ -71,6 +71,18 @@ const getById = (idDeliverer: number): Promise<IDeliverer> => {
     .then(([results]) => results[0]);
 };
 
+const getDeliverersByIdOffer = async (
+  idOffer: number
+): Promise<IDeliverer[]> => {
+  return connection
+    .promise()
+    .query<IDeliverer[]>(
+      'SELECT d.* FROM deliverers AS d INNER JOIN offer_deliverers AS od ON d.id_deliverer = od.id_deliverer WHERE od.id_offer = ?',
+      [idOffer]
+    )
+    .then(([results]) => results);
+};
+
 const getByName = (name: string): Promise<IDeliverer> => {
   return connection
     .promise()
@@ -89,14 +101,14 @@ const create = (newDeliverer: IDeliverer): Promise<number> => {
 
 const update = (
   idDeliverer: number,
-  attibutesToUpdate: IDeliverer
+  attributesToUpdate: IDeliverer
 ): Promise<boolean> => {
   let sql = 'UPDATE deliverers SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_deliverer = ?';
   sqlValues.push(idDeliverer);
@@ -116,7 +128,7 @@ const destroy = (idDeliverer: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateDeliverer,
   getAll,
   getById,
@@ -125,4 +137,5 @@ export {
   create,
   update,
   destroy,
+  getDeliverersByIdOffer
 };

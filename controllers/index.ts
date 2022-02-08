@@ -8,15 +8,15 @@ import conditionsRouter from './conditions';
 import brandsRouter from './brands';
 import colorsRouter from './colors';
 import deliverersRouter from './deliverers';
-import deliverer_pricesRouter from './deliverer_prices';
-import offer_deliverersRouter from './offer_deliverers';
+import delivererPricesRouter from './delivererPrices';
+import offerDeliverersRouter from './offerDeliverers';
 import athleticsRouter from './athletics';
 import textilesRouter from './textiles';
 import categoriesRouter from './categories';
 import itemsRouter from './items';
 import authRouter from './auth';
 import countriesRouter from './countries';
-import size_typesRouter from './size_types';
+import sizeTypesRouter from './sizeTypes';
 import favoritesRouter from './favorites';
 
 const setupRoutes = (app: express.Application) => {
@@ -26,11 +26,11 @@ const setupRoutes = (app: express.Application) => {
   app.use('/countries', countriesRouter);
   app.use('/sports', sportsRouter);
   app.use('/sizes', sizesRouter);
-  app.use('/size_types', size_typesRouter);
+  app.use('/size_types', sizeTypesRouter);
   app.use('/conditions', conditionsRouter);
   app.use('/deliverers', deliverersRouter);
-  app.use('/deliverer_prices', deliverer_pricesRouter);
-  app.use('/offer_deliverers', offer_deliverersRouter);
+  app.use('/deliverer_prices', delivererPricesRouter);
+  app.use('/offer_deliverers', offerDeliverersRouter);
   app.use('/brands', brandsRouter);
   app.use('/colors', colorsRouter);
   app.use('/athletics', athleticsRouter);

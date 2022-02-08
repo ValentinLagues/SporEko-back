@@ -86,14 +86,14 @@ const create = async (newBrand: IBrand): Promise<number> => {
 
 const update = async (
   idBrand: number,
-  attibutesToUpdate: IBrand
+  attributesToUpdate: IBrand
 ): Promise<boolean> => {
   let sql = 'UPDATE brands SET ';
   const sqlValues: Array<string | number> = [];
 
-  if (attibutesToUpdate.name) {
+  if (attributesToUpdate.name) {
     sql += 'name = ? ';
-    sqlValues.push(attibutesToUpdate.name);
+    sqlValues.push(attributesToUpdate.name);
   }
   sql += ' WHERE id_brand = ?';
   sqlValues.push(idBrand);
@@ -111,7 +111,7 @@ const destroy = async (idBrand: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   validateBrand,
   getAll,
   getById,

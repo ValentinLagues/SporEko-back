@@ -3,7 +3,8 @@ import { ErrorHandler } from '../helpers/errors';
 import { ResultSetHeader } from 'mysql2';
 import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
-import Joi from 'joi';
+import Joi from 'joi'; 
+import { waitForDebugger } from 'inspector';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -49,9 +50,17 @@ const getAllSizes = (
   sortBy: string,
   order: string,
   firstItem: string,
-  limit: string
+  limit: string,
+  id_item: string,
+  id_size: string
 ): Promise<ISize[]> => {
   let sql = `SELECT *, id_size as id FROM sizes`;
+  let sqlValues = [];
+
+  if(id_size && id_item) {
+    sql = "SELECT CASE WHEN s.id_size_type = 1 THEN s.size_eu WHEN s.id_size_type = 2 OR s.id_size_type = 3 then CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) WHEN s.id_size_type = 6 THEN s.age_child END AS size FROM sizes s INNER JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = ? AND s.id_size = ?"
+    sqlValues.push(id_item, id_size)
+  }
 
   if (!sortBy) {
     sql += ` ORDER BY id_size ASC`;
@@ -65,7 +74,7 @@ const getAllSizes = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<ISize[]>(sql)
+    .query<ISize[]>(sql,sqlValues)
     .then(([results]) => results);
 };
 
@@ -73,16 +82,16 @@ const getSizeById = (id: number): Promise<ISize> => {
   return connection
     .promise()
     .query<ISize[]>('SELECT * FROM sizes WHERE id_size = ? ', [id])
-    .then(([result]) => result[0]);
+    .then(([result]) => result[0])
 };
 
 const getSizesBySizeType = (
-  idSize_type: number,
+  idSizeType: number,
   id_gender: number,
   is_child: number
 ) => {
   let sql = `SELECT * FROM sizes WHERE id_size_type = ?`;
-  const sqlValues: Array<string | number> = [idSize_type];
+  const sqlValues: Array<string | number> = [idSizeType];
 
   if (id_gender) {
     sql += ` AND id_gender = ?`;
@@ -125,10 +134,11 @@ const getSizesByCategory = (
   return connection
     .promise()
     .query<ISize[]>(sql)
-    .then(([results]) => results);
+    .then(([results]) => {
+      return results});
 };
 
-const createSize = (newSize: ISize): Promise<number> => {
+const create = (newSize: ISize): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
@@ -161,109 +171,109 @@ const createSize = (newSize: ISize): Promise<number> => {
 
 const updateSize = (
   idSize: number,
-  attibutesToUpdate: ISize
+  attributesToUpdate: ISize
 ): Promise<boolean> => {
   let sql = 'UPDATE sizes SET ';
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
-  if (attibutesToUpdate.id_gender) {
+  if (attributesToUpdate.id_gender) {
     sql += 'id_gender = ? ';
-    sqlValues.push(attibutesToUpdate.id_gender);
+    sqlValues.push(attributesToUpdate.id_gender);
     oneValue = true;
   }
-  if (attibutesToUpdate.is_child) {
+  if (attributesToUpdate.is_child) {
     sql += oneValue ? ', is_child = ? ' : ' is_child = ? ';
-    sqlValues.push(attibutesToUpdate.is_child);
+    sqlValues.push(attributesToUpdate.is_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.id_size_type) {
-    sql += oneValue ? ', id_size_type = ? ' : ' id_size_type = ? ';
-    sqlValues.push(attibutesToUpdate.id_size_type);
+  if (attributesToUpdate.id_sizeType) {
+    sql += oneValue ? ', id_sizeType = ? ' : ' id_sizeType = ? ';
+    sqlValues.push(attributesToUpdate.id_sizeType);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_int) {
+  if (attributesToUpdate.size_int) {
     sql += oneValue ? ', size_int = ? ' : ' size_int = ? ';
-    sqlValues.push(attibutesToUpdate.size_int);
+    sqlValues.push(attributesToUpdate.size_int);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_eu) {
+  if (attributesToUpdate.size_eu) {
     sql += oneValue ? ', size_eu = ? ' : ' size_eu = ? ';
-    sqlValues.push(attibutesToUpdate.size_eu);
+    sqlValues.push(attributesToUpdate.size_eu);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_fr) {
+  if (attributesToUpdate.size_fr) {
     sql += oneValue ? ', size_fr = ? ' : ' size_fr = ? ';
-    sqlValues.push(attibutesToUpdate.size_fr);
+    sqlValues.push(attributesToUpdate.size_fr);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_uk) {
+  if (attributesToUpdate.size_uk) {
     sql += oneValue ? ', size_uk = ? ' : ' size_uk = ? ';
-    sqlValues.push(attibutesToUpdate.size_uk);
+    sqlValues.push(attributesToUpdate.size_uk);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_us) {
+  if (attributesToUpdate.size_us) {
     sql += oneValue ? ', size_us = ? ' : ' size_us = ? ';
-    sqlValues.push(attibutesToUpdate.size_us);
+    sqlValues.push(attributesToUpdate.size_us);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_foot) {
+  if (attributesToUpdate.size_foot) {
     sql += oneValue ? ', size_foot = ? ' : ' size_foot = ? ';
-    sqlValues.push(attibutesToUpdate.size_foot);
+    sqlValues.push(attributesToUpdate.size_foot);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_chest) {
+  if (attributesToUpdate.size_chest) {
     sql += oneValue ? ', size_chest = ? ' : ' size_chest = ? ';
-    sqlValues.push(attibutesToUpdate.size_chest);
+    sqlValues.push(attributesToUpdate.size_chest);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_pool) {
+  if (attributesToUpdate.size_pool) {
     sql += oneValue ? ', size_pool = ? ' : ' size_pool = ? ';
-    sqlValues.push(attibutesToUpdate.size_pool);
+    sqlValues.push(attributesToUpdate.size_pool);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_jeans) {
+  if (attributesToUpdate.size_jeans) {
     sql += oneValue ? ', size_jeans = ? ' : ' size_jeans = ? ';
-    sqlValues.push(attibutesToUpdate.size_jeans);
+    sqlValues.push(attributesToUpdate.size_jeans);
     oneValue = true;
   }
-  if (attibutesToUpdate.age_child) {
+  if (attributesToUpdate.age_child) {
     sql += oneValue ? ', age_child = ? ' : ' age_child = ? ';
-    sqlValues.push(attibutesToUpdate.age_child);
+    sqlValues.push(attributesToUpdate.age_child);
     oneValue = true;
   }
-  if (attibutesToUpdate.height) {
+  if (attributesToUpdate.height) {
     sql += oneValue ? ', height = ? ' : ' height = ? ';
-    sqlValues.push(attibutesToUpdate.height);
+    sqlValues.push(attributesToUpdate.height);
     oneValue = true;
   }
-  if (attibutesToUpdate.hand_turn) {
+  if (attributesToUpdate.hand_turn) {
     sql += oneValue ? ', hand_turn = ? ' : ' hand_turn = ? ';
-    sqlValues.push(attibutesToUpdate.hand_turn);
+    sqlValues.push(attributesToUpdate.hand_turn);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_glove) {
+  if (attributesToUpdate.size_glove) {
     sql += oneValue ? ', size_glove = ? ' : ' size_glove = ? ';
-    sqlValues.push(attibutesToUpdate.size_glove);
+    sqlValues.push(attributesToUpdate.size_glove);
     oneValue = true;
   }
-  if (attibutesToUpdate.crotch) {
+  if (attributesToUpdate.crotch) {
     sql += oneValue ? ', crotch = ? ' : ' crotch = ? ';
-    sqlValues.push(attibutesToUpdate.crotch);
+    sqlValues.push(attributesToUpdate.crotch);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_bike_inches) {
+  if (attributesToUpdate.size_bike_inches) {
     sql += oneValue ? ', size_bike_inches = ? ' : ' size_bike_inches = ? ';
-    sqlValues.push(attibutesToUpdate.size_bike_inches);
+    sqlValues.push(attributesToUpdate.size_bike_inches);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_bike) {
+  if (attributesToUpdate.size_bike) {
     sql += oneValue ? ', size_bike = ? ' : ' size_bike = ? ';
-    sqlValues.push(attibutesToUpdate.size_bike);
+    sqlValues.push(attributesToUpdate.size_bike);
     oneValue = true;
   }
-  if (attibutesToUpdate.size_wheel) {
+  if (attributesToUpdate.size_wheel) {
     sql += oneValue ? ', size_wheel = ? ' : ' size_wheel = ? ';
-    sqlValues.push(attibutesToUpdate.size_wheel);
+    sqlValues.push(attributesToUpdate.size_wheel);
     oneValue = true;
   }
   sql += ' WHERE id_size = ?';
@@ -281,12 +291,12 @@ const deleteSize = (id: number): Promise<boolean> => {
     .then(([results]) => results.affectedRows === 1);
 };
 
-export {
+export default {
   getAllSizes,
   getSizeById,
   getSizesBySizeType,
   getSizesByCategory,
-  createSize,
+  create,
   updateSize,
   deleteSize,
   validateSize,
