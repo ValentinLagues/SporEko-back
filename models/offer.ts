@@ -128,9 +128,20 @@ const getAll = async (
   minPrice: number,
   maxPrice: number
 ): Promise<IOffer[]> => {
-  let sql = `SELECT *, id_offer as id FROM offers`;
+
+
+  let sql = `SELECT o.*, o.id_offer as id, 
+  CASE WHEN s.id_size_type = 1 THEN s.size_eu 
+  WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
+  WHEN s.id_size_type = 6 THEN s.age_child 
+  END AS size 
+  FROM offers o 
+  INNER JOIN sizes s ON o.id_size = s.id_size 
+  INNER JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item`;
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
+
+
 
   if (id_user_seller) {
     sql += ` WHERE id_user_seller = ?`;
