@@ -4,6 +4,7 @@ import { ResultSetHeader } from 'mysql2';
 import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
 import Joi from 'joi'; 
+import { waitForDebugger } from 'inspector';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 
@@ -49,9 +50,17 @@ const getAllSizes = (
   sortBy: string,
   order: string,
   firstItem: string,
-  limit: string
+  limit: string,
+  id_item: string,
+  id_size: string
 ): Promise<ISize[]> => {
   let sql = `SELECT *, id_size as id FROM sizes`;
+  let sqlValues = [];
+
+  if(id_size && id_item) {
+    sql = "SELECT CASE WHEN s.id_size_type = 1 THEN s.size_eu WHEN s.id_size_type = 2 OR s.id_size_type = 3 then CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) WHEN s.id_size_type = 6 THEN s.age_child END AS size FROM sizes s INNER JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = ? AND s.id_size = ?"
+    sqlValues.push(id_item, id_size)
+  }
 
   if (!sortBy) {
     sql += ` ORDER BY id_size ASC`;
@@ -65,7 +74,7 @@ const getAllSizes = (
   sql = sql.replace(/"/g, '');
   return connection
     .promise()
-    .query<ISize[]>(sql)
+    .query<ISize[]>(sql,sqlValues)
     .then(([results]) => results);
 };
 
@@ -73,7 +82,7 @@ const getSizeById = (id: number): Promise<ISize> => {
   return connection
     .promise()
     .query<ISize[]>('SELECT * FROM sizes WHERE id_size = ? ', [id])
-    .then(([result]) => result[0]);
+    .then(([result]) => result[0])
 };
 
 const getSizesBySizeType = (
