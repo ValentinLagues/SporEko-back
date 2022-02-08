@@ -127,7 +127,7 @@ const getAll = async (
   id_condition: number,
   minPrice: number,
   maxPrice: number
-): Promise<IOffer[]> => {
+): Promise<IOffer[]> => { 
 
 
   let sql = `SELECT o.*, o.id_offer as id, 
@@ -150,79 +150,79 @@ const getAll = async (
   }
   if (title) {
     sql += oneValue
-      ? ` AND title LIKE ?`
-      : ` WHERE title LIKE ?`;
+      ? ` AND o.title LIKE ?`
+      : ` WHERE o.title LIKE ?`;
       title = '%' + title + '%';
       sqlValues.push(title);
     oneValue = true;
   }
   if (id_sport) {
     sql += oneValue
-      ? ` AND id_sport = ?`
-      : ` WHERE id_sport = ?`;
+      ? ` AND o.id_sport = ?`
+      : ` WHERE o.id_sport = ?`;
       sqlValues.push(id_sport);
     oneValue = true;
   }
   if (id_gender) {
     sql += oneValue
-      ? ` AND id_gender = ?`
-      : ` WHERE id_gender = ?`;
+      ? ` AND o.id_gender = ?`
+      : ` WHERE o.id_gender = ?`;
       sqlValues.push(id_gender);
     oneValue = true;
   }
   if (is_child) {
     sql += oneValue
-      ? ` AND is_child = ?`
-      : ` WHERE is_child = ?`;
+      ? ` AND o.is_child = ?`
+      : ` WHERE o.is_child = ?`;
       sqlValues.push(is_child);
     oneValue = true;
   }
   if (id_category) {
     sql += oneValue
-      ? ` AND id_category = ?`
-      : ` WHERE id_category = ?`;
+      ? ` AND o.id_category = ?`
+      : ` WHERE o.id_category = ?`;
       sqlValues.push(id_category);
     oneValue = true;
   }
   if (id_item) {
     sql += oneValue
-      ? ` AND id_item = ?`
-      : ` WHERE id_item = ?`;
+      ? ` AND o.id_item = ?`
+      : ` WHERE o.id_item = ?`;
       sqlValues.push(id_item);
     oneValue = true;
   }
   if (id_brand) {
     sql += oneValue
-      ? ` AND id_brand = ?`
-      : ` WHERE id_brand = ?`;
+      ? ` AND o.id_brand = ?`
+      : ` WHERE o.id_brand = ?`;
       sqlValues.push(id_brand);
     oneValue = true;
   }
   if (id_textile) {
     sql += oneValue
-      ? ` AND id_textile = ?`
-      : ` WHERE id_textile = ?`;
+      ? ` AND o.id_textile = ?`
+      : ` WHERE o.id_textile = ?`;
       sqlValues.push(id_textile);
     oneValue = true;
   }
   if (id_size) {
     sql += oneValue
-      ? ` AND id_size = ?`
-      : ` WHERE id_size = ?`;
+      ? ` AND o.id_size = ?`
+      : ` WHERE o.id_size = ?`;
       sqlValues.push(id_size);
     oneValue = true;
   }
   if (id_color1) {
     sql += oneValue
-      ? ` AND id_color1 = ? OR id_color2 = ?`
-      : ` WHERE id_color1 = ? OR id_color2 = ?`;
+      ? ` AND o.id_color1 = ? OR o.id_color2 = ?`
+      : ` WHERE o.id_color1 = ? OR o.id_color2 = ?`;
       sqlValues.push(id_color1, id_color1);
     oneValue = true;
   }
   if (id_condition) {
     sql += oneValue
-      ? ` AND id_condition = ?`
-      : ` WHERE id_condition = ?`;
+      ? ` AND o.id_condition = ?`
+      : ` WHERE o.id_condition = ?`;
       sqlValues.push(id_condition);
     oneValue = true;
   }
@@ -230,15 +230,15 @@ const getAll = async (
   if (minPrice || minPrice === 0) {
     if (maxPrice) {
       sql += oneValue
-        ? ` AND price BETWEEN ? AND ?`
-        : ` WHERE price BETWEEN ? AND ?`;
+        ? ` AND o.price BETWEEN ? AND ?`
+        : ` WHERE o.price BETWEEN ? AND ?`;
         sqlValues.push(minPrice, maxPrice);
       oneValue = true;
     } else { 
       // for > 100€ value (no max)
       sql += oneValue
-        ? ` AND price > ?`
-        : ` WHERE price > ?`;
+        ? ` AND o.price > ?`
+        : ` WHERE o.price > ?`;
         sqlValues.push(minPrice);
       oneValue = true;
     }
@@ -253,7 +253,7 @@ const getAll = async (
   if (limit) {
     sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   }
-  sql = sql.replace(/"/g, '');
+  sql = sql.replace(/"/g, ''); 
 
   return connection
     .promise()
