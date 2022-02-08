@@ -136,8 +136,8 @@ const getAll = async (
   WHEN s.id_size_type = 6 THEN s.age_child 
   END AS size 
   FROM offers o 
-  INNER JOIN sizes s ON o.id_size = s.id_size 
-  INNER JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item`;
+  LEFT JOIN sizes s ON o.id_size = s.id_size 
+  LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item`;
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
