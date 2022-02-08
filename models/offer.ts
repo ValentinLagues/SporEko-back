@@ -237,17 +237,33 @@ const getAll = async (
 };
 
 const getById = async (idOffer: number): Promise<IOffer> => {
+  const sql = `SELECT o.*, o.id_offer as id, 
+  CASE WHEN s.id_size_type = 1 THEN s.size_eu 
+  WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
+  WHEN s.id_size_type = 6 THEN s.age_child 
+  END AS size 
+  FROM offers o 
+  LEFT JOIN sizes s ON o.id_size = s.id_size 
+  LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item WHERE id_offer = ?`;
   return connection
     .promise()
-    .query<IOffer[]>('SELECT * FROM offers WHERE id_offer = ?', [idOffer])
+    .query<IOffer[]>(sql, [idOffer])
     .then(([results]) => results[0]);
 };
 
 const getOffersByIdUser = async (idOffer: number): Promise<IOffer[]> => {
+  const sql = `SELECT o.*, o.id_offer as id, 
+  CASE WHEN s.id_size_type = 1 THEN s.size_eu 
+  WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
+  WHEN s.id_size_type = 6 THEN s.age_child 
+  END AS size 
+  FROM offers o 
+  LEFT JOIN sizes s ON o.id_size = s.id_size 
+  LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item WHERE id_user_seller = ? or id_user_buyer = ?`;
   return connection
     .promise()
     .query<IOffer[]>(
-      'SELECT * FROM offers WHERE id_user_seller = ? or id_user_buyer = ?',
+      sql,
       [idOffer, idOffer]
     )
     .then(([results]) => results);
@@ -257,7 +273,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newOffer.id_user_seller,
         newOffer.picture1,

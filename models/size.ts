@@ -4,7 +4,6 @@ import { ResultSetHeader } from 'mysql2';
 import { Request, Response, NextFunction } from 'express';
 import ISize from '../interfaces/ISize';
 import Joi from 'joi'; 
-import { waitForDebugger } from 'inspector';
 
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 

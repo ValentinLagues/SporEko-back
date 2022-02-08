@@ -76,7 +76,7 @@ const getAll = (
   firstItem: string,
   limit: string
 ): Promise<ISport[]> => {
-  let sql = `SELECT *, id_sport as id FROM sports`;
+  let sql = `SELECT *, id_sport as id FROM sports`; 
 
   if (!sortBy) {
     sql += ` ORDER BY id_sport ASC`;
