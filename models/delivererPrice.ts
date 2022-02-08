@@ -58,7 +58,7 @@ const getAllDelivererPrice = (
   weight: string
 ): Promise<IDelivererPrice[]> => {
   let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
-  let sqlValues: string[] = [];
+  const sqlValues: string[] = [];
   let oneValue = false;
   if (idDeliverer && weight) {
     sql += ` WHERE id_deliverer = ? AND ? BETWEEN min_weight AND max_weight`;
