@@ -9,8 +9,10 @@ sizesRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const order = req.query.order as string;
   const firstItem = req.query.firstItem as string;
   const limit = req.query.limit as string;
+  const id_item = req.query.id_item as string;
+  const id_size = req.query.id_size as string;
 
-  Size.getAllSizes(sortBy, order, firstItem, limit)
+  Size.getAllSizes(sortBy, order, firstItem, limit, id_item, id_size)
     .then((sizes: Array<ISize>) => {
       res.setHeader(
         'Content-Range',

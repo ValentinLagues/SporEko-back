@@ -63,7 +63,6 @@ sportsRouter.post(
         const icon = `${req.protocol}://${req.get('host')}/imageSport/${
           req.file?.filename
         }`;
-        console.log(icon)
         res.status(201).json(icon);
       } catch (err) {
         next(err);
