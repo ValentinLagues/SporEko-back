@@ -141,7 +141,7 @@ offersRouter.post(
           const url = `${req.protocol}://${req.get('host')}/${el.path}`;
           pictures.push(url);
         });
-        const offer = await { ...pictures };
+        const offer = { ...pictures };
         res.status(201).json(offer);
       } catch (err) {
         next(err);

@@ -86,7 +86,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+const fileFilter = (
+  _req: Request,
+  file: { mimetype: string },
+  cb: CallableFunction
+) => {
   //reject file
   if (
     file.mimetype === 'image/jpeg' ||
@@ -262,10 +266,7 @@ const getOffersByIdUser = async (idOffer: number): Promise<IOffer[]> => {
   LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item WHERE id_user_seller = ? or id_user_buyer = ?`;
   return connection
     .promise()
-    .query<IOffer[]>(
-      sql,
-      [idOffer, idOffer]
-    )
+    .query<IOffer[]>(sql, [idOffer, idOffer])
     .then(([results]) => results);
 };
 

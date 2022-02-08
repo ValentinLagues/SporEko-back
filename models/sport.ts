@@ -49,7 +49,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+const fileFilter = (
+  _req: Request,
+  file: { mimetype: string },
+  cb: CallableFunction
+) => {
   //reject file
   if (
     file.mimetype === 'image/jpeg' ||
@@ -76,7 +80,7 @@ const getAll = (
   firstItem: string,
   limit: string
 ): Promise<ISport[]> => {
-  let sql = `SELECT *, id_sport as id FROM sports`; 
+  let sql = `SELECT *, id_sport as id FROM sports`;
 
   if (!sortBy) {
     sql += ` ORDER BY id_sport ASC`;
