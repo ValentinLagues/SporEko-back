@@ -36,7 +36,6 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
-    hand_delivery: Joi.number().integer().min(0).max(1).presence(presence),
     is_archived: Joi.number().integer().min(0).max(1).presence(presence),
     is_draft: Joi.number().integer().min(0).max(1).presence(presence),
     picture2: Joi.string().max(255),
@@ -284,7 +283,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, hand_delivery, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newOffer.id_user_seller,
         newOffer.picture1,
@@ -303,7 +302,6 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.id_condition,
         newOffer.price,
         newOffer.weight,
-        newOffer.hand_delivery,
         newOffer.is_archived,
         newOffer.is_draft,
         newOffer.picture2,
@@ -426,11 +424,6 @@ const update = async (
   if (attributesToUpdate.purchase_date) {
     sql += oneValue ? ', purchase_date = ? ' : ' purchase_date = ? ';
     sqlValues.push(attributesToUpdate.purchase_date);
-    oneValue = true;
-  }
-  if (attributesToUpdate.hand_delivery) {
-    sql += oneValue ? ', hand_delivery = ? ' : ' hand_delivery = ? ';
-    sqlValues.push(attributesToUpdate.hand_delivery);
     oneValue = true;
   }
   if (attributesToUpdate.is_archived) {

@@ -22,7 +22,6 @@ export default interface IOffer extends RowDataPacket {
   id_weight: number;
   id_user_buyer: number;
   purchase_date: string;
-  hand_delivery: number;
   colissimo_delivery: number;
   mondial_relay_delivery: number;
   is_archived: number;

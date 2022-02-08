@@ -71,7 +71,7 @@ const getById = (idDeliverer: number): Promise<IDeliverer> => {
     .then(([results]) => results[0]);
 };
 
-const getDeliverersByIdOffer = async (
+const getDeliverersByIdOffer = (
   idOffer: number
 ): Promise<IDeliverer[]> => {
   return connection
