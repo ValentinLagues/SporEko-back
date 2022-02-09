@@ -9,7 +9,7 @@ sportsRouter.get('/', (req: Request, res: Response, next: NextFunction) => {
   const sortBy = req.query.sortBy as string;
   const order = req.query.order as string;
   const firstItem = req.query.firstItem as string;
-  const limit = req.query.limit as string; 
+  const limit = req.query.limit as string;
 
   Sport.getAll(sortBy, order, firstItem, limit)
     .then((sports: Array<ISport>) => {
@@ -61,7 +61,7 @@ sportsRouter.post(
     void (() => {
       try {
         const icon = `${req.protocol}://${req.get('host')}/imageSport/${
-          req.file?.filename
+          req.file?.filename || ''
         }`;
         res.status(201).json(icon);
       } catch (err) {
