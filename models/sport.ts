@@ -49,7 +49,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+const fileFilter = (
+  _req: Request,
+  file: { mimetype: string },
+  cb: CallableFunction
+) => {
   //reject file
   if (
     file.mimetype === 'image/jpeg' ||

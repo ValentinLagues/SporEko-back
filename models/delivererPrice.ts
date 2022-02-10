@@ -3,7 +3,6 @@ import { ResultSetHeader } from 'mysql2';
 import { ErrorHandler } from '../helpers/errors';
 import { Request, Response, NextFunction } from 'express';
 import IDelivererPrice from '../interfaces/IDelivererPrice';
-import IDeliverer from '../interfaces/IDeliverer.js';
 import Joi from 'joi';
 /* ------------------------------------------------Midlleware----------------------------------------------------------- */
 const validateDelivererPrice = (
@@ -58,12 +57,10 @@ const getAllDelivererPrice = (
   weight: string
 ): Promise<IDelivererPrice[]> => {
   let sql = `SELECT *, id_deliverer_price as id FROM deliverer_prices`;
-  let sqlValues: string[] = [];
-  let oneValue = false;
+  const sqlValues: string[] = [];
   if (idDeliverer && weight) {
     sql += ` WHERE id_deliverer = ? AND ? BETWEEN min_weight AND max_weight`;
     sqlValues.push(idDeliverer, weight);
-    oneValue = true;
   }
   if (!sortBy) {
     sql += ` ORDER BY id_deliverer_price ASC`;

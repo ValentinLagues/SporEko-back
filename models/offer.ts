@@ -36,28 +36,27 @@ const validateOffer = (req: Request, res: Response, next: NextFunction) => {
     weight: Joi.number().integer(),
     id_user_buyer: Joi.number().integer(),
     purchase_date: Joi.string().max(255),
-    hand_delivery: Joi.number().integer().min(0).max(1).presence(presence),
     is_archived: Joi.number().integer().min(0).max(1).presence(presence),
     is_draft: Joi.number().integer().min(0).max(1).presence(presence),
-    picture2: Joi.string().max(255),
-    picture3: Joi.string().max(255),
-    picture4: Joi.string().max(255),
-    picture5: Joi.string().max(255),
-    picture6: Joi.string().max(255),
-    picture7: Joi.string().max(255),
-    picture8: Joi.string().max(255),
-    picture9: Joi.string().max(255),
-    picture10: Joi.string().max(255),
-    picture11: Joi.string().max(255),
-    picture12: Joi.string().max(255),
-    picture13: Joi.string().max(255),
-    picture14: Joi.string().max(255),
-    picture15: Joi.string().max(255),
-    picture16: Joi.string().max(255),
-    picture17: Joi.string().max(255),
-    picture18: Joi.string().max(255),
-    picture19: Joi.string().max(255),
-    picture20: Joi.string().max(255),
+    picture2: Joi.string().max(255).allow(null),
+    picture3: Joi.string().max(255).allow(null),
+    picture4: Joi.string().max(255).allow(null),
+    picture5: Joi.string().max(255).allow(null),
+    picture6: Joi.string().max(255).allow(null),
+    picture7: Joi.string().max(255).allow(null),
+    picture8: Joi.string().max(255).allow(null),
+    picture9: Joi.string().max(255).allow(null),
+    picture10: Joi.string().max(255).allow(null),
+    picture11: Joi.string().max(255).allow(null),
+    picture12: Joi.string().max(255).allow(null),
+    picture13: Joi.string().max(255).allow(null),
+    picture14: Joi.string().max(255).allow(null),
+    picture15: Joi.string().max(255).allow(null),
+    picture16: Joi.string().max(255).allow(null),
+    picture17: Joi.string().max(255).allow(null),
+    picture18: Joi.string().max(255).allow(null),
+    picture19: Joi.string().max(255).allow(null),
+    picture20: Joi.string().max(255).allow(null),
   }).validate(req.body, { abortEarly: false }).error;
   if (errors) {
     next(new ErrorHandler(422, errors.message));
@@ -87,7 +86,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (_req: Request, file: any, cb: CallableFunction) => {
+const fileFilter = (
+  _req: Request,
+  file: { mimetype: string },
+  cb: CallableFunction
+) => {
   //reject file
   if (
     file.mimetype === 'image/jpeg' ||
@@ -127,9 +130,7 @@ const getAll = async (
   id_condition: number,
   minPrice: number,
   maxPrice: number
-): Promise<IOffer[]> => { 
-
-
+): Promise<IOffer[]> => {
   let sql = `SELECT o.*, o.id_offer as id, 
   CASE WHEN s.id_size_type = 1 THEN s.size_eu 
   WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
@@ -141,89 +142,67 @@ const getAll = async (
   const sqlValues: Array<string | number> = [];
   let oneValue = false;
 
-
-
   if (id_user_seller) {
     sql += ` WHERE id_user_seller = ?`;
     sqlValues.push(id_user_seller);
     oneValue = true;
   }
   if (title) {
-    sql += oneValue
-      ? ` AND o.title LIKE ?`
-      : ` WHERE o.title LIKE ?`;
-      title = '%' + title + '%';
-      sqlValues.push(title);
+    sql += oneValue ? ` AND o.title LIKE ?` : ` WHERE o.title LIKE ?`;
+    title = '%' + title + '%';
+    sqlValues.push(title);
     oneValue = true;
   }
   if (id_sport) {
-    sql += oneValue
-      ? ` AND o.id_sport = ?`
-      : ` WHERE o.id_sport = ?`;
-      sqlValues.push(id_sport);
+    sql += oneValue ? ` AND o.id_sport = ?` : ` WHERE o.id_sport = ?`;
+    sqlValues.push(id_sport);
     oneValue = true;
   }
   if (id_gender) {
-    sql += oneValue
-      ? ` AND o.id_gender = ?`
-      : ` WHERE o.id_gender = ?`;
-      sqlValues.push(id_gender);
+    sql += oneValue ? ` AND o.id_gender = ?` : ` WHERE o.id_gender = ?`;
+    sqlValues.push(id_gender);
     oneValue = true;
   }
   if (is_child) {
-    sql += oneValue
-      ? ` AND o.is_child = ?`
-      : ` WHERE o.is_child = ?`;
-      sqlValues.push(is_child);
+    sql += oneValue ? ` AND o.is_child = ?` : ` WHERE o.is_child = ?`;
+    sqlValues.push(is_child);
     oneValue = true;
   }
   if (id_category) {
-    sql += oneValue
-      ? ` AND o.id_category = ?`
-      : ` WHERE o.id_category = ?`;
-      sqlValues.push(id_category);
+    sql += oneValue ? ` AND o.id_category = ?` : ` WHERE o.id_category = ?`;
+    sqlValues.push(id_category);
     oneValue = true;
   }
   if (id_item) {
-    sql += oneValue
-      ? ` AND o.id_item = ?`
-      : ` WHERE o.id_item = ?`;
-      sqlValues.push(id_item);
+    sql += oneValue ? ` AND o.id_item = ?` : ` WHERE o.id_item = ?`;
+    sqlValues.push(id_item);
     oneValue = true;
   }
   if (id_brand) {
-    sql += oneValue
-      ? ` AND o.id_brand = ?`
-      : ` WHERE o.id_brand = ?`;
-      sqlValues.push(id_brand);
+    sql += oneValue ? ` AND o.id_brand = ?` : ` WHERE o.id_brand = ?`;
+    sqlValues.push(id_brand);
     oneValue = true;
   }
   if (id_textile) {
-    sql += oneValue
-      ? ` AND o.id_textile = ?`
-      : ` WHERE o.id_textile = ?`;
-      sqlValues.push(id_textile);
+    sql += oneValue ? ` AND o.id_textile = ?` : ` WHERE o.id_textile = ?`;
+    sqlValues.push(id_textile);
     oneValue = true;
   }
   if (id_size) {
-    sql += oneValue
-      ? ` AND o.id_size = ?`
-      : ` WHERE o.id_size = ?`;
-      sqlValues.push(id_size);
+    sql += oneValue ? ` AND o.id_size = ?` : ` WHERE o.id_size = ?`;
+    sqlValues.push(id_size);
     oneValue = true;
   }
   if (id_color1) {
     sql += oneValue
       ? ` AND o.id_color1 = ? OR o.id_color2 = ?`
       : ` WHERE o.id_color1 = ? OR o.id_color2 = ?`;
-      sqlValues.push(id_color1, id_color1);
+    sqlValues.push(id_color1, id_color1);
     oneValue = true;
   }
   if (id_condition) {
-    sql += oneValue
-      ? ` AND o.id_condition = ?`
-      : ` WHERE o.id_condition = ?`;
-      sqlValues.push(id_condition);
+    sql += oneValue ? ` AND o.id_condition = ?` : ` WHERE o.id_condition = ?`;
+    sqlValues.push(id_condition);
     oneValue = true;
   }
 
@@ -232,14 +211,12 @@ const getAll = async (
       sql += oneValue
         ? ` AND o.price BETWEEN ? AND ?`
         : ` WHERE o.price BETWEEN ? AND ?`;
-        sqlValues.push(minPrice, maxPrice);
+      sqlValues.push(minPrice, maxPrice);
       oneValue = true;
-    } else { 
+    } else {
       // for > 100€ value (no max)
-      sql += oneValue
-        ? ` AND o.price > ?`
-        : ` WHERE o.price > ?`;
-        sqlValues.push(minPrice);
+      sql += oneValue ? ` AND o.price > ?` : ` WHERE o.price > ?`;
+      sqlValues.push(minPrice);
       oneValue = true;
     }
   }
@@ -253,7 +230,7 @@ const getAll = async (
   if (limit) {
     sql += ` LIMIT ${limit} OFFSET ${firstItem}`;
   }
-  sql = sql.replace(/"/g, ''); 
+  sql = sql.replace(/"/g, '');
 
   return connection
     .promise()
@@ -264,19 +241,32 @@ const getAll = async (
 };
 
 const getById = async (idOffer: number): Promise<IOffer> => {
+  const sql = `SELECT o.*, o.id_offer as id, 
+  CASE WHEN s.id_size_type = 1 THEN s.size_eu 
+  WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
+  WHEN s.id_size_type = 6 THEN s.age_child 
+  END AS size 
+  FROM offers o 
+  LEFT JOIN sizes s ON o.id_size = s.id_size 
+  LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item WHERE id_offer = ?`;
   return connection
     .promise()
-    .query<IOffer[]>('SELECT * FROM offers WHERE id_offer = ?', [idOffer])
+    .query<IOffer[]>(sql, [idOffer])
     .then(([results]) => results[0]);
 };
 
 const getOffersByIdUser = async (idOffer: number): Promise<IOffer[]> => {
+  const sql = `SELECT o.*, o.id_offer as id, 
+  CASE WHEN s.id_size_type = 1 THEN s.size_eu 
+  WHEN s.id_size_type = 2 OR s.id_size_type = 3 THEN CONCAT(s.size_int, '/', s.size_eu, '/', s.size_uk) 
+  WHEN s.id_size_type = 6 THEN s.age_child 
+  END AS size 
+  FROM offers o 
+  LEFT JOIN sizes s ON o.id_size = s.id_size 
+  LEFT JOIN items i ON i.id_size_type = s.id_size_type AND i.id_item = o.id_item WHERE id_user_seller = ? or id_user_buyer = ?`;
   return connection
     .promise()
-    .query<IOffer[]>(
-      'SELECT * FROM offers WHERE id_user_seller = ? or id_user_buyer = ?',
-      [idOffer, idOffer]
-    )
+    .query<IOffer[]>(sql, [idOffer, idOffer])
     .then(([results]) => results);
 };
 
@@ -284,7 +274,7 @@ const create = async (newOffer: IOffer): Promise<number> => {
   return connection
     .promise()
     .query<ResultSetHeader>(
-      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, hand_delivery, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO offers (id_user_seller, picture1, title, description, id_sport, id_gender, is_child, id_category, id_item, id_brand, id_textile, id_size, id_color1, id_color2, id_condition, price, weight, is_archived, is_draft, picture2, picture3, picture4, picture5, picture6, picture7, picture8, picture9, picture10, picture11, picture12, picture13, picture14, picture15, picture16, picture17, picture18, picture19, picture20) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         newOffer.id_user_seller,
         newOffer.picture1,
@@ -303,7 +293,6 @@ const create = async (newOffer: IOffer): Promise<number> => {
         newOffer.id_condition,
         newOffer.price,
         newOffer.weight,
-        newOffer.hand_delivery,
         newOffer.is_archived,
         newOffer.is_draft,
         newOffer.picture2,
@@ -426,11 +415,6 @@ const update = async (
   if (attributesToUpdate.purchase_date) {
     sql += oneValue ? ', purchase_date = ? ' : ' purchase_date = ? ';
     sqlValues.push(attributesToUpdate.purchase_date);
-    oneValue = true;
-  }
-  if (attributesToUpdate.hand_delivery) {
-    sql += oneValue ? ', hand_delivery = ? ' : ' hand_delivery = ? ';
-    sqlValues.push(attributesToUpdate.hand_delivery);
     oneValue = true;
   }
   if (attributesToUpdate.is_archived) {
